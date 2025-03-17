@@ -3,186 +3,119 @@
 <head>
 <meta charset="UTF-8">
 <title>宋珏清</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #0a0a0a;
+    color: #ffffff;
+    text-align: center;
+    padding: 20px;
+  }
+  h1, h2 {
+    color: #00bfff;
+  }
+  input {
+    padding: 10px;
+    margin: 10px;
+    border: 1px solid #00bfff;
+    border-radius: 5px;
+    background-color: #222;
+    color: white;
+  }
+  button {
+    background-color: #00bfff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #0080ff;
+  }
+  p {
+    font-size: 18px;
+  }
+</style>
 <script>
 // 正态分布函数
 function normalCDF(mean, sigma, x) {
   var z = (x - mean) / Math.sqrt(2 * sigma * sigma);
   var t = 1 / (1 + 0.3275911 * Math.abs(z));
-  var a1 = 0.254829592;
-  var a2 = -0.284496736;
-  var a3 = 1.421413741;
-  var a4 = -1.453152027;
-  var a5 = 1.061405429;
+  var a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741, a4 = -1.453152027, a5 = 1.061405429;
   var erf = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-z * z);
-  var sign = 1;
-  if (z < 0) {
-    sign = -1;
-  }
+  var sign = z < 0 ? -1 : 1;
   return (1/2) * (1 + sign * erf);
 }
 
-// 计算立定跳远击败的百分比
-function calculateScore() {
-  var score = document.getElementById('score').value;
-  var mean = 219.8; // 平均值
-  var sigma = 23.3; // 标准差
-  var percentage = normalCDF(mean, sigma, score);
+// 计算函数集合
+function calculateScore(inputId, outputId, mean, sigma, reverse = false) {
+  var value = document.getElementById(inputId).value;
+  var percentage = normalCDF(mean, sigma, value);
+  if (reverse) percentage = 1 - percentage;
   var result = '击败 ' + (percentage * 100).toFixed(2) + '% 的中国男大学生';
-// 如果击败的百分比超过90%，加上特别的赞美
-  if (percentage > 0.9) {
-    result += '，您真是天赋异禀。';
-  }
-  document.getElementById('result').innerHTML = result;
-}
-
-// 计算身高击败的百分比
-function calculateHeightScore() {
-  var height = document.getElementById('height').value;
-  var mean = 173.14; // 平均值
-  var sigma = 6.34; // 标准差
-  var percentage = normalCDF(mean, sigma, height);
-  var result = '击败 ' + (percentage * 100).toFixed(2) + '% 的中国男大学生';
-  document.getElementById('heightResult').innerHTML = result;
-}
-
-// 计算握力击败的百分比
-function calculateGripScore() {
-  var grip = document.getElementById('grip').value;
-  var mean = 41.83; // 平均值
-  var sigma = 8.22; // 标准差
-  var percentage = normalCDF(mean, sigma, grip);
-  var result = '击败 ' + (percentage * 100).toFixed(2) + '% 的中国男大学生';
-// 如果击败的百分比超过90%，加上特别的赞美
-  if (percentage > 0.9) {
-    result += '，您真是天赋异禀。';
-  }
-  document.getElementById('gripResult').innerHTML = result;
-}
-
-// 计算1000米跑击败的百分比
-function calculateRunScore() {
-  var runTime = document.getElementById('runTime').value;
-  var mean = 274.25; // 平均值
-  var sigma = 42.94; // 标准差
-  var percentage = 1 - normalCDF(mean, sigma, runTime); // 使用补数
-  var result = '击败 ' + (percentage * 100).toFixed(2) + '% 的中国男大学生';
-// 如果击败的百分比超过90%，加上特别的赞美
-  if (percentage > 0.9) {
-    result += '，您真是天赋异禀。';
-  }
-  document.getElementById('runResult').innerHTML = result;
-}
-// 计算肺活量击败的百分比
-function calculateLungCapacityScore() {
-  var lungCapacity = document.getElementById('lungCapacity').value;
-  var mean = 4063.4; // 平均值
-  var sigma = 814.7; // 标准差
-  var percentage = normalCDF(mean, sigma, lungCapacity);
-  var result = '击败 ' + (percentage * 100).toFixed(2) + '% 的中国男大学生';
-  document.getElementById('lungCapacityResult').innerHTML = result;
-}
-// 计算胸围击败的百分比
-function calculateChestScore() {
-  var chest = document.getElementById('chest').value;
-  var mean = 87.75; // 平均值
-  var sigma = 7.91; // 标准差
-  var percentage = normalCDF(mean, sigma, chest);
-  var result = '击败 ' + (percentage * 100).toFixed(2) + '% 的中国男大学生';
-  // 如果击败的百分比超过90%，加上特别的赞美
-  if (percentage > 0.9) {
-    result += '，您真是个壮汉。';
-  }
-document.getElementById('chestResult').innerHTML = result;
-}
-
-// 计算腰围击败的百分比
-function calculateWaistScore() {
-  var waist = document.getElementById('waist').value;
-  var mean = 77.71; // 平均值
-  var sigma = 10.04; // 标准差
-  var percentage = normalCDF(mean, sigma, waist);
-  var result = '击败 ' + (percentage * 100).toFixed(2) + '% 的中国男大学生';
-  document.getElementById('waistResult').innerHTML = result;
-}
-
-// 计算臀围击败的百分比
-function calculateHipScore() {
-  var hip = document.getElementById('hip').value;
-  var mean = 93.63; // 平均值
-  var sigma = 7.93; // 标准差
-  var percentage = normalCDF(mean, sigma, hip);
-  var result = '击败 ' + (percentage * 100).toFixed(2) + '% 的中国男大学生';
-  document.getElementById('hipResult').innerHTML = result;
-}
-function calculateHeheScore() {
-  var hehe = document.getElementById('hehe').value;
-  var mean = 12.42; // 平均值
-  var sigma = 1.63; // 标准差
-  var percentage = normalCDF(mean, sigma, hehe);
-  var result = '击败 ' + (percentage * 100).toFixed(2) + '% 的中国男性';
-// 如果击败的百分比超过90%，加上特别的赞美
-  if (percentage > 0.9) {
-    result += '，您真是天赋异禀。';
-  }
-  document.getElementById('heheResult').innerHTML = result;
-}
-
-// 计算体测总分击败的百分比
-function calculateTotalScore() {
-  var totalScore = document.getElementById('totalScore').value;
-  var mean = 64; // 平均值
-  var sigma = 9.55; // 标准差
-  var percentage = normalCDF(mean, sigma, totalScore);
-  var result = '您的体测总分击败了 ' + (percentage * 100).toFixed(2) + '% 的中国男大学生';
-  document.getElementById('totalScoreResult').innerHTML = result;
+  if (percentage > 0.9) result += '，您真是天赋异禀。';
+  document.getElementById(outputId).innerHTML = result;
 }
 </script>
 </head>
 <body>
-<h1>【宋珏清】体测成绩计算器【全网最准，官方认证】</h1>
-<h1>看看你打败了多少中国男大学生</h1>
+<h1>【宋珏清】体测成绩计算器</h1>
+<h2>看看你打败了多少中国男大学生</h2>
 <p>*数据来源：《2019中国学生体质与健康调研报告》</p>
 <p>*具体百分位因为地区不同有细微差异</p>
 <h2 style="color: blue;">*抖音关注@SJQ</h2>
+
 <h2>身高（cm）</h2>
 <input type="number" id="height" placeholder="请输入您的身高">
-<button onclick="calculateHeightScore()">计算</button>
+<button onclick="calculateScore('height', 'heightResult', 173.14, 6.34)">计算</button>
 <p id="heightResult"></p>
+
 <h2>dd长度（单位：cm）</h2>
 <input type="number" id="hehe" placeholder="请输入您的dd长度">
-<button onclick="calculateHeheScore()">计算</button>
+<button onclick="calculateScore('hehe', 'heheResult', 12.72, 1.63)">计算</button>
 <p id="heheResult"></p>
-<h2>肺活量 单位（ml）</h2>
+
+<h2>肺活量（ml）</h2>
 <input type="number" id="lungCapacity" placeholder="请输入您的肺活量">
-<button onclick="calculateLungCapacityScore()">计算</button>
+<button onclick="calculateScore('lungCapacity', 'lungCapacityResult', 4063.4, 814.7)">计算</button>
 <p id="lungCapacityResult"></p>
+
 <h2>胸围（cm）</h2>
 <input type="number" id="chest" placeholder="请输入您的胸围">
-<button onclick="calculateChestScore()">计算</button>
+<button onclick="calculateScore('chest', 'chestResult', 87.75, 7.91)">计算</button>
 <p id="chestResult"></p>
+
 <h2>腰围（cm）</h2>
 <input type="number" id="waist" placeholder="请输入您的腰围">
-<button onclick="calculateWaistScore()">计算</button>
+<button onclick="calculateScore('waist', 'waistResult', 77.71, 10.04)">计算</button>
 <p id="waistResult"></p>
+
 <h2>臀围（cm）</h2>
 <input type="number" id="hip" placeholder="请输入您的臀围">
-<button onclick="calculateHipScore()">计算</button>
+<button onclick="calculateScore('hip', 'hipResult', 93.63, 7.93)">计算</button>
 <p id="hipResult"></p>
-<h2>立定跳远 单位（cm）</h2>
+
+<h2>立定跳远（cm）</h2>
 <input type="number" id="score" placeholder="请输入您的立定跳远成绩">
-<button onclick="calculateScore()">计算</button>
+<button onclick="calculateScore('score', 'result', 219.8, 23.3)">计算</button>
 <p id="result"></p>
-<h2>握力 单位（kg）</h2>
+
+<h2>握力（kg）</h2>
 <input type="number" id="grip" placeholder="请输入您的握力值">
-<button onclick="calculateGripScore()">计算</button>
+<button onclick="calculateScore('grip', 'gripResult', 41.83, 8.22)">计算</button>
 <p id="gripResult"></p>
-<h2>1000米跑 单位（秒）</h2>
+
+<h2>1000米跑（秒）</h2>
 <input type="number" id="runTime" placeholder="请输入您的1000米跑成绩">
-<button onclick="calculateRunScore()">计算</button>
+<button onclick="calculateScore('runTime', 'runResult', 274.25, 42.94, true)">计算</button>
 <p id="runResult"></p>
+
 <h2>体测总分</h2>
 <input type="number" id="totalScore" placeholder="请输入您的体测总分">
-<button onclick="calculateTotalScore()">计算</button>
+<button onclick="calculateScore('totalScore', 'totalScoreResult', 64, 9.55)">计算</button>
 <p id="totalScoreResult"></p>
 </body>
 </html>
+
