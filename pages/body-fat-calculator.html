@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>宋珏清 | 体脂率计算器</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+      background-color: #0a0a0a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(0, 191, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(0, 100, 255, 0.06) 0%, transparent 50%);
+      z-index: -1;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0, 191, 255, 0.15);
+      z-index: 1000;
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .nav-brand {
+      font-size: 20px;
+      font-weight: 700;
+      color: #00bfff;
+      text-decoration: none;
+      letter-spacing: 2px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: #aaa;
+      text-decoration: none;
+      font-size: 15px;
+      transition: color 0.3s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #00bfff;
+      transition: width 0.3s;
+    }
+
+    .nav-links a:hover { color: #00bfff; }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: #00bfff; }
+    .nav-links a.active::after { width: 100%; }
+
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: #00bfff;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 600px) {
+      .menu-toggle { display: block; }
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        width: 100%;
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: 20px;
+        gap: 16px;
+        border-bottom: 1px solid rgba(0, 191, 255, 0.15);
+      }
+      .nav-links.open { display: flex; }
+    }
+
+    .page-container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 100px 24px 60px;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .page-header h1 span { color: #00bfff; }
+
+    .page-header p {
+      color: #888;
+      font-size: 15px;
+    }
+
+    .calc-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(0, 191, 255, 0.1);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 16px;
+      transition: all 0.3s;
+    }
+
+    .calc-item:hover {
+      border-color: rgba(0, 191, 255, 0.25);
+      background: rgba(0, 191, 255, 0.03);
+    }
+
+    .calc-item h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+
+    .input-group {
+      margin-bottom: 14px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 14px;
+      color: #aaa;
+      margin-bottom: 6px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid rgba(0, 191, 255, 0.3);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .input-group input:focus {
+      border-color: #00bfff;
+      box-shadow: 0 0 0 3px rgba(0, 191, 255, 0.1);
+    }
+
+    .input-group input::placeholder { color: #555; }
+
+    .calc-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #00bfff, #0080ff);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 4px;
+    }
+
+    .calc-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(0, 191, 255, 0.3);
+    }
+
+    .calc-btn:active { transform: translateY(0); }
+
+    .results {
+      margin-top: 20px;
+      display: none;
+    }
+
+    .results.show { display: block; }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .result-row:last-child { border-bottom: none; }
+
+    .result-label {
+      font-size: 15px;
+      color: #aaa;
+    }
+
+    .result-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: #00bfff;
+    }
+
+    .result-value .unit {
+      font-size: 13px;
+      font-weight: 400;
+      color: #888;
+      margin-left: 4px;
+    }
+
+    .level-tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
+    .level-lean { background: rgba(0, 191, 255, 0.15); color: #00bfff; }
+    .level-normal { background: rgba(0, 255, 136, 0.15); color: #00ff88; }
+    .level-over { background: rgba(255, 193, 7, 0.15); color: #ffc107; }
+    .level-high { background: rgba(255, 87, 34, 0.15); color: #ff5722; }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #888;
+      text-decoration: none;
+      font-size: 14px;
+      margin-bottom: 32px;
+      transition: color 0.3s;
+    }
+
+    .back-link:hover { color: #00bfff; }
+
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 40px;
+      text-align: center;
+      color: #555;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="../index.html" class="nav-brand">宋珏清</a>
+    <button class="menu-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="fitness-calculator.html">体测计算器</a></li>
+      <li><a href="body-fat-calculator.html" class="active">体脂率计算器</a></li>
+      <li><a href="records.html">个人记录</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-container">
+    <a href="../index.html" class="back-link">← 返回首页</a>
+
+    <div class="page-header">
+      <h1>体脂率<span>计算器</span></h1>
+      <p>输入身高、体重、腰围，自动计算体脂率、去脂肪体重和 FFMI</p>
+    </div>
+
+    <div class="calc-item">
+      <h3>📏 身体数据</h3>
+      <div class="input-group">
+        <label>身高（cm）</label>
+        <input type="number" id="height" placeholder="例如：175" min="100" max="250">
+      </div>
+      <div class="input-group">
+        <label>体重（kg）</label>
+        <input type="number" id="weight" placeholder="例如：70" min="30" max="300">
+      </div>
+      <div class="input-group">
+        <label>腰围（cm）</label>
+        <input type="number" id="waist" placeholder="例如：80" min="50" max="200">
+      </div>
+      <button class="calc-btn" onclick="calculate()">计算</button>
+
+      <div class="results" id="results">
+        <div class="result-row">
+          <span class="result-label">体脂率</span>
+          <span class="result-value" id="bfPercent">--<span class="unit">%</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">去脂肪体重</span>
+          <span class="result-value" id="lbm">--<span class="unit">kg</span></span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">FFMI（去脂体重指数）</span>
+          <span class="result-value" id="ffmi">--<span class="unit">kg/m²</span></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>© 2025 宋珏清 · Built with ❤️</p>
+  </footer>
+
+  <script>
+    function calculate() {
+      var height = parseFloat(document.getElementById('height').value);
+      var weight = parseFloat(document.getElementById('weight').value);
+      var waist = parseFloat(document.getElementById('waist').value);
+
+      if (!height || !weight || !waist) return;
+
+      // 体脂率 = (0.941 * (腰围/身高) - 0.2452) * 100
+      var bfDecimal = 0.941 * (waist / height) - 0.2452;
+      var bfPercent = bfDecimal * 100;
+
+      // 去脂肪体重 = (1 - 体脂率小数) * 体重 - 0.7
+      var lbm = (1 - bfDecimal) * weight - 0.7;
+
+      // FFMI = 去脂肪体重 / 身高²（身高转米）
+      var heightM = height / 100;
+      var ffmi = lbm / (heightM * heightM);
+
+      // 体脂等级
+      var levelText = '';
+      var levelClass = '';
+      if (bfPercent < 10) { levelText = '偏低'; levelClass = 'level-lean'; }
+      else if (bfPercent < 20) { levelText = '正常'; levelClass = 'level-normal'; }
+      else if (bfPercent < 25) { levelText = '偏高'; levelClass = 'level-over'; }
+      else { levelText = '过高'; levelClass = 'level-high'; }
+
+      document.getElementById('bfPercent').innerHTML =
+        bfPercent.toFixed(2) + '<span class="unit">%</span> ' +
+        '<span class="level-tag ' + levelClass + '">' + levelText + '</span>';
+      document.getElementById('lbm').innerHTML =
+        lbm.toFixed(1) + '<span class="unit">kg</span>';
+      document.getElementById('ffmi').innerHTML =
+        ffmi.toFixed(1) + '<span class="unit">kg/m²</span>';
+
+      document.getElementById('results').classList.add('show');
+    }
+
+    // 回车触发计算
+    document.querySelectorAll('input').forEach(function(input) {
+      input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') calculate();
+      });
+    });
+  </script>
+
+</body>
+</html>
