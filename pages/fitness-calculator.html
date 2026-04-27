@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>宋珏清 | 体测成绩计算器</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+      background-color: #0a0a0a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: 
+        radial-gradient(ellipse at 20% 50%, rgba(0, 191, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(0, 100, 255, 0.06) 0%, transparent 50%);
+      z-index: -1;
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0, 191, 255, 0.15);
+      z-index: 1000;
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .nav-brand {
+      font-size: 20px;
+      font-weight: 700;
+      color: #00bfff;
+      text-decoration: none;
+      letter-spacing: 2px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: #aaa;
+      text-decoration: none;
+      font-size: 15px;
+      transition: color 0.3s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #00bfff;
+      transition: width 0.3s;
+    }
+
+    .nav-links a:hover { color: #00bfff; }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: #00bfff; }
+    .nav-links a.active::after { width: 100%; }
+
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: #00bfff;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    
+    /* Dropdown menu */
+    .nav-dropdown { position: relative; }
+    .nav-dropdown > a { cursor: pointer; }
+    .nav-dropdown > a::after { content: ' \25BE'; font-size: 10px; }
+    .nav-dropdown-menu {
+      display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+      background: rgba(10,10,10,0.95); backdrop-filter: blur(20px);
+      border: 1px solid rgba(0,191,255,0.15); border-radius: 10px;
+      padding: 8px 0; min-width: 160px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+    .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+    .nav-dropdown-menu a {
+      display: block; padding: 10px 20px; color: #aaa; text-decoration: none;
+      font-size: 14px; transition: all 0.2s; white-space: nowrap;
+    }
+    .nav-dropdown-menu a::after { display: none !important; }
+    .nav-dropdown-menu a:hover { color: #00bfff; background: rgba(0,191,255,0.08); }
+    .nav-dropdown-menu a.active { color: #00bfff; font-weight: 600; }
+
+
+    @media (max-width: 600px) {
+      .nav-dropdown-menu {
+        position: static; transform: none; background: transparent;
+        border: none; box-shadow: none; padding: 0 0 0 16px;
+        display: block !important;
+      }
+      .nav-dropdown-menu a { padding: 8px 0; }
+    }
+
+@media (max-width: 600px) {
+      .menu-toggle { display: block; }
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        width: 100%;
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: 20px;
+        gap: 16px;
+        border-bottom: 1px solid rgba(0, 191, 255, 0.15);
+      }
+      .nav-links.open { display: flex; }
+    }
+
+    /* Main content */
+    .page-container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 100px 24px 60px;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .page-header h1 span {
+      color: #00bfff;
+    }
+
+    .page-header h2 {
+      font-size: 16px;
+      font-weight: 400;
+      color: #888;
+    }
+
+    .page-header .douyin {
+      color: #00bfff;
+      font-size: 14px;
+      margin-top: 12px;
+    }
+
+    .page-header .source {
+      font-size: 13px;
+      color: #666;
+      margin-top: 8px;
+    }
+
+    /* Calculator items */
+    .calc-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(0, 191, 255, 0.1);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 16px;
+      transition: all 0.3s;
+    }
+
+    .calc-item:hover {
+      border-color: rgba(0, 191, 255, 0.25);
+      background: rgba(0, 191, 255, 0.03);
+    }
+
+    .calc-item h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .calc-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .calc-row input {
+      flex: 1;
+      min-width: 180px;
+      padding: 12px 16px;
+      border: 1px solid rgba(0, 191, 255, 0.3);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .calc-row input:focus {
+      border-color: #00bfff;
+      box-shadow: 0 0 0 3px rgba(0, 191, 255, 0.1);
+    }
+
+    .calc-row input::placeholder {
+      color: #555;
+    }
+
+    .calc-row button {
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #00bfff, #0080ff);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .calc-row button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(0, 191, 255, 0.3);
+    }
+
+    .calc-row button:active {
+      transform: translateY(0);
+    }
+
+    .calc-result {
+      margin-top: 12px;
+      font-size: 15px;
+      color: #00bfff;
+      min-height: 22px;
+      font-weight: 500;
+    }
+
+    /* Back link */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #888;
+      text-decoration: none;
+      font-size: 14px;
+      margin-bottom: 32px;
+      transition: color 0.3s;
+    }
+
+    .back-link:hover {
+      color: #00bfff;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 40px;
+      text-align: center;
+      color: #555;
+      font-size: 14px;
+    }
+  </style>
+  <script>
+    // Normal distribution CDF
+    function normalCDF(mean, sigma, x) {
+      var z = (x - mean) / Math.sqrt(2 * sigma * sigma);
+      var t = 1 / (1 + 0.3275911 * Math.abs(z));
+      var a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741, a4 = -1.453152027, a5 = 1.061405429;
+      var erf = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-z * z);
+      var sign = z < 0 ? -1 : 1;
+      return (1/2) * (1 + sign * erf);
+    }
+
+    function calculateScore(inputId, outputId, mean, sigma, reverse = false) {
+      var value = document.getElementById(inputId).value;
+      if (!value) return;
+      var percentage = normalCDF(mean, sigma, value);
+      if (reverse) percentage = 1 - percentage;
+      var result = '击败 ' + (percentage * 100).toFixed(2) + '% 的中国男大学生';
+      if (percentage > 0.9) result += '，您真是天赋异禀。';
+      document.getElementById(outputId).textContent = result;
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="../index.html" class="nav-brand">宋珏清</a>
+    <button class="menu-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li class="nav-dropdown">
+        <a href="fitness-calculator.html" class="active">项目</a>
+        <div class="nav-dropdown-menu">
+          <a href="fitness-calculator.html" class="active">体测计算器</a>
+          <a href="body-fat-calculator.html">体脂率计算器</a>
+          <a href="testosterone.html">睾酮评估</a>
+        </div>
+      </li>
+      <li><a href="records.html">个人记录</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-container">
+    <a href="../index.html" class="back-link">← 返回首页</a>
+
+    <div class="page-header">
+      <h1>【宋珏清】<span>体测成绩计算器</span></h1>
+      <h2>看看你打败了多少中国男大学生</h2>
+      <p class="douyin">*抖音关注@SJQ</p>
+      <p class="source">*数据来源：《2019中国学生体质与健康调研报告》&nbsp;·&nbsp;具体百分位因地区不同有细微差异</p>
+    </div>
+
+    <!-- Calculator Items -->
+    <div class="calc-item">
+      <h3>📏 身高（cm）</h3>
+      <div class="calc-row">
+        <input type="number" id="height" placeholder="请输入您的身高">
+        <button onclick="calculateScore('height', 'heightResult', 173.14, 6.34)">计算</button>
+      </div>
+      <div class="calc-result" id="heightResult"></div>
+    </div>
+
+    <div class="calc-item">
+      <h3>🫁 肺活量（ml）</h3>
+      <div class="calc-row">
+        <input type="number" id="lungCapacity" placeholder="请输入您的肺活量">
+        <button onclick="calculateScore('lungCapacity', 'lungCapacityResult', 4063.4, 814.7)">计算</button>
+      </div>
+      <div class="calc-result" id="lungCapacityResult"></div>
+    </div>
+
+    <div class="calc-item">
+      <h3>💪 胸围（cm）</h3>
+      <div class="calc-row">
+        <input type="number" id="chest" placeholder="请输入您的胸围">
+        <button onclick="calculateScore('chest', 'chestResult', 87.75, 7.91)">计算</button>
+      </div>
+      <div class="calc-result" id="chestResult"></div>
+    </div>
+
+    <div class="calc-item">
+      <h3>📐 腰围（cm）</h3>
+      <div class="calc-row">
+        <input type="number" id="waist" placeholder="请输入您的腰围">
+        <button onclick="calculateScore('waist', 'waistResult', 77.71, 10.04)">计算</button>
+      </div>
+      <div class="calc-result" id="waistResult"></div>
+    </div>
+
+    <div class="calc-item">
+      <h3>📐 臀围（cm）</h3>
+      <div class="calc-row">
+        <input type="number" id="hip" placeholder="请输入您的臀围">
+        <button onclick="calculateScore('hip', 'hipResult', 93.63, 7.93)">计算</button>
+      </div>
+      <div class="calc-result" id="hipResult"></div>
+    </div>
+
+    <div class="calc-item">
+      <h3>🦘 立定跳远（cm）</h3>
+      <div class="calc-row">
+        <input type="number" id="score" placeholder="请输入您的立定跳远成绩">
+        <button onclick="calculateScore('score', 'result', 219.8, 23.3)">计算</button>
+      </div>
+      <div class="calc-result" id="result"></div>
+    </div>
+
+    <div class="calc-item">
+      <h3>✊ 握力（kg）</h3>
+      <div class="calc-row">
+        <input type="number" id="grip" placeholder="请输入您的握力值">
+        <button onclick="calculateScore('grip', 'gripResult', 41.83, 8.22)">计算</button>
+      </div>
+      <div class="calc-result" id="gripResult"></div>
+    </div>
+
+    <div class="calc-item">
+      <h3>🏃 1000米跑（秒）</h3>
+      <div class="calc-row">
+        <input type="number" id="runTime" placeholder="请输入您的1000米跑成绩">
+        <button onclick="calculateScore('runTime', 'runResult', 274.25, 42.94, true)">计算</button>
+      </div>
+      <div class="calc-result" id="runResult"></div>
+    </div>
+
+    <div class="calc-item">
+      <h3>🏆 体测总分</h3>
+      <div class="calc-row">
+        <input type="number" id="totalScore" placeholder="请输入您的体测总分">
+        <button onclick="calculateScore('totalScore', 'totalScoreResult', 64, 9.55)">计算</button>
+      </div>
+      <div class="calc-result" id="totalScoreResult"></div>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>© 2025 宋珏清 · Built with ❤️</p>
+  </footer>
+
+</body>
+</html>
