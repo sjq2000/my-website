@@ -265,6 +265,42 @@
       font-weight: 500;
     }
 
+    .service-panel {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.08), rgba(0, 191, 255, 0.04));
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      border-radius: 12px;
+      padding: 22px;
+      margin: 24px 0;
+    }
+
+    .service-panel h3 {
+      font-size: 17px;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .service-panel p {
+      color: #aaa;
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+
+    .service-price {
+      display: inline-block;
+      padding: 5px 14px;
+      border-radius: 20px;
+      background: rgba(0, 255, 136, 0.12);
+      color: #00ff88;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .wechat {
+      color: #00bfff;
+      font-weight: 700;
+    }
+
     /* Back link */
     .back-link {
       display: inline-flex;
@@ -340,6 +376,12 @@
       <h2>看看你打败了多少中国男大学生</h2>
       <p class="douyin">*抖音关注@SJQ</p>
       <p class="source">*数据来源：《2019中国学生体质与健康调研报告》&nbsp;·&nbsp;具体百分位因地区不同有细微差异</p>
+    </div>
+
+    <div class="service-panel" id="private-service">
+      <h3>🎯 私人分析服务</h3>
+      <p>面向青少年体育生，提供身体素质评估选材、专项潜力判断、成绩预测与训练发展建议。</p>
+      <p><span class="service-price">59 元 / 次</span> &nbsp; 联系微信：<span class="wechat">m2470679039</span></p>
     </div>
 
     <!-- Calculator Items -->
@@ -422,6 +464,12 @@
         <button onclick="calculateScore('totalScore', 'totalScoreResult', 64, 9.55)">计算</button>
       </div>
       <div class="calc-result" id="totalScoreResult"></div>
+    </div>
+
+    <div class="service-panel">
+      <h3>需要更完整的个人判断？</h3>
+      <p>如果你是体育生、家长或教练，可以把身高体重、体测成绩、专项成绩和训练年限发给我，我可以做一次更完整的身体素质评估选材和成绩预测。</p>
+      <p><span class="service-price">59 元 / 次</span> &nbsp; 微信：<span class="wechat">m2470679039</span></p>
     </div>
 
   </div>
