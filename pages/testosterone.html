@@ -220,6 +220,16 @@
       border-top: 1px solid rgba(255,255,255,0.05); padding: 40px; text-align: center;
       color: #555; font-size: 14px;
     }
+
+    .visit-counter {
+      margin-top: 8px;
+      color: #444;
+      font-size: 12px;
+    }
+
+    .visit-counter span {
+      color: #555;
+    }
   </style>
 </head>
 <body>
@@ -236,6 +246,7 @@
           <a href="fitness-calculator.html">体测计算器</a>
           <a href="body-fat-calculator.html">体脂率计算器</a>
           <a href="testosterone.html" class="active">睾酮评估</a>
+          <a href="muscle-potential.html">增肌潜力计算器</a>
         </div>
       </li>
 
@@ -328,6 +339,9 @@
 
   <footer>
     <p>© 2025 宋珏清 · Built with ❤️</p>
+    <p class="visit-counter">
+      访问量 <span id="busuanzi_value_site_pv">--</span> · 本页 <span id="busuanzi_value_page_pv">--</span>
+    </p>
   </footer>
 
 <script>
@@ -444,5 +458,6 @@ function report(age,mean,val,z,p,g){
   document.getElementById('rTxt').innerHTML=t;
 }
 </script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 </body>
 </html>

@@ -325,6 +325,16 @@
       color: #555;
       font-size: 14px;
     }
+
+    .visit-counter {
+      margin-top: 8px;
+      color: #444;
+      font-size: 12px;
+    }
+
+    .visit-counter span {
+      color: #555;
+    }
   </style>
   <script>
     // Normal distribution CDF
@@ -362,6 +372,7 @@
           <a href="fitness-calculator.html" class="active">体测计算器</a>
           <a href="body-fat-calculator.html">体脂率计算器</a>
           <a href="testosterone.html">睾酮评估</a>
+          <a href="muscle-potential.html">增肌潜力计算器</a>
         </div>
       </li>
       <li><a href="records.html">个人记录</a></li>
@@ -476,7 +487,11 @@
 
   <footer>
     <p>© 2025 宋珏清 · Built with ❤️</p>
+    <p class="visit-counter">
+      访问量 <span id="busuanzi_value_site_pv">--</span> · 本页 <span id="busuanzi_value_page_pv">--</span>
+    </p>
   </footer>
 
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 </body>
 </html>

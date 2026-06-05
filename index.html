@@ -352,6 +352,16 @@
       text-decoration: none;
     }
 
+    .visit-counter {
+      margin-top: 8px;
+      color: #444;
+      font-size: 12px;
+    }
+
+    .visit-counter span {
+      color: #555;
+    }
+
     /* Scroll indicator */
     .scroll-indicator {
       position: absolute;
@@ -467,6 +477,7 @@
           <a href="pages/fitness-calculator.html">体测计算器</a>
           <a href="pages/body-fat-calculator.html">体脂率计算器</a>
           <a href="pages/testosterone.html">睾酮评估</a>
+          <a href="pages/muscle-potential.html">增肌潜力计算器</a>
         </div>
       </li>
 
@@ -517,6 +528,12 @@
         <p>基于年龄的正态分布模型，输入睾酮值查看你在同龄人中的百分位数和健康报告。</p>
         <span class="card-tag">Web Tool</span>
       </a>
+      <a href="pages/muscle-potential.html" class="card">
+        <div class="card-icon">💪</div>
+        <h3>增肌潜力计算器</h3>
+        <p>输入身高、体重、体脂率、腕围和踝围，估算自然训练状态下的现实与最大增肌潜力。</p>
+        <span class="card-tag">Web Tool</span>
+      </a>
       <a href="pages/fitness-calculator.html#private-service" class="card service-card">
         <div class="card-icon">🎯</div>
         <h3>私人分析服务</h3>
@@ -538,7 +555,7 @@
       </div>
       <div class="about-stats">
         <div class="stat-card">
-          <div class="stat-number">5</div>
+          <div class="stat-number">6</div>
           <div class="stat-label">项目与服务</div>
         </div>
         <div class="stat-card">
@@ -552,7 +569,11 @@
   <!-- Footer -->
   <footer>
     <p>© 2025 宋珏清 · Built with ❤️</p>
+    <p class="visit-counter">
+      访问量 <span id="busuanzi_value_site_pv">--</span> · 本页 <span id="busuanzi_value_page_pv">--</span>
+    </p>
   </footer>
 
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 </body>
 </html>
