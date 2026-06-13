@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>宋珏清 | 体脂率计算器</title>
+  <title>【SJQ】身体数据实验室 | 体脂率计算器</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -297,6 +297,88 @@
 
     .back-link:hover { color: #00bfff; }
 
+
+
+    /* Paid report upsell */
+    .paid-report-upsell {
+      margin: 22px 0 18px;
+      padding: 22px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.08), rgba(0, 191, 255, 0.04));
+    }
+
+    .paid-report-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .paid-report-title {
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .paid-report-subtitle {
+      color: #aaa;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .paid-report-price {
+      color: #00ff88;
+      font-size: 28px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .paid-report-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .paid-report-item {
+      color: #bbb;
+      font-size: 13px;
+      line-height: 1.6;
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .paid-report-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 44px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #00ff88, #00bfff);
+      color: #061010;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 800;
+      transition: all 0.3s;
+    }
+
+    .paid-report-action:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(0, 255, 136, 0.22);
+    }
+
+    @media (max-width: 760px) {
+      .paid-report-head { flex-direction: column; }
+      .paid-report-list { grid-template-columns: 1fr; }
+      .paid-report-price { font-size: 24px; }
+    }
+
     footer {
       border-top: 1px solid rgba(255, 255, 255, 0.05);
       padding: 40px;
@@ -314,12 +396,66 @@
     .visit-counter span {
       color: #555;
     }
+  
+
+    .nav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #eaf6ff !important;
+      text-decoration: none;
+      letter-spacing: 0;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 36px;
+      border-radius: 10px;
+      background: #15d8d2;
+      color: #051015;
+      font-size: 15px;
+      font-weight: 950;
+      letter-spacing: 0;
+      box-shadow: 0 8px 22px rgba(0, 191, 255, 0.18);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .brand-mark::after {
+      content: '';
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      width: 10px;
+      height: 5px;
+      border-right: 3px solid #2168ff;
+      border-bottom: 3px solid #2168ff;
+      border-radius: 0 0 8px 0;
+      transform: rotate(20deg);
+    }
+
+    .brand-text {
+      font-size: 15px;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 600px) {
+      .brand-text { font-size: 13px; }
+      .brand-mark { width: 48px; height: 32px; font-size: 14px; }
+    }
+
   </style>
 </head>
 <body>
 
   <nav>
-    <a href="../index.html" class="nav-brand">宋珏清</a>
+    <a href="../index.html" class="nav-brand"><span class="brand-mark">SJQ</span><span class="brand-text">身体数据实验室</span></a>
     <button class="menu-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
     <ul class="nav-links">
       <li><a href="../index.html">Home</a></li>
@@ -330,8 +466,12 @@
           <a href="body-fat-calculator.html" class="active">体脂率计算器</a>
           <a href="testosterone.html">睾酮评估</a>
           <a href="muscle-potential.html">增肌潜力计算器</a>
+          <a href="height-prediction.html">身高预测计算器</a>
+          <a href="bio-age-calculator.html">生理年龄计算器</a>
+          <a href="private-service.html">私人分析服务</a>
         </div>
       </li>
+      <li><a href="column.html">专栏</a></li>
       <li><a href="records.html">个人记录</a></li>
 
     </ul>
@@ -367,6 +507,10 @@
           <span class="result-value" id="bfPercent">--<span class="unit">%</span></span>
         </div>
         <div class="result-row">
+          <span class="result-label">BMI</span>
+          <span class="result-value" id="bmi">--</span>
+        </div>
+        <div class="result-row">
           <span class="result-label">去脂肪体重</span>
           <span class="result-value" id="lbm">--<span class="unit">kg</span></span>
         </div>
@@ -379,8 +523,27 @@
 
   </div>
 
+
+    <!-- paid-report-upsell:start -->
+    <div class="paid-report-upsell">
+      <div class="paid-report-head">
+        <div>
+          <div class="paid-report-title">生成体脂分析报告</div>
+          <div class="paid-report-subtitle">基础计算免费。付费报告会结合你的输入结果，分析你的体质类型、脂肪风险和下一步减脂/增肌方向。</div>
+        </div>
+        <div class="paid-report-price">¥4.9</div>
+      </div>
+      <div class="paid-report-list">
+        <div class="paid-report-item">体质类型：BMI × FFMI 九宫格定位</div>
+        <div class="paid-report-item">结果解读：体脂、BMI、FFMI 综合判断</div>
+        <div class="paid-report-item">行动建议：减脂、增肌或体态优化路线</div>
+      </div>
+      <a class="paid-report-action" href="paid-report.html">购买完整报告</a>
+    </div>
+    <!-- paid-report-upsell:end -->
+
   <footer>
-    <p>© 2025 宋珏清 · Built with ❤️</p>
+    <p>© 2025 【SJQ】身体数据实验室 · Built with ❤️</p>
     <p class="visit-counter">
       访问量 <span id="busuanzi_value_site_pv">--</span> · 本页 <span id="busuanzi_value_page_pv">--</span>
     </p>
@@ -401,8 +564,9 @@
       // 去脂肪体重 = (1 - 体脂率小数) * 体重 - 0.7
       var lbm = (1 - bfDecimal) * weight - 0.7;
 
-      // FFMI = 去脂肪体重 / 身高²（身高转米）
+      // BMI / FFMI
       var heightM = height / 100;
+      var bmi = weight / (heightM * heightM);
       var ffmi = lbm / (heightM * heightM);
 
       // 体脂等级
@@ -416,10 +580,26 @@
       document.getElementById('bfPercent').innerHTML =
         bfPercent.toFixed(2) + '<span class="unit">%</span> ' +
         '<span class="level-tag ' + levelClass + '">' + levelText + '</span>';
+      document.getElementById('bmi').innerHTML =
+        bmi.toFixed(1);
       document.getElementById('lbm').innerHTML =
         lbm.toFixed(1) + '<span class="unit">kg</span>';
       document.getElementById('ffmi').innerHTML =
         ffmi.toFixed(1) + '<span class="unit">kg/m²</span>';
+
+      window.bodyFatReportData = {
+        reportType: 'bodyFat',
+        title: '体脂率分析报告',
+        price: '¥4.9',
+        height: height,
+        weight: weight,
+        waist: waist,
+        bodyFatPercent: bfPercent,
+        bmi: bmi,
+        lbm: lbm,
+        ffmi: ffmi,
+        fatLevel: levelText
+      };
 
       document.getElementById('results').classList.add('show');
     }
@@ -432,6 +612,83 @@
     });
   </script>
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+  <script>
+    function collectPaidReportData() {
+      var titleEl = document.querySelector('.page-header h1') || document.querySelector('h1');
+      var reportEl = document.getElementById('reportText');
+      var rowEls = Array.prototype.slice.call(document.querySelectorAll('#resultRows tr'));
+      var summaryEls = Array.prototype.slice.call(document.querySelectorAll('.summary-card'));
+      var resultEls = Array.prototype.slice.call(document.querySelectorAll('.result, [id$="Result"]'));
+
+      var rows = rowEls.map(function(row) {
+        return Array.prototype.slice.call(row.children).map(function(cell) {
+          return cell.textContent.trim();
+        }).join('：');
+      }).filter(Boolean);
+
+      var summaries = summaryEls.map(function(card) {
+        var value = card.querySelector('.summary-value');
+        var label = card.querySelector('.summary-label');
+        if (!value || !label) return '';
+        return label.textContent.trim() + '：' + value.textContent.trim();
+      }).filter(Boolean);
+
+      var looseResults = resultEls.map(function(el) {
+        return el.textContent.trim();
+      }).filter(function(text) {
+        return text && text !== '--';
+      });
+
+      var inputRows = Array.prototype.slice.call(document.querySelectorAll('.input-group')).map(function(group) {
+        var label = group.querySelector('label');
+        var input = group.querySelector('input');
+        if (!label || !input) return '';
+        return label.textContent.trim() + '：' + input.value;
+      }).filter(Boolean);
+
+      var data = {
+        title: titleEl ? titleEl.textContent.replace(/\s+/g, '') : document.title,
+        url: location.pathname.split('/').pop(),
+        createdAt: new Date().toLocaleString(),
+        inputs: inputRows,
+        summaries: summaries,
+        rows: rows,
+        looseResults: looseResults,
+        interpretation: reportEl ? reportEl.textContent.trim() : ''
+      };
+
+      if (window.bodyFatReportData) {
+        data = Object.assign(data, window.bodyFatReportData, {
+          createdAt: new Date().toLocaleString(),
+          inputs: inputRows,
+          rows: [
+            '体脂率：' + window.bodyFatReportData.bodyFatPercent.toFixed(2) + '%',
+            'BMI：' + window.bodyFatReportData.bmi.toFixed(1),
+            '去脂肪体重：' + window.bodyFatReportData.lbm.toFixed(1) + 'kg',
+            'FFMI：' + window.bodyFatReportData.ffmi.toFixed(1)
+          ]
+        });
+      }
+
+      localStorage.removeItem('paidReportUnlocked');
+      localStorage.setItem('paidReportData', JSON.stringify(data));
+    }
+
+    document.addEventListener('click', function(event) {
+      var link = event.target.closest && event.target.closest('.paid-report-action');
+      if (link) {
+        if (!window.bodyFatReportData) calculate();
+        if (!window.bodyFatReportData) {
+          event.preventDefault();
+          alert('请先填写身体数据并计算，再查看报告。');
+          return;
+        }
+        collectPaidReportData();
+      }
+    });
+  </script>
 
 </body>
 </html>
