@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>【SJQ】身体数据实验室 | 增肌潜力计算器</title>
+  <title>【SJQ】身体数据实验室 | 身高预测计算器</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -94,7 +94,7 @@
       border: 1px solid rgba(0,191,255,0.15);
       border-radius: 10px;
       padding: 8px 0;
-      min-width: 180px;
+      min-width: 190px;
       box-shadow: 0 12px 40px rgba(0,0,0,0.5);
     }
 
@@ -122,37 +122,8 @@
       cursor: pointer;
     }
 
-    @media (max-width: 600px) {
-      .menu-toggle { display: block; }
-      nav { padding: 0 20px; }
-      .nav-links {
-        display: none;
-        position: absolute;
-        top: 64px;
-        left: 0;
-        width: 100%;
-        background: rgba(10, 10, 10, 0.95);
-        backdrop-filter: blur(20px);
-        flex-direction: column;
-        padding: 20px;
-        gap: 16px;
-        border-bottom: 1px solid rgba(0, 191, 255, 0.15);
-      }
-      .nav-links.open { display: flex; }
-      .nav-dropdown-menu {
-        position: static;
-        transform: none;
-        background: transparent;
-        border: none;
-        box-shadow: none;
-        padding: 0 0 0 16px;
-        display: block !important;
-      }
-      .nav-dropdown-menu a { padding: 8px 0; }
-    }
-
     .page-container {
-      max-width: 860px;
+      max-width: 880px;
       margin: 0 auto;
       padding: 100px 24px 60px;
     }
@@ -208,8 +179,6 @@
       flex-direction: column;
       gap: 8px;
     }
-
-    .input-group.wide { grid-column: span 1; }
 
     .input-group label {
       font-size: 14px;
@@ -283,97 +252,7 @@
       font-size: 12px;
     }
 
-    .potential-progress {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(0, 191, 255, 0.1);
-      border-radius: 10px;
-      padding: 16px;
-      margin-bottom: 18px;
-    }
-
-    .progress-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 12px;
-      margin-bottom: 10px;
-    }
-
-    .progress-title {
-      color: #fff;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .progress-value {
-      color: #00bfff;
-      font-size: 20px;
-      font-weight: 800;
-    }
-
-    .progress-track {
-      height: 14px;
-      overflow: hidden;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .progress-fill {
-      width: 0%;
-      height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(135deg, #00bfff, #0080ff);
-      box-shadow: 0 0 20px rgba(0, 191, 255, 0.35);
-      transition: width 0.4s ease;
-    }
-
-    .progress-meta {
-      margin-top: 10px;
-      color: #888;
-      font-size: 12px;
-      line-height: 1.6;
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 10px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 620px;
-    }
-
-    th, td {
-      padding: 18px 20px;
-      text-align: left;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      border-right: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    th:last-child, td:last-child { border-right: none; }
-    tr:last-child td { border-bottom: none; }
-    th {
-      color: #fff;
-      font-size: 15px;
-      background: rgba(0, 191, 255, 0.05);
-    }
-
-    td {
-      color: #ddd;
-      font-size: 16px;
-    }
-
-    td:first-child {
-      color: #fff;
-      font-weight: 700;
-    }
-
     .report {
-      margin-top: 18px;
       padding: 18px;
       border-radius: 10px;
       background: rgba(0, 191, 255, 0.04);
@@ -391,6 +270,39 @@
       font-size: 12px;
       line-height: 1.7;
       margin-top: 14px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      margin-top: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 520px;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    th:last-child, td:last-child { border-right: none; }
+    tr:last-child td { border-bottom: none; }
+    th {
+      color: #fff;
+      font-size: 14px;
+      background: rgba(0, 191, 255, 0.05);
+    }
+
+    td {
+      color: #ddd;
+      font-size: 15px;
     }
 
 
@@ -489,15 +401,42 @@
       font-size: 12px;
     }
 
-    .visit-counter span {
-      color: #555;
-    }
+    .visit-counter span { color: #555; }
 
     @media (max-width: 760px) {
       .form-grid { grid-template-columns: 1fr; }
       .summary-grid { grid-template-columns: 1fr; }
       .page-container { padding: 90px 18px 50px; }
       .panel { padding: 20px; }
+    }
+
+    @media (max-width: 600px) {
+      .menu-toggle { display: block; }
+      nav { padding: 0 20px; }
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        width: 100%;
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: 20px;
+        gap: 16px;
+        border-bottom: 1px solid rgba(0, 191, 255, 0.15);
+      }
+      .nav-links.open { display: flex; }
+      .nav-dropdown-menu {
+        position: static;
+        transform: none;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        padding: 0 0 0 16px;
+        display: block !important;
+      }
+      .nav-dropdown-menu a { padding: 8px 0; }
     }
   
 
@@ -558,17 +497,17 @@
 <body>
   <nav>
     <a href="../index.html" class="nav-brand"><span class="brand-mark">SJQ</span><span class="brand-text">身体数据实验室</span></a>
-    <button class="menu-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+    <button class="menu-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
     <ul class="nav-links">
       <li><a href="../index.html">Home</a></li>
       <li class="nav-dropdown">
-        <a href="muscle-potential.html" class="active">项目</a>
+        <a href="height-prediction.html" class="active">项目</a>
         <div class="nav-dropdown-menu">
           <a href="fitness-calculator.html">体测计算器</a>
           <a href="body-fat-calculator.html">体脂率计算器</a>
           <a href="testosterone.html">睾酮评估</a>
-          <a href="muscle-potential.html" class="active">增肌潜力计算器</a>
-          <a href="height-prediction.html">身高预测计算器</a>
+          <a href="muscle-potential.html">增肌潜力计算器</a>
+          <a href="height-prediction.html" class="active">身高预测计算器</a>
           <a href="bio-age-calculator.html">生理年龄计算器</a>
           <a href="private-service.html">私人分析服务</a>
         </div>
@@ -579,89 +518,71 @@
   </nav>
 
   <div class="page-container">
-    <a href="../index.html" class="back-link">← 返回首页</a>
+    <a href="../index.html" class="back-link">&larr; 返回首页</a>
 
     <div class="page-header">
-      <h1>💪 <span>增肌潜力计算器</span></h1>
-      <p>输入身高、体重、体脂率、腕围和踝围，估算自然训练状态下的现实与最大增肌潜力。</p>
+      <h1>身高<span>预测计算器</span></h1>
+      <p>根据儿童出生年月计算年龄，比较同龄平均身高差值，并估算成年身高。小于 6.5 岁不计算，大于 20 岁显示已发育完全。</p>
     </div>
 
     <div class="panel">
       <div class="form-grid">
         <div class="input-group">
-          <label>身高（cm）</label>
-          <input type="number" id="height" value="175" min="120" max="230" step="0.1">
+          <label>出生年份</label>
+          <input type="number" id="birthYear" value="2010" min="2000" max="2030" step="1">
         </div>
         <div class="input-group">
-          <label>体重（kg）</label>
-          <input type="number" id="weight" value="75" min="30" max="200" step="0.1">
+          <label>出生月份</label>
+          <input type="number" id="birthMonth" value="6" min="1" max="12" step="1">
         </div>
         <div class="input-group">
-          <label>体脂率（%）</label>
-          <input type="number" id="bodyFat" value="10" min="3" max="45" step="0.1">
+          <label>测量年份</label>
+          <input type="number" id="measureYear" min="2000" max="2030" step="1">
         </div>
         <div class="input-group">
-          <label>腕围（cm）</label>
-          <input type="number" id="wrist" value="18" min="10" max="30" step="0.1">
+          <label>测量月份</label>
+          <input type="number" id="measureMonth" min="1" max="12" step="1">
         </div>
         <div class="input-group">
-          <label>踝围（cm）</label>
-          <input type="number" id="ankle" value="22" min="14" max="35" step="0.1">
-        </div>
-        <div class="input-group">
-          <label>训练年限（年，可选）</label>
-          <input type="number" id="years" value="1" min="0" max="30" step="0.5">
+          <label>测量身高（cm）</label>
+          <input type="number" id="currentHeight" value="170" min="80" max="230" step="0.1">
         </div>
       </div>
 
-      <button class="btn-primary" onclick="calculate()">计算增肌潜力</button>
-      <p class="note">本工具为健身参考模型，结果不代表绝对上限，也不构成医学或训练诊断。</p>
+      <button class="btn-primary" onclick="calculate()">计算身高预测</button>
+      <p class="note">表中 6、7、8 等年龄点按 6.5、7.5、8.5 岁处理；年龄按测量年月减出生年月计算，两个年龄点之间用线性插值估算同龄平均身高。</p>
     </div>
 
     <div class="results" id="results">
       <div class="summary-grid">
         <div class="summary-card">
-          <div class="summary-value" id="gainLeft">--</div>
-          <div class="summary-label">距离现实潜力还可增加的去脂体重</div>
+          <div class="summary-value" id="ageValue">--</div>
+          <div class="summary-label">当前年龄</div>
         </div>
         <div class="summary-card">
-          <div class="summary-value" id="frameScore">--</div>
-          <div class="summary-label">骨架评分</div>
+          <div class="summary-value" id="diffValue">--</div>
+          <div class="summary-label">高于同龄平均</div>
         </div>
         <div class="summary-card">
-          <div class="summary-value" id="ffmiNow">--</div>
-          <div class="summary-label">当前 FFMI</div>
+          <div class="summary-value" id="adultValue">--</div>
+          <div class="summary-label">预测成年身高</div>
         </div>
       </div>
-      <div class="potential-progress">
-        <div class="progress-head">
-          <div class="progress-title">增肌潜力开发进度</div>
-          <div class="progress-value" id="potentialPercent">--</div>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill" id="potentialFill"></div>
-        </div>
-        <div class="progress-meta" id="potentialMeta">--</div>
-      </div>
-
 
       <div class="panel">
+        <div class="report" id="reportText"></div>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
                 <th>指标</th>
-                <th>现实自然状态</th>
-                <th>最大自然状态</th>
+                <th>结果</th>
               </tr>
             </thead>
             <tbody id="resultRows"></tbody>
           </table>
         </div>
-
-        <div class="report" id="reportText"></div>
       </div>
-
     </div>
   </div>
 
@@ -685,108 +606,129 @@
     <!-- paid-report-upsell:end -->
 
   <footer>
-    <p>© 2025 【SJQ】身体数据实验室 · Built with ❤️</p>
+    <p>&copy; 2025 【SJQ】身体数据实验室 &middot; Built with &#10084;&#65039;</p>
     <p class="visit-counter">
-      访问量 <span id="busuanzi_value_site_pv">--</span> · 本页 <span id="busuanzi_value_page_pv">--</span>
+      访问量 <span id="busuanzi_value_site_pv">--</span> &middot; 本页 <span id="busuanzi_value_page_pv">--</span>
     </p>
   </footer>
 
   <script>
-    function cmToIn(cm) { return cm / 2.54; }
-    function kgToLb(kg) { return kg * 2.2046226218; }
-    function lbToKg(lb) { return lb / 2.2046226218; }
-    function fmt(n) { return Number(n).toFixed(2); }
+    var averageHeights = [
+      { age: 6.5, height: 121.71 },
+      { age: 7.5, height: 126.87 },
+      { age: 8.5, height: 132.40 },
+      { age: 9.5, height: 137.76 },
+      { age: 10.5, height: 143.09 },
+      { age: 11.5, height: 149.66 },
+      { age: 12.5, height: 156.34 },
+      { age: 13.5, height: 163.48 },
+      { age: 14.5, height: 168.57 },
+      { age: 15.5, height: 171.28 },
+      { age: 16.5, height: 172.58 },
+      { age: 17.5, height: 173.03 },
+      { age: 18.5, height: 173.08 },
+      { age: 20.5, height: 173.14 }
+    ];
 
-    function setRow(label, realistic, max) {
-      return '<tr><td>' + label + '</td><td>' + fmt(realistic) + '</td><td>' + fmt(max) + '</td></tr>';
+    function fmt(n, digits) {
+      return Number(n).toFixed(digits == null ? 2 : digits);
     }
 
-    function trainingRatio(years) {
-      if (years <= 0) return 0;
-      if (years <= 1) return 0.35;
-      if (years <= 2) return 0.55;
-      if (years <= 3) return 0.70;
-      if (years <= 4) return 0.82;
-      if (years <= 5) return 0.90;
-      return Math.min(0.98, 0.90 + (years - 5) * 0.015);
+    function getAge(birthYear, birthMonth, measureYear, measureMonth) {
+      return (measureYear - birthYear) + (measureMonth - birthMonth) / 12;
+    }
+
+    function setDefaultMeasureDate() {
+      var now = new Date();
+      document.getElementById('measureYear').value = now.getFullYear();
+      document.getElementById('measureMonth').value = now.getMonth() + 1;
+    }
+
+    function interpolateAverage(age) {
+      for (var i = 0; i < averageHeights.length - 1; i++) {
+        var left = averageHeights[i];
+        var right = averageHeights[i + 1];
+        if (age >= left.age && age <= right.age) {
+          var ratio = (age - left.age) / (right.age - left.age);
+          return left.height + (right.height - left.height) * ratio;
+        }
+      }
+      return null;
+    }
+
+    function setRows(rows) {
+      document.getElementById('resultRows').innerHTML = rows.map(function(row) {
+        return '<tr><td>' + row[0] + '</td><td>' + row[1] + '</td></tr>';
+      }).join('');
     }
 
     function calculate() {
-      var height = parseFloat(document.getElementById('height').value);
-      var weight = parseFloat(document.getElementById('weight').value);
-      var bodyFat = parseFloat(document.getElementById('bodyFat').value);
-      var wrist = parseFloat(document.getElementById('wrist').value);
-      var ankle = parseFloat(document.getElementById('ankle').value);
-      var years = parseFloat(document.getElementById('years').value) || 0;
+      var birthYear = parseInt(document.getElementById('birthYear').value, 10);
+      var birthMonth = parseInt(document.getElementById('birthMonth').value, 10);
+      var measureYear = parseInt(document.getElementById('measureYear').value, 10);
+      var measureMonth = parseInt(document.getElementById('measureMonth').value, 10);
+      var currentHeight = parseFloat(document.getElementById('currentHeight').value);
 
-      if (!height || !weight || !bodyFat || !wrist || !ankle || bodyFat <= 0 || bodyFat >= 45) {
-        alert('请填写有效的身高、体重、体脂率、腕围和踝围');
+      if (!birthYear || !birthMonth || birthMonth < 1 || birthMonth > 12 || !measureYear || !measureMonth || measureMonth < 1 || measureMonth > 12 || !currentHeight || currentHeight <= 0) {
+        alert('请填写有效的出生年月、测量年月和测量身高');
         return;
       }
 
-      var hIn = cmToIn(height);
-      var wIn = cmToIn(wrist);
-      var aIn = cmToIn(ankle);
-      var bf = bodyFat / 100;
+      var age = getAge(birthYear, birthMonth, measureYear, measureMonth);
+      if (age < 0) {
+        alert('测量时间不能早于出生时间');
+        return;
+      }
+      var adultAverage = 173.14;
+      var results = document.getElementById('results');
+      results.classList.add('show');
+      document.getElementById('ageValue').textContent = fmt(age, 1) + ' 岁';
 
-      var contestLb = Math.pow(hIn, 1.5) * Math.pow(Math.sqrt(wIn) + Math.sqrt(aIn), 1.5) * 0.02408;
-      var maxLbmKg = lbToKg(contestLb * 0.95);
-      var maxBodyKg = maxLbmKg / (1 - bf);
-      var maxFatKg = maxBodyKg - maxLbmKg;
+      if (age < 6.5) {
+        document.getElementById('diffValue').textContent = '--';
+        document.getElementById('adultValue').textContent = '--';
+        document.getElementById('reportText').innerHTML = '<strong>结果：</strong>当前年龄约 <span class="hl">' + fmt(age, 1) + ' 岁</span>，小于 6.5 岁，暂不计算身高预测。';
+        setRows([
+          ['当前年龄', fmt(age, 2) + ' 岁'],
+          ['测量身高', fmt(currentHeight, 1) + ' cm'],
+          ['计算状态', '小于 6.5 岁，不计算']
+        ]);
+        return;
+      }
 
-      var realisticBodyKg = maxBodyKg * 0.95;
-      var realisticLbmKg = maxLbmKg * 0.95;
-      var realisticFatKg = maxFatKg * 0.95;
+      if (age > 20) {
+        document.getElementById('diffValue').textContent = '--';
+        document.getElementById('adultValue').textContent = fmt(currentHeight, 1) + ' cm';
+        document.getElementById('reportText').innerHTML = '<strong>结果：</strong>当前年龄约 <span class="hl">' + fmt(age, 1) + ' 岁</span>，已经发育完全，当前身高可视为成年身高。';
+        setRows([
+          ['当前年龄', fmt(age, 2) + ' 岁'],
+          ['测量身高', fmt(currentHeight, 1) + ' cm'],
+          ['计算状态', '已经发育完全']
+        ]);
+        return;
+      }
 
-      var chestMax = (1.625 * wIn + 1.3682 * aIn + 0.3562 * hIn) * 2.54 * 0.975;
-      var bicepsMax = wrist + 25.24;
-      var forearmsMax = wrist + 16.63;
-      var neckMax = bicepsMax * 0.976;
-      var thighsMax = (1.75 * aIn + 9.29) * 2.54;
-      var calvesMax = ankle + 19.63;
+      var sameAgeAverage = interpolateAverage(age);
+      var diff = currentHeight - sameAgeAverage;
+      var predictedAdult = adultAverage + diff;
+      var sign = diff >= 0 ? '+' : '';
 
-      var rows = '';
-      rows += setRow('总体重（kg）', realisticBodyKg, maxBodyKg);
-      rows += setRow('去脂体重（kg）', realisticLbmKg, maxLbmKg);
-      rows += setRow('脂肪量（kg）', realisticFatKg, maxFatKg);
-      rows += setRow('胸围（cm）', chestMax * 0.95, chestMax);
-      rows += setRow('上臂围（cm）', bicepsMax * 0.95, bicepsMax);
-      rows += setRow('前臂围（cm）', forearmsMax * 0.95, forearmsMax);
-      rows += setRow('颈围（cm）', neckMax * 0.95, neckMax);
-      rows += setRow('大腿围（cm）', thighsMax * 0.95, thighsMax);
-      rows += setRow('小腿围（cm）', calvesMax * 0.95, calvesMax);
-      document.getElementById('resultRows').innerHTML = rows;
-
-      var currentLbm = weight * (1 - bf);
-      var heightM = height / 100;
-      var ffmi = currentLbm / (heightM * heightM);
-      var gainLeft = Math.max(0, realisticLbmKg - currentLbm);
-      var frameIndex = wrist + ankle;
-      var baseLbmKg = heightM * heightM * 18.5;
-      var trainableLbmKg = Math.max(0, realisticLbmKg - baseLbmKg);
-      var developedLbmKg = Math.max(0, currentLbm - baseLbmKg);
-      var potentialRatio = trainableLbmKg > 0 ? Math.min(1, Math.max(0, developedLbmKg / trainableLbmKg)) : 0;
-      var potentialPercent = Math.round(potentialRatio * 100);
-      var frameText = frameIndex < 38 ? '偏小骨架' : frameIndex < 42 ? '中等骨架' : '偏大骨架';
-      var ratio = trainingRatio(years);
-      var stageText = years < 1 ? '新手红利期' : years < 3 ? '快速增长期' : years < 5 ? '稳定增长期' : '接近自然平台期';
-
-      document.getElementById('gainLeft').textContent = fmt(gainLeft) + ' kg';
-      document.getElementById('frameScore').textContent = frameText;
-      document.getElementById('ffmiNow').textContent = ffmi.toFixed(1);
-      document.getElementById('potentialPercent').textContent = potentialPercent + '%';
-      document.getElementById('potentialFill').style.width = potentialPercent + '%';
-      document.getElementById('potentialMeta').textContent = '按基础 FFMI 18.5 估算起点：已开发 ' + fmt(developedLbmKg) + ' kg / 可开发 ' + fmt(trainableLbmKg) + ' kg，还可增加约 ' + fmt(gainLeft) + ' kg';
-
+      document.getElementById('diffValue').textContent = sign + fmt(diff, 1) + ' cm';
+      document.getElementById('adultValue').textContent = fmt(predictedAdult, 1) + ' cm';
       document.getElementById('reportText').innerHTML =
-        '<strong>结果解读：</strong>在当前体脂率 <span class="hl">' + bodyFat.toFixed(1) + '%</span> 下，你的现实自然体重潜力约为 <span class="hl">' +
-        fmt(realisticBodyKg) + ' kg</span>，最大自然体重潜力约为 <span class="hl">' + fmt(maxBodyKg) +
-        ' kg</span>。当前去脂体重约为 <span class="hl">' + fmt(currentLbm) + ' kg</span>，距离现实自然状态还差约 <span class="hl">' +
-        fmt(gainLeft) + ' kg</span> 去脂体重。<br><br><strong>训练阶段：</strong>你填写的训练年限为 <span class="hl">' +
-        years + ' 年</span>，大致属于 <span class="hl">' + stageText + '</span>。按照常见自然训练进程估计，你可能已经开发了约 <span class="hl">' +
-        Math.round(ratio * 100) + '%</span> 的自然潜力。实际结果会受到训练质量、饮食、睡眠、激素水平、肌肉插入点和伤病史影响。';
+        '<strong>结果解读：</strong>当前年龄约 <span class="hl">' + fmt(age, 1) +
+        ' 岁</span>，同龄平均身高约 <span class="hl">' + fmt(sameAgeAverage, 1) +
+        ' cm</span>。当前身高比同龄平均 <span class="hl">' + sign + fmt(diff, 1) +
+        ' cm</span>，按成年平均身高 173.14 cm 加上该差值，预测成年身高约为 <span class="hl">' +
+        fmt(predictedAdult, 1) + ' cm</span>。';
 
-      document.getElementById('results').classList.add('show');
+      setRows([
+        ['当前年龄', fmt(age, 2) + ' 岁'],
+        ['测量身高', fmt(currentHeight, 1) + ' cm'],
+        ['同龄平均身高', fmt(sameAgeAverage, 2) + ' cm'],
+        ['与同龄平均差值', sign + fmt(diff, 2) + ' cm'],
+        ['预测成年身高', fmt(predictedAdult, 2) + ' cm']
+      ]);
     }
 
     document.querySelectorAll('input').forEach(function(input) {
@@ -795,6 +737,7 @@
       });
     });
 
+    setDefaultMeasureDate();
     calculate();
   </script>
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>

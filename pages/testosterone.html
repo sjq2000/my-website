@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>宋珏清 | 睾酮水平评估</title>
+  <title>【SJQ】身体数据实验室 | 睾酮水平评估</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -216,6 +216,88 @@
     .d2 { animation-delay:0.2s; opacity:0; }
     .d3 { animation-delay:0.3s; opacity:0; }
 
+
+
+    /* Paid report upsell */
+    .paid-report-upsell {
+      margin: 22px 0 18px;
+      padding: 22px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.08), rgba(0, 191, 255, 0.04));
+    }
+
+    .paid-report-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .paid-report-title {
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .paid-report-subtitle {
+      color: #aaa;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .paid-report-price {
+      color: #00ff88;
+      font-size: 28px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .paid-report-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .paid-report-item {
+      color: #bbb;
+      font-size: 13px;
+      line-height: 1.6;
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .paid-report-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 44px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #00ff88, #00bfff);
+      color: #061010;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 800;
+      transition: all 0.3s;
+    }
+
+    .paid-report-action:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(0, 255, 136, 0.22);
+    }
+
+    @media (max-width: 760px) {
+      .paid-report-head { flex-direction: column; }
+      .paid-report-list { grid-template-columns: 1fr; }
+      .paid-report-price { font-size: 24px; }
+    }
+
     footer {
       border-top: 1px solid rgba(255,255,255,0.05); padding: 40px; text-align: center;
       color: #555; font-size: 14px;
@@ -230,13 +312,67 @@
     .visit-counter span {
       color: #555;
     }
+  
+
+    .nav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #eaf6ff !important;
+      text-decoration: none;
+      letter-spacing: 0;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 36px;
+      border-radius: 10px;
+      background: #15d8d2;
+      color: #051015;
+      font-size: 15px;
+      font-weight: 950;
+      letter-spacing: 0;
+      box-shadow: 0 8px 22px rgba(0, 191, 255, 0.18);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .brand-mark::after {
+      content: '';
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      width: 10px;
+      height: 5px;
+      border-right: 3px solid #2168ff;
+      border-bottom: 3px solid #2168ff;
+      border-radius: 0 0 8px 0;
+      transform: rotate(20deg);
+    }
+
+    .brand-text {
+      font-size: 15px;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 600px) {
+      .brand-text { font-size: 13px; }
+      .brand-mark { width: 48px; height: 32px; font-size: 14px; }
+    }
+
   </style>
 </head>
 <body>
 
   <!-- Navigation -->
   <nav>
-    <a href="../index.html" class="nav-brand">宋珏清</a>
+    <a href="../index.html" class="nav-brand"><span class="brand-mark">SJQ</span><span class="brand-text">身体数据实验室</span></a>
     <button class="menu-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
     <ul class="nav-links">
       <li><a href="../index.html">Home</a></li>
@@ -247,9 +383,13 @@
           <a href="body-fat-calculator.html">体脂率计算器</a>
           <a href="testosterone.html" class="active">睾酮评估</a>
           <a href="muscle-potential.html">增肌潜力计算器</a>
+          <a href="height-prediction.html">身高预测计算器</a>
+          <a href="bio-age-calculator.html">生理年龄计算器</a>
+          <a href="private-service.html">私人分析服务</a>
         </div>
       </li>
 
+      <li><a href="column.html">专栏</a></li>
       <li><a href="records.html">个人记录</a></li>
     </ul>
   </nav>
@@ -286,66 +426,54 @@
         </div>
       </div>
 
-      <div class="card">
-        <h3><span class="step-num">2</span>验证并查看报告</h3>
-        <div class="pay-section">
-          <p>支付 <strong>¥5</strong> 或输入邀请码即可查看完整分析报告</p>
-          <img class="qr-img" src="payment-qr.png" alt="微信收款码">
-          <div class="price-tag">¥5 · 微信支付</div>
-          <p class="pay-note">支付后即可获得完整睾酮分析报告</p>
-        </div>
-        <div class="divider">或者</div>
-        <div class="input-group">
-          <label>邀请码（可以不填）</label>
-          <input type="text" id="inviteCode" placeholder="有邀请码可以不付款">
-        </div>
-        <button class="btn-primary" onclick="verify()">🔓 查看报告</button>
-      </div>
+      <button class="btn-primary" onclick="verify()">免费查看百分位</button>
     </div>
 
-    <!-- Step 2: Report -->
+    <!-- Step 2: Free Result -->
     <div class="step" id="step2">
       <div class="card report" id="rc">
-        <h3>📊 分析报告</h3>
+        <h3>免费结果</h3>
         <div id="noData" class="no-data-msg" style="display:none"></div>
         <div id="rContent" style="display:none">
           <div class="percentile-hero anim">
             <div class="percentile-number" id="pNum">--</div>
             <div class="percentile-label">同龄人百分位数</div>
-            <div class="grade-badge" id="gBadge">--</div>
-          </div>
-          <div class="gauge-container anim d1">
-            <div class="gauge-bar"><div class="gauge-marker" id="gMark" style="left:50%"></div></div>
-            <div class="gauge-labels"><span>极低</span><span>低</span><span>中低</span><span>中等</span><span>中高</span><span>高</span><span>极高</span></div>
-          </div>
-          <div class="stats-grid anim d1">
-            <div class="stat-item"><div class="stat-value" id="sMean">--</div><div class="stat-label">同龄均值 (ng/dL)</div></div>
-            <div class="stat-item"><div class="stat-value" id="sVal">--</div><div class="stat-label">你的数值 (ng/dL)</div></div>
-            <div class="stat-item"><div class="stat-value" id="sZ">--</div><div class="stat-label">Z-Score</div></div>
-          </div>
-          <div class="curve-container anim d2"><canvas id="cv" width="600" height="220"></canvas></div>
-          <div class="report-text anim d3" id="rTxt"></div>
-          <div class="stats-grid anim d3">
-            <div class="stat-item"><div class="stat-value" id="u1">--</div><div class="stat-label">ng/dL</div></div>
-            <div class="stat-item"><div class="stat-value" id="u2">--</div><div class="stat-label">nmol/L</div></div>
-            <div class="stat-item"><div class="stat-value" id="u3">--</div><div class="stat-label">ng/mL</div></div>
           </div>
         </div>
       </div>
-      <button class="btn-primary" onclick="goBack()" style="margin-top:16px;">← 返回修改</button>
+      <button class="btn-primary" onclick="goBack()" style="margin-top:16px;">返回修改</button>
     </div>
 
   </div>
 
+
+    <!-- paid-report-upsell:start -->
+    <div class="paid-report-upsell">
+      <div class="paid-report-head">
+        <div>
+          <div class="paid-report-title">生成完整睾酮报告</div>
+          <div class="paid-report-subtitle">免费只显示百分位。完整报告会展示同龄定位、数值换算、结果解读和建议。</div>
+        </div>
+        <div class="paid-report-price">¥4.9</div>
+      </div>
+      <div class="paid-report-list">
+        <div class="paid-report-item">同龄定位：百分位、均值差距和等级</div>
+        <div class="paid-report-item">数值换算：ng/dL、nmol/L、ng/mL</div>
+        <div class="paid-report-item">结果解读：生活方式和复查建议</div>
+      </div>
+      <a class="paid-report-action" href="paid-report.html">购买完整报告</a>
+    </div>
+    <!-- paid-report-upsell:end -->
+
   <footer>
-    <p>© 2025 宋珏清 · Built with ❤️</p>
+    <p>© 2025 【SJQ】身体数据实验室 · Built with ❤️</p>
     <p class="visit-counter">
       访问量 <span id="busuanzi_value_site_pv">--</span> · 本页 <span id="busuanzi_value_page_pv">--</span>
     </p>
   </footer>
 
 <script>
-var M25=576,M55=467,SD=147,C=0.0347,unit='ngdl',INVITE='573892';
+var M25=576,M55=467,SD=147,C=0.0347,unit='ngdl';
 
 function setU(u){unit=u;document.querySelectorAll('.unit-btn').forEach(function(b){b.classList.remove('active')});document.querySelector('[data-u="'+u+'"]').classList.add('active')}
 
@@ -357,29 +485,12 @@ function ncdf(x){var a1=.254829592,a2=-.284496736,a3=1.421413741,a4=-1.453152027
 
 function npdf(x){return Math.exp(-.5*x*x)/Math.sqrt(2*Math.PI)}
 
-function verify(){
-  var code=document.getElementById('inviteCode').value.trim();
+async function verify(){
   var age=parseInt(document.getElementById('age').value);
   var v=parseFloat(document.getElementById('val').value);
 
   if(isNaN(age)||isNaN(v)||v<=0){alert('请填写有效的年龄和睾酮值');return}
 
-  // Check invite code
-  if(code!=='' && code!==INVITE){
-    alert('邀请码无效，请检查后重试');
-    return;
-  }
-
-  // If no invite code, check payment (simulated client-side: user must have paid)
-  if(code===''){
-    // No invite code entered — user needs to have paid
-    // We show a confirmation that they've paid
-    if(!confirm('请确认您已完成微信支付（¥5）。\n\n点击"确定"继续查看报告。')){
-      return;
-    }
-  }
-
-  // Generate report
   generateReport();
   document.getElementById('step1').classList.remove('active');
   document.getElementById('step2').classList.add('active');
@@ -392,6 +503,7 @@ function goBack(){
 }
 
 function generateReport(){
+  window.testosteroneReportData = null;
   var a=parseInt(document.getElementById('age').value),
       v=parseFloat(document.getElementById('val').value),
       rc=document.getElementById('rc'),nd=document.getElementById('noData'),ct=document.getElementById('rContent');
@@ -402,12 +514,9 @@ function generateReport(){
   nd.style.display='none';ct.style.display='block';
   var n=ngdl(v,unit),z=(n-m)/SD,p=ncdf(z)*100;
   document.getElementById('pNum').textContent=p.toFixed(1)+'%';
-  document.getElementById('sMean').textContent=m.toFixed(0);
-  document.getElementById('sVal').textContent=n.toFixed(0);
-  document.getElementById('sZ').textContent=z.toFixed(2);
-  document.getElementById('u1').textContent=n.toFixed(1);
-  document.getElementById('u2').textContent=(n*C).toFixed(2);
-  document.getElementById('u3').textContent=(n*.01).toFixed(2);
+  var originalValue = v;
+  var nmol = n * C;
+  var ngml = n * 0.01;
 
   var col,g,bg,em;
   if(p<5){col='#ff4757';g='极低';bg='rgba(255,71,87,.15)';em='🔴'}
@@ -419,9 +528,21 @@ function generateReport(){
   else{col='#3742fa';g='极高';bg='rgba(55,66,250,.15)';em='⚡'}
 
   document.getElementById('pNum').style.color=col;
-  var bd=document.getElementById('gBadge');bd.textContent=em+' '+g;bd.style.background=bg;bd.style.color=col;
-  document.getElementById('gMark').style.left=Math.min(100,Math.max(0,p))+'%';
-  draw(m,n);report(a,m,n,z,p,g);
+  window.testosteroneReportData = {
+    reportType: 'testosterone',
+    title: '睾酮水平完整报告',
+    price: '¥4.9',
+    age: a,
+    unit: unit,
+    originalValue: originalValue,
+    testosteroneNgdl: n,
+    testosteroneNmol: nmol,
+    testosteroneNgml: ngml,
+    meanNgdl: m,
+    zScore: z,
+    percentile: p,
+    grade: g
+  };
 }
 
 function draw(mean,val){
@@ -459,5 +580,85 @@ function report(age,mean,val,z,p,g){
 }
 </script>
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  <script>
+    function collectPaidReportData() {
+      var titleEl = document.querySelector('.page-header h1') || document.querySelector('h1');
+      var reportEl = document.getElementById('reportText');
+      var rowEls = Array.prototype.slice.call(document.querySelectorAll('#resultRows tr'));
+      var summaryEls = Array.prototype.slice.call(document.querySelectorAll('.summary-card'));
+      var resultEls = Array.prototype.slice.call(document.querySelectorAll('.result, [id$="Result"]'));
+
+      var rows = rowEls.map(function(row) {
+        return Array.prototype.slice.call(row.children).map(function(cell) {
+          return cell.textContent.trim();
+        }).join('：');
+      }).filter(Boolean);
+
+      var summaries = summaryEls.map(function(card) {
+        var value = card.querySelector('.summary-value');
+        var label = card.querySelector('.summary-label');
+        if (!value || !label) return '';
+        return label.textContent.trim() + '：' + value.textContent.trim();
+      }).filter(Boolean);
+
+      var looseResults = resultEls.map(function(el) {
+        return el.textContent.trim();
+      }).filter(function(text) {
+        return text && text !== '--';
+      });
+
+      var inputRows = Array.prototype.slice.call(document.querySelectorAll('.input-group')).map(function(group) {
+        var label = group.querySelector('label');
+        var input = group.querySelector('input');
+        if (!label || !input) return '';
+        return label.textContent.trim() + '：' + input.value;
+      }).filter(Boolean);
+
+      var data = {
+        title: titleEl ? titleEl.textContent.replace(/\s+/g, '') : document.title,
+        url: location.pathname.split('/').pop(),
+        createdAt: new Date().toLocaleString(),
+        inputs: inputRows,
+        summaries: summaries,
+        rows: rows,
+        looseResults: looseResults,
+        interpretation: reportEl ? reportEl.textContent.trim() : ''
+      };
+
+      if (window.testosteroneReportData) {
+        data = Object.assign(data, window.testosteroneReportData, {
+          createdAt: new Date().toLocaleString(),
+          inputs: [
+            '年龄：' + window.testosteroneReportData.age,
+            '睾酮值：' + window.testosteroneReportData.originalValue + ' ' + window.testosteroneReportData.unit
+          ],
+          rows: [
+            '同龄百分位：' + window.testosteroneReportData.percentile.toFixed(1) + '%',
+            '睾酮：' + window.testosteroneReportData.testosteroneNgdl.toFixed(0) + ' ng/dL',
+            '同龄均值：' + window.testosteroneReportData.meanNgdl.toFixed(0) + ' ng/dL',
+            'Z-Score：' + window.testosteroneReportData.zScore.toFixed(2)
+          ]
+        });
+      }
+
+      localStorage.removeItem('paidReportUnlocked');
+      localStorage.setItem('paidReportData', JSON.stringify(data));
+    }
+
+    document.addEventListener('click', function(event) {
+      var link = event.target.closest && event.target.closest('.paid-report-action');
+      if (link) {
+        generateReport();
+        if (!window.testosteroneReportData) {
+          event.preventDefault();
+          alert('请先填写年龄和睾酮值，并查看免费百分位。');
+          return;
+        }
+        collectPaidReportData();
+      }
+    });
+  </script>
+
 </body>
 </html>
