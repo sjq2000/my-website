@@ -524,35 +524,35 @@
 
     <div class="page-header">
       <h1>身高<span>预测计算器</span></h1>
-      <p>根据儿童出生年月计算年龄，比较同龄平均身高差值，并估算成年身高。小于 6.5 岁不计算，大于 20 岁显示已发育完全。</p>
+      <p>输入出生时间、测量时间和当前身高，估算同龄位置与成年身高参考值。</p>
     </div>
 
     <div class="panel">
       <div class="form-grid">
         <div class="input-group">
           <label>出生年份</label>
-          <input type="number" id="birthYear" value="2010" min="2000" max="2030" step="1">
+          <input type="number" id="birthYear" placeholder="例如：2010" min="2000" max="2030" step="1">
         </div>
         <div class="input-group">
           <label>出生月份</label>
-          <input type="number" id="birthMonth" value="6" min="1" max="12" step="1">
+          <input type="number" id="birthMonth" placeholder="例如：6" min="1" max="12" step="1">
         </div>
         <div class="input-group">
           <label>测量年份</label>
-          <input type="number" id="measureYear" min="2000" max="2030" step="1">
+          <input type="number" id="measureYear" placeholder="例如：2026" min="2000" max="2030" step="1">
         </div>
         <div class="input-group">
           <label>测量月份</label>
-          <input type="number" id="measureMonth" min="1" max="12" step="1">
+          <input type="number" id="measureMonth" placeholder="例如：6" min="1" max="12" step="1">
         </div>
         <div class="input-group">
           <label>测量身高（cm）</label>
-          <input type="number" id="currentHeight" value="170" min="80" max="230" step="0.1">
+          <input type="number" id="currentHeight" placeholder="例如：170" min="80" max="230" step="0.1">
         </div>
       </div>
 
       <button class="btn-primary" onclick="calculate()">计算身高预测</button>
-      <p class="note">表中 6、7、8 等年龄点按 6.5、7.5、8.5 岁处理；年龄按测量年月减出生年月计算，两个年龄点之间用线性插值估算同龄平均身高。</p>
+      <p class="note">结果仅作发育趋势参考，实际成年身高还会受到遗传、营养、睡眠、运动和发育节奏影响。</p>
     </div>
 
     <div class="results" id="results">
@@ -562,8 +562,8 @@
           <div class="summary-label">当前年龄</div>
         </div>
         <div class="summary-card">
-          <div class="summary-value" id="diffValue">--</div>
-          <div class="summary-label">高于同龄平均</div>
+          <div class="summary-value" id="percentileValue">--</div>
+          <div class="summary-label">同龄百分位</div>
         </div>
         <div class="summary-card">
           <div class="summary-value" id="adultValue">--</div>
@@ -615,21 +615,21 @@
   </footer>
 
   <script>
-    var averageHeights = [
-      { age: 6.5, height: 121.71 },
-      { age: 7.5, height: 126.87 },
-      { age: 8.5, height: 132.40 },
-      { age: 9.5, height: 137.76 },
-      { age: 10.5, height: 143.09 },
-      { age: 11.5, height: 149.66 },
-      { age: 12.5, height: 156.34 },
-      { age: 13.5, height: 163.48 },
-      { age: 14.5, height: 168.57 },
-      { age: 15.5, height: 171.28 },
-      { age: 16.5, height: 172.58 },
-      { age: 17.5, height: 173.03 },
-      { age: 18.5, height: 173.08 },
-      { age: 20.5, height: 173.14 }
+    var heightStandards = [
+      { age: 6.5, mean: 121.71, sd: 5.4 },
+      { age: 7.5, mean: 126.87, sd: 5.7 },
+      { age: 8.5, mean: 132.40, sd: 5.9 },
+      { age: 9.5, mean: 137.76, sd: 6.4 },
+      { age: 10.5, mean: 143.09, sd: 6.9 },
+      { age: 11.5, mean: 149.66, sd: 8.0 },
+      { age: 12.5, mean: 156.34, sd: 8.9 },
+      { age: 13.5, mean: 163.48, sd: 8.4 },
+      { age: 14.5, mean: 168.57, sd: 7.2 },
+      { age: 15.5, mean: 171.28, sd: 6.6 },
+      { age: 16.5, mean: 172.58, sd: 6.3 },
+      { age: 17.5, mean: 173.03, sd: 6.3 },
+      { age: 18.5, mean: 172.98, sd: 6.3 },
+      { age: 19.5, mean: 173.14, sd: 6.3 }
     ];
 
     function fmt(n, digits) {
@@ -646,16 +646,37 @@
       document.getElementById('measureMonth').value = now.getMonth() + 1;
     }
 
-    function interpolateAverage(age) {
-      for (var i = 0; i < averageHeights.length - 1; i++) {
-        var left = averageHeights[i];
-        var right = averageHeights[i + 1];
+    function interpolateStandard(age) {
+      for (var i = 0; i < heightStandards.length - 1; i++) {
+        var left = heightStandards[i];
+        var right = heightStandards[i + 1];
         if (age >= left.age && age <= right.age) {
           var ratio = (age - left.age) / (right.age - left.age);
-          return left.height + (right.height - left.height) * ratio;
+          return {
+            mean: left.mean + (right.mean - left.mean) * ratio,
+            sd: left.sd + (right.sd - left.sd) * ratio
+          };
         }
       }
       return null;
+    }
+
+    function erf(x) {
+      var sign = x >= 0 ? 1 : -1;
+      x = Math.abs(x);
+      var a1 = 0.254829592;
+      var a2 = -0.284496736;
+      var a3 = 1.421413741;
+      var a4 = -1.453152027;
+      var a5 = 1.061405429;
+      var p = 0.3275911;
+      var t = 1 / (1 + p * x);
+      var y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+      return sign * y;
+    }
+
+    function normalCdf(z) {
+      return 0.5 * (1 + erf(z / Math.SQRT2));
     }
 
     function setRows(rows) {
@@ -687,19 +708,19 @@
       document.getElementById('ageValue').textContent = fmt(age, 1) + ' 岁';
 
       if (age < 6.5) {
-        document.getElementById('diffValue').textContent = '--';
+        document.getElementById('percentileValue').textContent = '--';
         document.getElementById('adultValue').textContent = '--';
-        document.getElementById('reportText').innerHTML = '<strong>结果：</strong>当前年龄约 <span class="hl">' + fmt(age, 1) + ' 岁</span>，小于 6.5 岁，暂不计算身高预测。';
+        document.getElementById('reportText').innerHTML = '<strong>结果：</strong>当前年龄约 <span class="hl">' + fmt(age, 1) + ' 岁</span>，年龄过小，暂不计算身高预测。';
         setRows([
           ['当前年龄', fmt(age, 2) + ' 岁'],
           ['测量身高', fmt(currentHeight, 1) + ' cm'],
-          ['计算状态', '小于 6.5 岁，不计算']
+          ['计算状态', '年龄过小，暂不计算']
         ]);
         return;
       }
 
-      if (age > 20) {
-        document.getElementById('diffValue').textContent = '--';
+      if (age > 19) {
+        document.getElementById('percentileValue').textContent = '--';
         document.getElementById('adultValue').textContent = fmt(currentHeight, 1) + ' cm';
         document.getElementById('reportText').innerHTML = '<strong>结果：</strong>当前年龄约 <span class="hl">' + fmt(age, 1) + ' 岁</span>，已经发育完全，当前身高可视为成年身高。';
         setRows([
@@ -710,25 +731,29 @@
         return;
       }
 
-      var sameAgeAverage = interpolateAverage(age);
-      var diff = currentHeight - sameAgeAverage;
-      var predictedAdult = adultAverage + diff;
-      var sign = diff >= 0 ? '+' : '';
+      var standard = interpolateStandard(age);
+      var z = (currentHeight - standard.mean) / standard.sd;
+      var percentile = Math.max(0.1, Math.min(99.9, normalCdf(z) * 100));
+      var adultAverage = 173.14;
+      var adultSd = 6.3;
+      var predictedAdult = adultAverage + z * adultSd;
+      var sign = z >= 0 ? '+' : '';
 
-      document.getElementById('diffValue').textContent = sign + fmt(diff, 1) + ' cm';
+      document.getElementById('percentileValue').textContent = fmt(percentile, 1) + '%';
       document.getElementById('adultValue').textContent = fmt(predictedAdult, 1) + ' cm';
       document.getElementById('reportText').innerHTML =
         '<strong>结果解读：</strong>当前年龄约 <span class="hl">' + fmt(age, 1) +
-        ' 岁</span>，同龄平均身高约 <span class="hl">' + fmt(sameAgeAverage, 1) +
-        ' cm</span>。当前身高比同龄平均 <span class="hl">' + sign + fmt(diff, 1) +
-        ' cm</span>，按成年平均身高 173.14 cm 加上该差值，预测成年身高约为 <span class="hl">' +
+        ' 岁</span>，测量身高对应同龄约 <span class="hl">' + fmt(percentile, 1) +
+        '%</span> 百分位。综合当前身高位置和后续发育趋势，预测成年身高约为 <span class="hl">' +
         fmt(predictedAdult, 1) + ' cm</span>。';
 
       setRows([
         ['当前年龄', fmt(age, 2) + ' 岁'],
         ['测量身高', fmt(currentHeight, 1) + ' cm'],
-        ['同龄平均身高', fmt(sameAgeAverage, 2) + ' cm'],
-        ['与同龄平均差值', sign + fmt(diff, 2) + ' cm'],
+        ['同龄平均身高', fmt(standard.mean, 2) + ' cm'],
+        ['同龄标准差', fmt(standard.sd, 2) + ' cm'],
+        ['Z 值', sign + fmt(z, 2)],
+        ['同龄百分位', fmt(percentile, 2) + '%'],
         ['预测成年身高', fmt(predictedAdult, 2) + ' cm']
       ]);
     }
@@ -739,8 +764,6 @@
       });
     });
 
-    setDefaultMeasureDate();
-    calculate();
   </script>
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
