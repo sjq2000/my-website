@@ -442,6 +442,68 @@
       font-size: 18px;
     }
 
+
+    .report-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .report-table th,
+    .report-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      text-align: left;
+      color: #cfe8f6;
+      font-size: 13px;
+    }
+
+    .report-table th {
+      color: #fff;
+      background: rgba(0, 191, 255, 0.08);
+      font-weight: 800;
+    }
+
+    .report-table tr:last-child td { border-bottom: none; }
+
+    .report-progress {
+      padding: 14px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .report-progress-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      color: #cfe8f6;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .report-progress-value {
+      color: #00ff88;
+      font-size: 16px;
+    }
+
+    .report-progress-track {
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .report-progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #00bfff, #00ff88);
+    }
+
     .share-actions {
       display: grid;
       grid-template-columns: 1fr;
@@ -687,7 +749,7 @@
       <p>从计算器结果生成报告，扫码支付后确认查看。</p>
     </div>
 
-    <div class="pay-strip">
+    <div class="pay-strip" id="payStrip">
       <img class="pay-qr" src="payment-qr-cropped.png" alt="微信收款码">
       <div class="pay-copy">
         <div class="pay-title">完整分析报告 <span id="reportPrice">¥9.9</span></div>
@@ -1133,6 +1195,45 @@
       return html;
     }
 
+    function formatMaybeNumber(value, digits, suffix) {
+      if (value == null || value === '' || !isFinite(Number(value))) return '--';
+      return Number(value).toFixed(digits == null ? 1 : digits) + (suffix || '');
+    }
+
+    function renderMuscleSpecificReport(data) {
+      var progress = Math.max(0, Math.min(100, Number(data.potentialPercent || 0)));
+      var metrics = [
+        ['当前去脂体重', formatMaybeNumber(data.currentLbm, 1, ' kg')],
+        ['可增加去脂体重', formatMaybeNumber(data.gainLeft, 1, ' kg')],
+        ['当前 FFMI', formatMaybeNumber(data.ffmi, 1)],
+        ['骨架评分', escapeHtml(data.frameText || '--')]
+      ].map(function(item) {
+        return '<div class="metric-pill"><span>' + item[0] + '</span><strong>' + item[1] + '</strong></div>';
+      }).join('');
+
+      var rows = [
+        ['总体重（kg）', data.realisticBodyKg, data.maxBodyKg],
+        ['去脂体重（kg）', data.realisticLbm, data.maxLbm],
+        ['脂肪量（kg）', data.realisticFatKg, data.maxFatKg],
+        ['胸围（cm）', data.chestRealistic, data.chestMax],
+        ['上臂围（cm）', data.bicepsRealistic, data.bicepsMax],
+        ['前臂围（cm）', data.forearmsRealistic, data.forearmsMax],
+        ['颈围（cm）', data.neckRealistic, data.neckMax],
+        ['大腿围（cm）', data.thighsRealistic, data.thighsMax],
+        ['小腿围（cm）', data.calvesRealistic, data.calvesMax]
+      ].map(function(row) {
+        return '<tr><td>' + row[0] + '</td><td>' + formatMaybeNumber(row[1], 1) + '</td><td>' + formatMaybeNumber(row[2], 1) + '</td></tr>';
+      }).join('');
+
+      var html = '';
+      html += '<div class="report-section"><h3>1. 核心指标</h3><div class="metric-pills">' + metrics + '</div></div>';
+      html += '<div class="report-section"><h3>2. 潜力进度</h3><div class="report-progress"><div class="report-progress-head"><span>增肌潜力开发进度</span><span class="report-progress-value">' + progress + '%</span></div><div class="report-progress-track"><div class="report-progress-fill" style="width:' + progress + '%"></div></div><p style="margin-top:10px;">按基础 FFMI 18.5 估算起点：已开发 <strong>' + formatMaybeNumber(data.developedLbmKg, 1, ' kg') + '</strong> / 可开发 <strong>' + formatMaybeNumber(data.trainableLbmKg, 1, ' kg') + '</strong>。</p></div></div>';
+      html += '<div class="report-section"><h3>3. 自然状态预测表</h3><table class="report-table"><thead><tr><th>指标</th><th>合理自然状态</th><th>最大自然状态</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+      html += '<div class="report-section"><h3>4. 结果解读</h3><p>当前去脂体重约 <strong>' + formatMaybeNumber(data.currentLbm, 1, ' kg') + '</strong>，距离合理自然状态还差约 <strong>' + formatMaybeNumber(data.gainLeft, 1, ' kg') + '</strong> 去脂体重。当前体脂率约 <strong>' + formatMaybeNumber(data.bodyFatPercent, 1, '%') + '</strong>，训练阶段为 <strong>' + escapeHtml(data.stageText || '--') + '</strong>。</p></div>';
+      html += '<div class="report-section"><h3>5. 训练建议</h3><p>' + escapeHtml(data.muscleAdvice || inferAdvice(data)) + '</p></div>';
+      return html;
+    }
+
     function inferAdvice(data) {
       var title = data.title || '';
       if (title.indexOf('增肌') !== -1) return '重点关注去脂体重、体脂率和潜力开发进度。如果剩余空间较大，优先优化热量盈余、蛋白质摄入、复合动作训练容量和睡眠恢复。';
@@ -1158,9 +1259,42 @@
       return '<div class="report-section"><h3>报告已生成，支付后查看</h3><p>已检测到 <strong>' + escapeHtml(data.title || '当前计算器') + '</strong> 的计算结果。请先扫码支付，支付完成后点击上方按钮确认查看。</p><div class="locked-preview">可预览：本报告将包含输入数据、核心结果、能力图表、结果解读和训练建议。</div></div>';
     }
 
+    function getReportUnlockKey(data) {
+      var source = JSON.stringify({
+        reportType: data && data.reportType,
+        title: data && data.title,
+        createdAt: data && data.createdAt,
+        inputs: data && data.inputs,
+        rows: data && data.rows,
+        summaries: data && data.summaries,
+        bodyFatPercent: data && data.bodyFatPercent,
+        bmi: data && data.bmi,
+        ffmi: data && data.ffmi,
+        percentile: data && data.percentile,
+        testosteroneNgdl: data && data.testosteroneNgdl
+      });
+      var hash = 0;
+      for (var i = 0; i < source.length; i++) {
+        hash = ((hash << 5) - hash) + source.charCodeAt(i);
+        hash |= 0;
+      }
+      return 'report-' + Math.abs(hash);
+    }
+
     function confirmPayment() {
       if (confirm('是否确定已完成支付？')) {
-        localStorage.setItem('paidReportUnlocked', 'true');
+        var raw = localStorage.getItem('paidReportData');
+        if (!raw) {
+          alert('还没有检测到报告数据，请先回到计算器完成计算。');
+          return;
+        }
+        var data;
+        try { data = JSON.parse(raw); } catch (e) {
+          alert('报告数据读取失败，请回到计算器重新计算一次。');
+          return;
+        }
+        localStorage.removeItem('paidReportUnlocked');
+        localStorage.setItem('paidReportUnlockedKey', getReportUnlockKey(data));
         renderGeneratedReport();
         var report = document.getElementById('generatedReport');
         if (report) report.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1173,6 +1307,8 @@
       if (!box) return;
       var raw = localStorage.getItem('paidReportData');
       if (!raw) {
+        var emptyPayStrip = document.getElementById('payStrip');
+        if (emptyPayStrip) emptyPayStrip.style.display = '';
         box.innerHTML = '<div class="report-section"><h3>还没有报告数据</h3><p>请先回到体脂率计算器填写身高、体重、腰围并点击计算，再购买完整报告。</p><div class="generated-list"><div><a href="body-fat-calculator.html" style="color:#00bfff;text-decoration:none;font-weight:800;">去体脂率计算器测试 &rarr;</a></div></div></div>';
         if (time) time.textContent = '等待计算结果';
         return;
@@ -1199,18 +1335,28 @@
       time.textContent = data.createdAt || '刚刚生成';
       var priceEl = document.getElementById('reportPrice');
       if (priceEl) priceEl.textContent = data.price || '¥9.9';
-      if (localStorage.getItem('paidReportUnlocked') === 'true') {
-        if (data.reportType === 'fitness') {
-          box.innerHTML = renderFitnessSpecificReport(data);
-        } else if (data.reportType === 'bodyFat') {
-          box.innerHTML = renderBodyFatSpecificReport(data);
-        } else if (data.reportType === 'testosterone') {
-          box.innerHTML = renderTestosteroneSpecificReport(data);
-        } else {
-          box.innerHTML = buildGeneratedReportHtml(data);
-        }
-      } else {
+      var payStrip = document.getElementById('payStrip');
+      var unlockedKey = localStorage.getItem('paidReportUnlockedKey');
+      var currentKey = getReportUnlockKey(data);
+      if (unlockedKey !== currentKey) {
+        if (payStrip) payStrip.style.display = '';
+        localStorage.removeItem('paidReportUnlocked');
         box.innerHTML = renderLockedReport(data);
+        return;
+      }
+
+      if (payStrip) payStrip.style.display = 'none';
+
+      if (data.reportType === 'fitness') {
+        box.innerHTML = renderFitnessSpecificReport(data);
+      } else if (data.reportType === 'muscle') {
+        box.innerHTML = renderMuscleSpecificReport(data);
+      } else if (data.reportType === 'bodyFat') {
+        box.innerHTML = renderBodyFatSpecificReport(data);
+      } else if (data.reportType === 'testosterone') {
+        box.innerHTML = renderTestosteroneSpecificReport(data);
+      } else {
+        box.innerHTML = buildGeneratedReportHtml(data);
       }
     }
 
