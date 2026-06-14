@@ -506,20 +506,8 @@
 
       <div class="results" id="results">
         <div class="result-row">
-          <span class="result-label">体脂率</span>
+          <span class="result-label">估算体脂率范围</span>
           <span class="result-value" id="bfPercent">--<span class="unit">%</span></span>
-        </div>
-        <div class="result-row">
-          <span class="result-label">BMI</span>
-          <span class="result-value" id="bmi">--</span>
-        </div>
-        <div class="result-row">
-          <span class="result-label">去脂肪体重</span>
-          <span class="result-value" id="lbm">--<span class="unit">kg</span></span>
-        </div>
-        <div class="result-row">
-          <span class="result-label">FFMI（去脂体重指数）</span>
-          <span class="result-value" id="ffmi">--<span class="unit">kg/m²</span></span>
         </div>
       </div>
     </div>
@@ -581,14 +569,8 @@
       else { levelText = '过高'; levelClass = 'level-high'; }
 
       document.getElementById('bfPercent').innerHTML =
-        bfPercent.toFixed(2) + '<span class="unit">%</span> ' +
+        bfPercent.toFixed(1) + '<span class="unit">% ±2%</span> ' +
         '<span class="level-tag ' + levelClass + '">' + levelText + '</span>';
-      document.getElementById('bmi').innerHTML =
-        bmi.toFixed(1);
-      document.getElementById('lbm').innerHTML =
-        lbm.toFixed(1) + '<span class="unit">kg</span>';
-      document.getElementById('ffmi').innerHTML =
-        ffmi.toFixed(1) + '<span class="unit">kg/m²</span>';
 
       window.bodyFatReportData = {
         reportType: 'bodyFat',
