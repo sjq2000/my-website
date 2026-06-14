@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="【SJQ】身体数据实验室完整分析报告页面，展示计算器生成的身体数据解读、图表和行动建议。">
   <title>【SJQ】身体数据实验室 | 完整分析报告</title>
+  <link rel="canonical" href="https://sjqlab.top/pages/paid-report.html">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -440,6 +442,59 @@
       font-size: 18px;
     }
 
+    .share-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .share-btn,
+    .share-download {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 191, 255, 0.28);
+      background: rgba(0, 191, 255, 0.08);
+      color: #00bfff;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .share-btn:hover,
+    .share-download:hover {
+      background: rgba(0, 191, 255, 0.14);
+      border-color: rgba(0, 191, 255, 0.45);
+    }
+
+    .share-preview {
+      display: none;
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.24);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .share-preview.show { display: block; }
+
+    .share-preview img {
+      display: block;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      border-radius: 12px;
+      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.36);
+    }
+
+    .share-download { margin-top: 12px; }
+
+
     .distribution-chart {
       width: 100%;
       max-width: 720px;
@@ -789,6 +844,68 @@
       return html + '</div>';
     }
 
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight) {
+      var chars = String(text).split('');
+      var line = '';
+      for (var i = 0; i < chars.length; i++) {
+        var test = line + chars[i];
+        if (ctx.measureText(test).width > maxWidth && line) {
+          ctx.fillText(line, x, y);
+          line = chars[i];
+          y += lineHeight;
+        } else {
+          line = test;
+        }
+      }
+      if (line) ctx.fillText(line, x, y);
+      return y;
+    }
+
+    function buildBodyFatShareUrl(data) {
+      var p = getBodyFatProfile(data);
+      var params = new URLSearchParams({
+        type: p.name,
+        key: p.key,
+        bf: p.bf.toFixed(2),
+        bmi: p.bmi.toFixed(1),
+        ffmi: p.ffmi.toFixed(1)
+      });
+      return new URL('body-fat-share.html?' + params.toString(), location.href).href;
+    }
+
+    function showBodyFatShareLink() {
+      var raw = localStorage.getItem('paidReportData');
+      if (!raw) return;
+      var data;
+      try { data = JSON.parse(raw); } catch (e) { return; }
+      if (data.reportType !== 'bodyFat') return;
+      var p = getBodyFatProfile(data);
+      var url = buildBodyFatShareUrl(data);
+      var input = document.getElementById('bodyFatShareUrl');
+      var link = document.getElementById('bodyFatShareOpen');
+      var box = document.getElementById('bodyFatShareBox');
+      var typeEl = document.getElementById('bodyFatShareType');
+      if (!input || !link || !box) return;
+      input.value = url;
+      link.href = url;
+      if (typeEl) typeEl.textContent = p.name;
+      box.classList.add('show');
+    }
+
     function renderBodyFatSpecificReport(data) {
       var p = getBodyFatProfile(data);
       var metrics = [
@@ -822,6 +939,7 @@
       html += '<div class="report-section"><h3>4. 结果解读</h3><p>当前 BMI 为 <strong>' + p.bmi.toFixed(1) + '</strong>，FFMI 为 <strong>' + p.ffmi.toFixed(1) + '</strong>，体脂率约 <strong>' + p.bf.toFixed(2) + '%</strong>。单看体重容易误判，结合FFMI后能更清楚地看到你的主要矛盾：到底是脂肪过多、肌肉不足，还是肌肉量不错但需要控制脂肪。</p></div>';
       html += '<div class="report-section"><h3>5. 行动建议</h3><p>' + escapeHtml(goal) + '</p></div>';
       html += '<div class="report-section"><h3>6. 复测方式</h3><p>建议每2-4周复测一次体重、腰围和训练表现。减脂期优先看腰围和体脂趋势，增肌期优先看FFMI、力量和体重是否同步上升。</p></div>';
+      html += '<div class="report-section"><h3>7. 分享报告</h3><p>生成一个结果图和一个可点击分享链接，别人打开后可以直接进入体脂率测试。</p><div class="share-actions"><button class="share-btn" type="button" onclick="showBodyFatShareLink()">生成分享</button></div><div class="share-preview" id="bodyFatShareBox"><div style="padding:18px;border-radius:14px;background:linear-gradient(135deg,rgba(0,255,136,0.14),rgba(0,191,255,0.09));border:1px solid rgba(0,255,136,0.22);margin-bottom:12px;"><div style="color:#8ca0aa;font-size:13px;font-weight:700;margin-bottom:8px;">分享图预览</div><div style="color:#fff;font-size:20px;font-weight:900;margin-bottom:8px;">我的身体类型：<span id="bodyFatShareType" style="color:#00ff88;"></span></div><div style="color:#aaa;font-size:13px;line-height:1.7;">BMI × FFMI 九宫格定位 · 【SJQ】身体数据实验室</div></div><input id="bodyFatShareUrl" readonly onclick="this.select();" style="width:100%;padding:12px 14px;border-radius:8px;border:1px solid rgba(0,191,255,0.25);background:rgba(0,0,0,0.35);color:#dff6ff;font-size:13px;outline:none;"><a class="share-download" id="bodyFatShareOpen" href="#" target="_blank" rel="noopener">打开分享链接</a></div></div>';
       return html;
     }
 
