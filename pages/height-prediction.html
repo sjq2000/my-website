@@ -383,6 +383,26 @@
       box-shadow: 0 6px 22px rgba(0, 255, 136, 0.22);
     }
 
+
+    .growth-assessment {
+      margin: 22px 0 18px;
+      border-color: rgba(0, 255, 136, 0.16);
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.06), rgba(0, 191, 255, 0.035));
+    }
+
+    .growth-assessment h2 {
+      color: #fff;
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .growth-assessment p {
+      color: #aaa;
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 18px;
+    }
+
     @media (max-width: 760px) {
       .paid-report-head { flex-direction: column; }
       .paid-report-list { grid-template-columns: 1fr; }
@@ -589,21 +609,41 @@
   </div>
 
 
+    <div class="panel growth-assessment">
+      <h2>青少年生长状态评估</h2>
+      <p>填写营养相关指标，生成完整报告后查看营养状态、潜在身高亏损和补足后的参考身高。</p>
+      <div class="form-grid">
+        <div class="input-group">
+          <label>血清25羟基维生素D（ng/mL）</label>
+          <input type="number" id="vitaminD" placeholder="例如：30" min="0" max="100" step="0.1">
+        </div>
+        <div class="input-group">
+          <label>动物蛋白质摄入量（g/天）</label>
+          <input type="number" id="animalProtein" placeholder="例如：60" min="0" max="200" step="1">
+        </div>
+        <div class="input-group">
+          <label>Ca摄入量（mg/天）</label>
+          <input type="number" id="calciumIntake" placeholder="例如：800" min="0" max="2500" step="10">
+        </div>
+      </div>
+    </div>
+
+
     <!-- paid-report-upsell:start -->
     <div class="paid-report-upsell">
       <div class="paid-report-head">
         <div>
-          <div class="paid-report-title">生成完整分析报告</div>
-          <div class="paid-report-subtitle">基础计算免费。付费报告会结合你的输入结果，给出更完整的水平定位、优势短板和下一步建议。</div>
+          <div class="paid-report-title">生成青少年生长状态评估</div>
+          <div class="paid-report-subtitle">身高预测免费。完整报告会结合维生素D、动物蛋白和钙摄入，评估营养状态与生长潜能。</div>
         </div>
         <div class="paid-report-price">¥9.9</div>
       </div>
       <div class="paid-report-list">
-        <div class="paid-report-item">结果解读：这组数据说明了什么</div>
-        <div class="paid-report-item">同类比较：优势、短板和风险点</div>
-        <div class="paid-report-item">行动建议：下一步训练或改善方向</div>
+        <div class="paid-report-item">营养进度：维D、动物蛋白、Ca 1:1:1 综合</div>
+        <div class="paid-report-item">潜在影响：估算可能亏损的成年身高</div>
+        <div class="paid-report-item">补足参考：给出优化后的身高参考值</div>
       </div>
-      <a class="paid-report-action" href="paid-report.html">购买完整报告</a>
+      <a class="paid-report-action" href="paid-report.html">购买生长状态评估</a>
     </div>
     <!-- paid-report-upsell:end -->
 
@@ -756,6 +796,18 @@
         ['同龄百分位', fmt(percentile, 2) + '%'],
         ['预测成年身高', fmt(predictedAdult, 2) + ' cm']
       ]);
+
+
+      window.heightPredictionData = {
+        reportType: 'heightGrowth',
+        title: '青少年生长状态评估',
+        price: '¥9.9',
+        age: age,
+        currentHeight: currentHeight,
+        percentile: percentile,
+        predictedAdult: predictedAdult,
+        zScore: z
+      };
     }
 
     document.querySelectorAll('input').forEach(function(input) {
@@ -801,6 +853,10 @@
         return label.textContent.trim() + '：' + input.value;
       }).filter(Boolean);
 
+      var vitaminD = parseFloat(document.getElementById('vitaminD').value);
+      var animalProtein = parseFloat(document.getElementById('animalProtein').value);
+      var calciumIntake = parseFloat(document.getElementById('calciumIntake').value);
+
       var data = {
         title: titleEl ? titleEl.textContent.replace(/\s+/g, '') : document.title,
         url: location.pathname.split('/').pop(),
@@ -811,13 +867,35 @@
         looseResults: looseResults,
         interpretation: reportEl ? reportEl.textContent.trim() : ''
       };
+      if (window.heightPredictionData) {
+        Object.keys(window.heightPredictionData).forEach(function(key) {
+          data[key] = window.heightPredictionData[key];
+        });
+      }
+      data.vitaminD = vitaminD;
+      data.animalProtein = animalProtein;
+      data.calciumIntake = calciumIntake;
 
       localStorage.setItem('paidReportData', JSON.stringify(data));
     }
 
     document.addEventListener('click', function(event) {
       var link = event.target.closest && event.target.closest('.paid-report-action');
-      if (link) collectPaidReportData();
+      if (!link) return;
+      if (!window.heightPredictionData) {
+        event.preventDefault();
+        alert('请先完成身高预测计算');
+        return;
+      }
+      var vitaminD = parseFloat(document.getElementById('vitaminD').value);
+      var animalProtein = parseFloat(document.getElementById('animalProtein').value);
+      var calciumIntake = parseFloat(document.getElementById('calciumIntake').value);
+      if (!vitaminD || !animalProtein || !calciumIntake) {
+        event.preventDefault();
+        alert('请填写维生素D、动物蛋白质摄入量和Ca摄入量');
+        return;
+      }
+      collectPaidReportData();
     });
   </script>
 
