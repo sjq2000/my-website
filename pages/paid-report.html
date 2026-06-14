@@ -1234,6 +1234,46 @@
       return html;
     }
 
+    function nutritionScore(value, target) {
+      if (!value || !target) return 0;
+      return Math.max(0, Math.min(100, Number(value) / target * 100));
+    }
+
+    function renderHeightGrowthReport(data) {
+      var vitaminScore = nutritionScore(data.vitaminD, 30);
+      var proteinScore = nutritionScore(data.animalProtein, 60);
+      var calciumScore = nutritionScore(data.calciumIntake, 800);
+      var nutrition = Math.round((vitaminScore + proteinScore + calciumScore) / 3);
+      var nutritionGap = Math.max(0, 1 - nutrition / 100);
+      var deficit = 8 * (Math.exp(2 * nutritionGap) - 1) / (Math.exp(1.4) - 1);
+      var baseHeight = Number(data.predictedAdult || 0);
+      var optimizedHeight = baseHeight + deficit;
+      var status = nutrition >= 98 ? '已接近最大化生长潜能' : nutrition >= 75 ? '营养支持较好，仍有小幅优化空间' : nutrition >= 50 ? '营养支持一般，可能限制生长潜能' : '营养支持不足，建议尽快补足关键项目';
+      var metrics = [
+        ['预测成年身高', formatMaybeNumber(baseHeight, 1, ' cm')],
+        ['营养状况', nutrition + '%'],
+        ['可能亏损', formatMaybeNumber(deficit, 1, ' cm')],
+        ['补足后参考', formatMaybeNumber(optimizedHeight, 1, ' cm')]
+      ].map(function(item) {
+        return '<div class="metric-pill"><span>' + item[0] + '</span><strong>' + item[1] + '</strong></div>';
+      }).join('');
+      var rows = [
+        ['血清25羟基维生素D', formatMaybeNumber(data.vitaminD, 1, ' ng/mL'), vitaminScore],
+        ['动物蛋白质摄入量', formatMaybeNumber(data.animalProtein, 0, ' g/天'), proteinScore],
+        ['Ca摄入量', formatMaybeNumber(data.calciumIntake, 0, ' mg/天'), calciumScore]
+      ].map(function(row) {
+        return '<tr><td>' + row[0] + '</td><td>' + row[1] + '</td><td>' + Math.round(row[2]) + '%</td></tr>';
+      }).join('');
+
+      var html = '';
+      html += '<div class="report-section"><h3>1. 核心结果</h3><div class="metric-pills">' + metrics + '</div><p>' + escapeHtml(status) + '。</p></div>';
+      html += '<div class="report-section"><h3>2. 营养进度</h3><div class="report-progress"><div class="report-progress-head"><span>生长营养支持度</span><span class="report-progress-value">' + nutrition + '%</span></div><div class="report-progress-track"><div class="report-progress-fill" style="width:' + nutrition + '%"></div></div></div></div>';
+      html += '<div class="report-section"><h3>3. 分项数据</h3><table class="report-table"><thead><tr><th>项目</th><th>输入值</th><th>完成度</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+      html += '<div class="report-section"><h3>4. 身高影响</h3><p>当前预测成年身高约 <strong>' + formatMaybeNumber(baseHeight, 1, ' cm') + '</strong>。按营养支持度估算，若关键营养长期不足，可能亏损约 <strong>' + formatMaybeNumber(deficit, 1, ' cm') + '</strong> 成年身高；若后续补足营养，参考值可调整至约 <strong>' + formatMaybeNumber(optimizedHeight, 1, ' cm') + '</strong>。</p></div>';
+      html += '<div class="report-section"><h3>5. 建议</h3><p>建议把目标量具体化：25羟基维生素D尽量维持在30 ng/mL以上；动物蛋白质摄入量建议稳定到每天60 g左右，可由鸡蛋、牛奶、鱼虾、瘦肉、禽肉等分散到2-3餐；Ca摄入量建议达到每天800 mg左右，优先来自牛奶、酸奶、奶酪、豆制品和深绿色蔬菜。如果维生素D偏低，可以增加日晒并在医生或营养师建议下补充维D，8-12周后复查。睡眠建议保证8-9小时，运动以跳跃、球类、力量基础和户外活动为主。</p></div>';
+      return html;
+    }
+
     function inferAdvice(data) {
       var title = data.title || '';
       if (title.indexOf('增肌') !== -1) return '重点关注去脂体重、体脂率和潜力开发进度。如果剩余空间较大，优先优化热量盈余、蛋白质摄入、复合动作训练容量和睡眠恢复。';
@@ -1351,6 +1391,8 @@
         box.innerHTML = renderFitnessSpecificReport(data);
       } else if (data.reportType === 'muscle') {
         box.innerHTML = renderMuscleSpecificReport(data);
+      } else if (data.reportType === 'heightGrowth') {
+        box.innerHTML = renderHeightGrowthReport(data);
       } else if (data.reportType === 'bodyFat') {
         box.innerHTML = renderBodyFatSpecificReport(data);
       } else if (data.reportType === 'testosterone') {
