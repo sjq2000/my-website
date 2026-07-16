@@ -1,0 +1,804 @@
+﻿<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="体测成绩计算器，输入身高、体重、肺活量、50米、立定跳远、握力和1000米成绩，生成体测能力分析报告。">
+  <title>【SJQ】身体数据实验室 | 体测成绩计算器</title>
+  <link rel="canonical" href="https://sjqlab.top/pages/fitness-calculator.html">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+      background-color: #0a0a0a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: 
+        radial-gradient(ellipse at 20% 50%, rgba(0, 191, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(0, 100, 255, 0.06) 0%, transparent 50%);
+      z-index: -1;
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0, 191, 255, 0.15);
+      z-index: 1000;
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .nav-brand {
+      font-size: 20px;
+      font-weight: 700;
+      color: #00bfff;
+      text-decoration: none;
+      letter-spacing: 2px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: #aaa;
+      text-decoration: none;
+      font-size: 15px;
+      transition: color 0.3s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #00bfff;
+      transition: width 0.3s;
+    }
+
+    .nav-links a:hover { color: #00bfff; }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: #00bfff; }
+    .nav-links a.active::after { width: 100%; }
+
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: #00bfff;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    
+    /* Dropdown menu */
+    .nav-dropdown { position: relative; }
+    .nav-dropdown > a { cursor: pointer; }
+    .nav-dropdown > a::after { content: ' \25BE'; font-size: 10px; }
+    .nav-dropdown-menu {
+      display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+      background: rgba(10,10,10,0.95); backdrop-filter: blur(20px);
+      border: 1px solid rgba(0,191,255,0.15); border-radius: 10px;
+      padding: 8px 0; min-width: 160px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+    .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+    .nav-dropdown-menu a {
+      display: block; padding: 10px 20px; color: #aaa; text-decoration: none;
+      font-size: 14px; transition: all 0.2s; white-space: nowrap;
+    }
+    .nav-dropdown-menu a::after { display: none !important; }
+    .nav-dropdown-menu a:hover { color: #00bfff; background: rgba(0,191,255,0.08); }
+    .nav-dropdown-menu a.active { color: #00bfff; font-weight: 600; }
+
+
+    @media (max-width: 600px) {
+      .nav-dropdown-menu {
+        position: static; transform: none; background: transparent;
+        border: none; box-shadow: none; padding: 0 0 0 16px;
+        display: block !important;
+      }
+      .nav-dropdown-menu a { padding: 8px 0; }
+    }
+
+@media (max-width: 600px) {
+      .menu-toggle { display: block; }
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        width: 100%;
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: 20px;
+        gap: 16px;
+        border-bottom: 1px solid rgba(0, 191, 255, 0.15);
+      }
+      .nav-links.open { display: flex; }
+    }
+
+    /* Main content */
+    .page-container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 100px 24px 60px;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .page-header h1 span {
+      color: #00bfff;
+    }
+
+    .page-header h2 {
+      font-size: 16px;
+      font-weight: 400;
+      color: #888;
+    }
+
+    .page-header .douyin {
+      color: #00bfff;
+      font-size: 14px;
+      margin-top: 12px;
+    }
+
+    .page-header .source {
+      font-size: 13px;
+      color: #666;
+      margin-top: 8px;
+    }
+
+    /* Calculator items */
+    .calc-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(0, 191, 255, 0.1);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 16px;
+      transition: all 0.3s;
+    }
+
+    .calc-item:hover {
+      border-color: rgba(0, 191, 255, 0.25);
+      background: rgba(0, 191, 255, 0.03);
+    }
+
+    .calc-item h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .calc-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .calc-row input {
+      flex: 1;
+      min-width: 180px;
+      padding: 12px 16px;
+      border: 1px solid rgba(0, 191, 255, 0.3);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .calc-row input:focus {
+      border-color: #00bfff;
+      box-shadow: 0 0 0 3px rgba(0, 191, 255, 0.1);
+    }
+
+    .calc-row input::placeholder {
+      color: #555;
+    }
+
+    .calc-row button {
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #00bfff, #0080ff);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .calc-row button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(0, 191, 255, 0.3);
+    }
+
+    .calc-row button:active {
+      transform: translateY(0);
+    }
+
+    .calc-result {
+      margin-top: 12px;
+      font-size: 15px;
+      color: #00bfff;
+      min-height: 22px;
+      font-weight: 500;
+    }
+
+    .service-panel {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.08), rgba(0, 191, 255, 0.04));
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      border-radius: 12px;
+      padding: 22px;
+      margin: 24px 0;
+    }
+
+    .service-panel h3 {
+      font-size: 17px;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .service-panel p {
+      color: #aaa;
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+
+    .service-price {
+      display: inline-block;
+      padding: 5px 14px;
+      border-radius: 20px;
+      background: rgba(0, 255, 136, 0.12);
+      color: #00ff88;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .wechat {
+      color: #00bfff;
+      font-weight: 700;
+    }
+
+    /* Back link */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #888;
+      text-decoration: none;
+      font-size: 14px;
+      margin-bottom: 32px;
+      transition: color 0.3s;
+    }
+
+    .back-link:hover {
+      color: #00bfff;
+    }
+
+    /* Footer */
+
+
+    /* Paid report upsell */
+    .paid-report-upsell {
+      margin: 22px 0 18px;
+      padding: 22px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.08), rgba(0, 191, 255, 0.04));
+    }
+
+    .paid-report-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .paid-report-title {
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .paid-report-subtitle {
+      color: #aaa;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .paid-report-price {
+      color: #00ff88;
+      font-size: 28px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .paid-report-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .paid-report-item {
+      color: #bbb;
+      font-size: 13px;
+      line-height: 1.6;
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .paid-report-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 44px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #00ff88, #00bfff);
+      color: #061010;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 800;
+      transition: all 0.3s;
+    }
+
+    .paid-report-action:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(0, 255, 136, 0.22);
+    }
+
+    @media (max-width: 760px) {
+      .paid-report-head { flex-direction: column; }
+      .paid-report-list { grid-template-columns: 1fr; }
+      .paid-report-price { font-size: 24px; }
+    }
+
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 40px;
+      text-align: center;
+      color: #555;
+      font-size: 14px;
+    }
+
+    .visit-counter {
+      margin-top: 8px;
+      color: #444;
+      font-size: 12px;
+    }
+
+    .visit-counter span {
+      color: #555;
+    }
+  
+
+    .nav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #eaf6ff !important;
+      text-decoration: none;
+      letter-spacing: 0;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 36px;
+      border-radius: 10px;
+      background: #15d8d2;
+      color: #051015;
+      font-size: 15px;
+      font-weight: 950;
+      letter-spacing: 0;
+      box-shadow: 0 8px 22px rgba(0, 191, 255, 0.18);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .brand-mark::after {
+      content: '';
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      width: 10px;
+      height: 5px;
+      border-right: 3px solid #2168ff;
+      border-bottom: 3px solid #2168ff;
+      border-radius: 0 0 8px 0;
+      transform: rotate(20deg);
+    }
+
+    .brand-text {
+      font-size: 15px;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 600px) {
+      .brand-text { font-size: 13px; }
+      .brand-mark { width: 48px; height: 32px; font-size: 14px; }
+    }
+
+  </style>
+  <script>
+    // Normal distribution CDF
+    function normalCDF(mean, sigma, x) {
+      var z = (x - mean) / Math.sqrt(2 * sigma * sigma);
+      var t = 1 / (1 + 0.3275911 * Math.abs(z));
+      var a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741, a4 = -1.453152027, a5 = 1.061405429;
+      var erf = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-z * z);
+      var sign = z < 0 ? -1 : 1;
+      return (1/2) * (1 + sign * erf);
+    }
+
+    var fitnessPercentiles = {};
+
+    function getPercentile(inputId, mean, sigma, reverse) {
+      var value = parseFloat(document.getElementById(inputId).value);
+      if (!isFinite(value)) return null;
+      var percentage = normalCDF(mean, sigma, value);
+      return reverse ? 1 - percentage : percentage;
+    }
+
+    function calculateScore(inputId, outputId, mean, sigma, reverse = false) {
+      var value = document.getElementById(inputId).value;
+      if (!value) return;
+      var percentage = getPercentile(inputId, mean, sigma, reverse);
+      fitnessPercentiles[inputId] = percentage;
+      var result = '击败 ' + (percentage * 100).toFixed(2) + '% 的中国男大学生';
+      if (percentage > 0.9) result += '，您真是天赋异禀。';
+      document.getElementById(outputId).textContent = result;
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="../index.html" class="nav-brand"><span class="brand-mark">SJQ</span><span class="brand-text">身体数据实验室</span></a>
+    <button class="menu-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li class="nav-dropdown">
+        <a href="fitness-calculator.html" class="active">项目</a>
+        <div class="nav-dropdown-menu">
+          <a href="fitness-calculator.html" class="active">体测计算器</a>
+          <a href="body-fat-calculator.html">体脂率计算器</a>
+          <a href="testosterone.html">睾酮评估</a>
+          <a href="muscle-potential.html">增肌潜力计算器</a>
+          <a href="height-prediction.html">身高预测计算器</a>
+          <a href="bio-age-calculator.html">生理年龄计算器</a>
+          <a href="private-service.html">私人分析服务</a>
+        </div>
+      </li>
+      <li><a href="column.html">专栏</a></li>
+      <li><a href="records.html">个人记录</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-container">
+    <a href="../index.html" class="back-link">← 返回首页</a>
+
+    <div class="page-header">
+      <h1>【SJQ】<span>体测成绩计算器</span></h1>
+      <h2>看看你打败了多少中国男大学生</h2>
+      <p class="douyin">*抖音关注@SJQ</p>
+      <p class="source">*数据来源：《2019中国学生体质与健康调研报告》&nbsp;·&nbsp;具体百分位因地区不同有细微差异</p>
+    </div>
+    <!-- Calculator Items -->
+    <div class="calc-item">
+      <h3>📏 身高（cm）</h3>
+      <div class="calc-row">
+        <input type="number" id="height" placeholder="请输入您的身高">
+        <button onclick="calculateScore('height', 'heightResult', 173.14, 6.34)">计算</button>
+      </div>
+      <div class="calc-result" id="heightResult"></div>
+    </div>
+
+    <div class="calc-item">
+      <h3>⚖️ 体重（kg）</h3>
+      <div class="calc-row">
+        <input type="number" id="weight" placeholder="请输入您的体重">
+        <button onclick="calculateScore('weight', 'weightResult', 67.7, 10.5)">计算</button>
+      </div>
+      <div class="calc-result" id="weightResult"></div>
+    </div>
+
+    <div class="calc-item">
+      <h3>🫁 肺活量（ml）</h3>
+      <div class="calc-row">
+        <input type="number" id="lungCapacity" placeholder="请输入您的肺活量">
+        <button onclick="calculateScore('lungCapacity', 'lungCapacityResult', 4063.4, 814.7)">计算</button>
+      </div>
+      <div class="calc-result" id="lungCapacityResult"></div>
+    </div>
+
+    <div class="calc-item">
+      <h3>💪 胸围（cm）</h3>
+      <div class="calc-row">
+        <input type="number" id="chest" placeholder="请输入您的胸围">
+        <button onclick="calculateScore('chest', 'chestResult', 87.75, 7.91)">计算</button>
+      </div>
+      <div class="calc-result" id="chestResult"></div>
+    </div>
+
+    <div class="calc-item">
+      <h3>📐 腰围（cm）</h3>
+      <div class="calc-row">
+        <input type="number" id="waist" placeholder="请输入您的腰围">
+        <button onclick="calculateScore('waist', 'waistResult', 77.71, 10.04)">计算</button>
+      </div>
+      <div class="calc-result" id="waistResult"></div>
+    </div>
+
+    <div class="calc-item">
+      <h3>📐 臀围（cm）</h3>
+      <div class="calc-row">
+        <input type="number" id="hip" placeholder="请输入您的臀围">
+        <button onclick="calculateScore('hip', 'hipResult', 93.63, 7.93)">计算</button>
+      </div>
+      <div class="calc-result" id="hipResult"></div>
+    </div>
+
+    <div class="calc-item">
+      <h3>⚡ 50米跑（秒）</h3>
+      <div class="calc-row">
+        <input type="number" id="sprint50" placeholder="请输入您的50米跑成绩">
+        <button onclick="calculateScore('sprint50', 'sprint50Result', 7.52, 0.62, true)">计算</button>
+      </div>
+      <div class="calc-result" id="sprint50Result"></div>
+    </div>
+
+    <div class="calc-item">
+      <h3>🦘 立定跳远（cm）</h3>
+      <div class="calc-row">
+        <input type="number" id="score" placeholder="请输入您的立定跳远成绩">
+        <button onclick="calculateScore('score', 'result', 219.8, 23.3)">计算</button>
+      </div>
+      <div class="calc-result" id="result"></div>
+    </div>
+
+    <div class="calc-item">
+      <h3>✊ 握力（kg）</h3>
+      <div class="calc-row">
+        <input type="number" id="grip" placeholder="请输入您的握力值">
+        <button onclick="calculateScore('grip', 'gripResult', 41.83, 8.22)">计算</button>
+      </div>
+      <div class="calc-result" id="gripResult"></div>
+    </div>
+
+    <div class="calc-item">
+      <h3>🏃 1000米跑（秒）</h3>
+      <div class="calc-row">
+        <input type="number" id="runTime" placeholder="请输入您的1000米跑成绩">
+        <button onclick="calculateScore('runTime', 'runResult', 274.25, 42.94, true)">计算</button>
+      </div>
+      <div class="calc-result" id="runResult"></div>
+    </div>
+
+    <div class="calc-item">
+      <h3>🏆 体测总分</h3>
+      <div class="calc-row">
+        <input type="number" id="totalScore" placeholder="请输入您的体测总分">
+        <button onclick="calculateScore('totalScore', 'totalScoreResult', 64, 9.55)">计算</button>
+      </div>
+      <div class="calc-result" id="totalScoreResult"></div>
+    </div>
+  </div>
+
+
+    <!-- paid-report-upsell:start -->
+    <div class="paid-report-upsell">
+      <div class="paid-report-head">
+        <div>
+          <div class="paid-report-title">生成完整分析报告</div>
+          <div class="paid-report-subtitle">基础计算免费。付费报告会结合你的输入结果，给出更完整的水平定位、优势短板和下一步建议。</div>
+        </div>
+        <div class="paid-report-price">¥9.9</div>
+      </div>
+      <div class="paid-report-list">
+        <div class="paid-report-item">结果解读：这组数据说明了什么</div>
+        <div class="paid-report-item">同类比较：优势、短板和风险点</div>
+        <div class="paid-report-item">行动建议：下一步训练或改善方向</div>
+      </div>
+      <a class="paid-report-action" href="paid-report.html">购买完整报告</a>
+    </div>
+    <!-- paid-report-upsell:end -->
+
+  <footer>
+    <p>© 2025 【SJQ】身体数据实验室 · Built with ❤️</p>
+    <p class="visit-counter">
+      访问量 <span id="busuanzi_value_site_pv">--</span> · 本页 <span id="busuanzi_value_page_pv">--</span>
+    </p>
+  </footer>
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  <script>
+    function collectPaidReportData() {
+      var titleEl = document.querySelector('.page-header h1') || document.querySelector('h1');
+      var reportEl = document.getElementById('reportText');
+      var rowEls = Array.prototype.slice.call(document.querySelectorAll('#resultRows tr'));
+      var summaryEls = Array.prototype.slice.call(document.querySelectorAll('.summary-card'));
+      var resultEls = Array.prototype.slice.call(document.querySelectorAll('.result, [id$="Result"]'));
+
+      var rows = rowEls.map(function(row) {
+        return Array.prototype.slice.call(row.children).map(function(cell) {
+          return cell.textContent.trim();
+        }).join('：');
+      }).filter(Boolean);
+
+      var summaries = summaryEls.map(function(card) {
+        var value = card.querySelector('.summary-value');
+        var label = card.querySelector('.summary-label');
+        if (!value || !label) return '';
+        return label.textContent.trim() + '：' + value.textContent.trim();
+      }).filter(Boolean);
+
+      var looseResults = resultEls.map(function(el) {
+        return el.textContent.trim();
+      }).filter(function(text) {
+        return text && text !== '--';
+      });
+
+      var inputRows = Array.prototype.slice.call(document.querySelectorAll('.input-group')).map(function(group) {
+        var label = group.querySelector('label');
+        var input = group.querySelector('input');
+        if (!label || !input) return '';
+        return label.textContent.trim() + '：' + input.value;
+      }).filter(Boolean);
+
+      var data = {
+        title: titleEl ? titleEl.textContent.replace(/\s+/g, '') : document.title,
+        url: location.pathname.split('/').pop(),
+        createdAt: new Date().toLocaleString(),
+        inputs: inputRows,
+        summaries: summaries,
+        rows: rows,
+        looseResults: looseResults,
+        interpretation: reportEl ? reportEl.textContent.trim() : ''
+      };
+
+      localStorage.setItem('paidReportData', JSON.stringify(data));
+    }
+
+    document.addEventListener('click', function(event) {
+      var link = event.target.closest && event.target.closest('.paid-report-action');
+      if (link) collectPaidReportData();
+    });
+  </script>
+
+
+  <script>
+    function pctValue(inputId, mean, sigma, reverse) {
+      var value = parseFloat(document.getElementById(inputId).value);
+      if (!isFinite(value)) return null;
+      var pct = normalCDF(mean, sigma, value);
+      return reverse ? 1 - pct : pct;
+    }
+
+    function fmtPctValue(value) {
+      return value == null ? '未填写' : (value * 100).toFixed(1) + '分';
+    }
+
+    function collectFitnessPaidReportData() {
+      var p = {
+        height: pctValue('height', 173.14, 6.34, false),
+        weight: pctValue('weight', 67.7, 10.5, false),
+        lungCapacity: pctValue('lungCapacity', 4063.4, 814.7, false),
+        sprint50: pctValue('sprint50', 7.52, 0.62, true),
+        jump: pctValue('score', 219.8, 23.3, false),
+        grip: pctValue('grip', 41.83, 8.22, false),
+        chest: pctValue('chest', 87.75, 7.91, false),
+        run1000: pctValue('runTime', 274.25, 42.94, true)
+      };
+
+      var physiqueParts = [p.height, p.weight, p.chest].filter(function(v) { return v != null; });
+      var explosiveParts = [p.sprint50, p.jump].filter(function(v) { return v != null; });
+      var ability = {
+        physique: physiqueParts.length ? (physiqueParts.reduce(function(a, b) { return a + b; }, 0) / physiqueParts.length) * 100 : null,
+        cardio: p.lungCapacity == null ? null : p.lungCapacity * 100,
+        explosive: explosiveParts.length ? (explosiveParts.reduce(function(a, b) { return a + b; }, 0) / explosiveParts.length) * 100 : null,
+        strength: p.grip == null ? null : p.grip * 100,
+        endurance: p.run1000 == null ? null : p.run1000 * 100
+      };
+
+      var inputs = [
+        '身高：' + (document.getElementById('height').value || '未填写'),
+        '体重：' + (document.getElementById('weight').value || '未填写'),
+        '肺活量：' + (document.getElementById('lungCapacity').value || '未填写'),
+        '50米跑：' + (document.getElementById('sprint50').value || '未填写'),
+        '立定跳远：' + (document.getElementById('score').value || '未填写'),
+        '握力：' + (document.getElementById('grip').value || '未填写'),
+        '胸围：' + (document.getElementById('chest').value || '未填写'),
+        '1000米跑：' + (document.getElementById('runTime').value || '未填写')
+      ];
+
+      var rows = [
+        '体格：' + (ability.physique == null ? '未计算' : ability.physique.toFixed(1) + '分') + '（身高、体重、胸围各33.3%）',
+        '心肺：' + (ability.cardio == null ? '未计算' : ability.cardio.toFixed(1) + '分') + '（肺活量）',
+        '爆发力：' + (ability.explosive == null ? '未计算' : ability.explosive.toFixed(1) + '分') + '（50米、立定跳远各50%）',
+        '力量：' + (ability.strength == null ? '未计算' : ability.strength.toFixed(1) + '分') + '（握力）',
+        '耐力：' + (ability.endurance == null ? '未计算' : ability.endurance.toFixed(1) + '分') + '（1000米跑）'
+      ];
+
+      var data = {
+        reportType: 'fitness',
+        title: '体测成绩分析报告',
+        url: location.pathname.split('/').pop(),
+        createdAt: new Date().toLocaleString(),
+        inputs: inputs,
+        rows: rows,
+        looseResults: Array.prototype.slice.call(document.querySelectorAll('[id$="Result"], #result')).map(function(el) {
+          return el.textContent.trim();
+        }).filter(Boolean),
+        fitnessProfile: ability,
+        interpretation: '五维能力值按照对应项目百分位换算为0-100分：体格=身高、体重、胸围平均，心肺=肺活量，爆发力=50米和立定跳远平均，力量=握力，耐力=1000米。'
+      };
+
+      localStorage.setItem('paidReportData', JSON.stringify(data));
+      localStorage.removeItem('paidReportUnlocked');
+    }
+
+    document.addEventListener('click', function(event) {
+      var link = event.target.closest && event.target.closest('.paid-report-action');
+      if (link) collectFitnessPaidReportData();
+    });
+  </script>
+
+</body>
+</html>

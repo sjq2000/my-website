@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="身高预测计算器，按出生年月和测量时间计算年龄，对比同龄平均身高并估算成年身高。">
+  <title>【SJQ】身体数据实验室 | 身高预测计算器</title>
+  <link rel="canonical" href="https://sjqlab.top/pages/height-prediction.html">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+      background-color: #0a0a0a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(0, 191, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(0, 100, 255, 0.06) 0%, transparent 50%);
+      z-index: -1;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0, 191, 255, 0.15);
+      z-index: 1000;
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .nav-brand {
+      font-size: 20px;
+      font-weight: 700;
+      color: #00bfff;
+      text-decoration: none;
+      letter-spacing: 2px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: #aaa;
+      text-decoration: none;
+      font-size: 15px;
+      transition: color 0.3s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #00bfff;
+      transition: width 0.3s;
+    }
+
+    .nav-links a:hover { color: #00bfff; }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: #00bfff; }
+    .nav-links a.active::after { width: 100%; }
+
+    .nav-dropdown { position: relative; }
+    .nav-dropdown > a { cursor: pointer; }
+    .nav-dropdown > a::after { content: ' \25BE'; font-size: 10px; }
+    .nav-dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0,191,255,0.15);
+      border-radius: 10px;
+      padding: 8px 0;
+      min-width: 190px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+
+    .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+    .nav-dropdown-menu a {
+      display: block;
+      padding: 10px 20px;
+      color: #aaa;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .nav-dropdown-menu a::after { display: none !important; }
+    .nav-dropdown-menu a:hover { color: #00bfff; background: rgba(0,191,255,0.08); }
+    .nav-dropdown-menu a.active { color: #00bfff; font-weight: 600; }
+
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: #00bfff;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .page-container {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 100px 24px 60px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #888;
+      text-decoration: none;
+      font-size: 14px;
+      margin-bottom: 32px;
+      transition: color 0.3s;
+    }
+
+    .back-link:hover { color: #00bfff; }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 34px;
+    }
+
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .page-header h1 span { color: #00bfff; }
+    .page-header p {
+      color: #888;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(0, 191, 255, 0.1);
+      border-radius: 12px;
+      padding: 26px;
+      margin-bottom: 18px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .input-group label {
+      font-size: 14px;
+      color: #aaa;
+      font-weight: 500;
+    }
+
+    .input-group input,
+    .input-group select {
+      width: 100%;
+      padding: 13px 15px;
+      border: 1px solid rgba(0, 191, 255, 0.3);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .input-group select option {
+      background: #111;
+      color: #fff;
+    }
+
+    .input-group input:focus,
+    .input-group select:focus {
+      border-color: #00bfff;
+      box-shadow: 0 0 0 3px rgba(0, 191, 255, 0.1);
+    }
+
+    .btn-primary {
+      width: 100%;
+      margin-top: 20px;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #00bfff, #0080ff);
+      color: white;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(0, 191, 255, 0.3);
+    }
+
+    .results { display: none; }
+    .results.show { display: block; }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .summary-card {
+      background: rgba(0, 191, 255, 0.04);
+      border: 1px solid rgba(0, 191, 255, 0.09);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .summary-value {
+      color: #00bfff;
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .summary-label {
+      color: #888;
+      font-size: 12px;
+    }
+
+    .report {
+      padding: 18px;
+      border-radius: 10px;
+      background: rgba(0, 191, 255, 0.04);
+      border: 1px solid rgba(0, 191, 255, 0.08);
+      color: #bbb;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .report strong { color: #fff; }
+    .report .hl { color: #00bfff; font-weight: 700; }
+
+    .note {
+      color: #666;
+      font-size: 12px;
+      line-height: 1.7;
+      margin-top: 14px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      margin-top: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 520px;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    th:last-child, td:last-child { border-right: none; }
+    tr:last-child td { border-bottom: none; }
+    th {
+      color: #fff;
+      font-size: 14px;
+      background: rgba(0, 191, 255, 0.05);
+    }
+
+    td {
+      color: #ddd;
+      font-size: 15px;
+    }
+
+
+
+    /* Paid report upsell */
+    .paid-report-upsell {
+      margin: 22px 0 18px;
+      padding: 22px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.08), rgba(0, 191, 255, 0.04));
+    }
+
+    .paid-report-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .paid-report-title {
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .paid-report-subtitle {
+      color: #aaa;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .paid-report-price {
+      color: #00ff88;
+      font-size: 28px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .paid-report-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .paid-report-item {
+      color: #bbb;
+      font-size: 13px;
+      line-height: 1.6;
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .paid-report-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 44px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #00ff88, #00bfff);
+      color: #061010;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 800;
+      transition: all 0.3s;
+    }
+
+    .paid-report-action:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(0, 255, 136, 0.22);
+    }
+
+
+    .growth-assessment {
+      margin: 22px 0 18px;
+      border-color: rgba(0, 255, 136, 0.16);
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.06), rgba(0, 191, 255, 0.035));
+    }
+
+    .growth-assessment h2 {
+      color: #fff;
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .growth-assessment p {
+      color: #aaa;
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 760px) {
+      .paid-report-head { flex-direction: column; }
+      .paid-report-list { grid-template-columns: 1fr; }
+      .paid-report-price { font-size: 24px; }
+    }
+
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 40px;
+      text-align: center;
+      color: #555;
+      font-size: 14px;
+    }
+
+    .visit-counter {
+      margin-top: 8px;
+      color: #444;
+      font-size: 12px;
+    }
+
+    .visit-counter span { color: #555; }
+
+    @media (max-width: 760px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .page-container { padding: 90px 18px 50px; }
+      .panel { padding: 20px; }
+    }
+
+    @media (max-width: 600px) {
+      .menu-toggle { display: block; }
+      nav { padding: 0 20px; }
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        width: 100%;
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: 20px;
+        gap: 16px;
+        border-bottom: 1px solid rgba(0, 191, 255, 0.15);
+      }
+      .nav-links.open { display: flex; }
+      .nav-dropdown-menu {
+        position: static;
+        transform: none;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        padding: 0 0 0 16px;
+        display: block !important;
+      }
+      .nav-dropdown-menu a { padding: 8px 0; }
+    }
+  
+
+    .nav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #eaf6ff !important;
+      text-decoration: none;
+      letter-spacing: 0;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 36px;
+      border-radius: 10px;
+      background: #15d8d2;
+      color: #051015;
+      font-size: 15px;
+      font-weight: 950;
+      letter-spacing: 0;
+      box-shadow: 0 8px 22px rgba(0, 191, 255, 0.18);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .brand-mark::after {
+      content: '';
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      width: 10px;
+      height: 5px;
+      border-right: 3px solid #2168ff;
+      border-bottom: 3px solid #2168ff;
+      border-radius: 0 0 8px 0;
+      transform: rotate(20deg);
+    }
+
+    .brand-text {
+      font-size: 15px;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 600px) {
+      .brand-text { font-size: 13px; }
+      .brand-mark { width: 48px; height: 32px; font-size: 14px; }
+    }
+
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="../index.html" class="nav-brand"><span class="brand-mark">SJQ</span><span class="brand-text">身体数据实验室</span></a>
+    <button class="menu-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li class="nav-dropdown">
+        <a href="height-prediction.html" class="active">项目</a>
+        <div class="nav-dropdown-menu">
+          <a href="fitness-calculator.html">体测计算器</a>
+          <a href="body-fat-calculator.html">体脂率计算器</a>
+          <a href="testosterone.html">睾酮评估</a>
+          <a href="muscle-potential.html">增肌潜力计算器</a>
+          <a href="height-prediction.html" class="active">身高预测计算器</a>
+          <a href="bio-age-calculator.html">生理年龄计算器</a>
+          <a href="private-service.html">私人分析服务</a>
+        </div>
+      </li>
+      <li><a href="column.html">专栏</a></li>
+      <li><a href="records.html">个人记录</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-container">
+    <a href="../index.html" class="back-link">&larr; 返回首页</a>
+
+    <div class="page-header">
+      <h1>身高<span>预测计算器</span></h1>
+      <p>输入出生时间、测量时间和当前身高，估算同龄位置与成年身高参考值。</p>
+    </div>
+
+    <div class="panel">
+      <div class="form-grid">
+        <div class="input-group">
+          <label>性别</label>
+          <select id="sex">
+            <option value="male">男生</option>
+            <option value="female">女生</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>出生年份</label>
+          <input type="number" id="birthYear" placeholder="例如：2010" min="2000" max="2030" step="1">
+        </div>
+        <div class="input-group">
+          <label>出生月份</label>
+          <input type="number" id="birthMonth" placeholder="例如：6" min="1" max="12" step="1">
+        </div>
+        <div class="input-group">
+          <label>测量年份</label>
+          <input type="number" id="measureYear" placeholder="例如：2026" min="2000" max="2030" step="1">
+        </div>
+        <div class="input-group">
+          <label>测量月份</label>
+          <input type="number" id="measureMonth" placeholder="例如：6" min="1" max="12" step="1">
+        </div>
+        <div class="input-group">
+          <label>测量身高（cm）</label>
+          <input type="number" id="currentHeight" placeholder="例如：170" min="80" max="230" step="0.1">
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="calculate()">计算身高预测</button>
+      <p class="note">结果仅作发育趋势参考，实际成年身高还会受到遗传、营养、睡眠、运动和发育节奏影响。</p>
+    </div>
+
+    <div class="results" id="results">
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-value" id="ageValue">--</div>
+          <div class="summary-label">当前年龄</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-value" id="percentileValue">--</div>
+          <div class="summary-label">同龄百分位</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-value" id="adultValue">--</div>
+          <div class="summary-label">预测成年身高</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="report" id="reportText"></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>指标</th>
+                <th>结果</th>
+              </tr>
+            </thead>
+            <tbody id="resultRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+    <div class="panel growth-assessment">
+      <h2>青少年生长状态评估</h2>
+      <p>填写营养相关指标，生成完整报告后查看营养状态、潜在身高亏损和补足后的参考身高。</p>
+      <div class="form-grid">
+        <div class="input-group">
+          <label>血清25羟基维生素D（ng/mL）</label>
+          <input type="number" id="vitaminD" placeholder="未填按22计算" min="0" max="100" step="0.1">
+        </div>
+        <div class="input-group">
+          <label>动物蛋白质摄入量（g/天）</label>
+          <input type="number" id="animalProtein" placeholder="未填按40计算" min="0" max="200" step="1">
+        </div>
+        <div class="input-group">
+          <label>Ca摄入量（mg/天）</label>
+          <input type="number" id="calciumIntake" placeholder="未填按500计算" min="0" max="2500" step="10">
+        </div>
+        <div class="input-group">
+          <label>睡眠时长（小时/天）</label>
+          <input type="number" id="sleepHours" placeholder="未填按7计算" min="0" max="14" step="0.1">
+        </div>
+        <div class="input-group">
+          <label>运动情况</label>
+          <select id="exerciseLevel">
+            <option value="">未填按偶尔运动计算</option>
+            <option value="0">完全不运动</option>
+            <option value="25">很少运动</option>
+            <option value="50">偶尔运动</option>
+            <option value="75">规律运动</option>
+            <option value="100">经常运动</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- paid-report-upsell:start -->
+    <div class="paid-report-upsell">
+      <div class="paid-report-head">
+        <div>
+          <div class="paid-report-title">生成青少年生长状态评估</div>
+          <div class="paid-report-subtitle">身高预测免费。完整报告会结合维生素D、动物蛋白、钙摄入、睡眠和运动，评估生长状态与生长潜能。</div>
+        </div>
+        <div class="paid-report-price">¥9.9</div>
+      </div>
+      <div class="paid-report-list">
+        <div class="paid-report-item">综合进度：营养、睡眠、运动加权评估</div>
+        <div class="paid-report-item">潜在影响：估算可能亏损的成年身高</div>
+        <div class="paid-report-item">补足参考：给出优化后的身高参考值</div>
+      </div>
+      <a class="paid-report-action" href="paid-report.html">购买生长状态评估</a>
+    </div>
+    <!-- paid-report-upsell:end -->
+
+  <footer>
+    <p>&copy; 2025 【SJQ】身体数据实验室 &middot; Built with &#10084;&#65039;</p>
+    <p class="visit-counter">
+      访问量 <span id="busuanzi_value_site_pv">--</span> &middot; 本页 <span id="busuanzi_value_page_pv">--</span>
+    </p>
+  </footer>
+
+  <script>
+    var heightProfiles = {
+      male: {
+        label: '男生',
+        adultAverage: 173.14,
+        adultSd: 6.3,
+        matureAge: 19,
+        matureInclusive: false,
+        standards: [
+          { age: 6.5, mean: 121.71, sd: 5.4 },
+          { age: 7.5, mean: 126.87, sd: 5.7 },
+          { age: 8.5, mean: 132.40, sd: 5.9 },
+          { age: 9.5, mean: 137.76, sd: 6.4 },
+          { age: 10.5, mean: 143.09, sd: 6.9 },
+          { age: 11.5, mean: 149.66, sd: 8.0 },
+          { age: 12.5, mean: 156.34, sd: 8.9 },
+          { age: 13.5, mean: 163.48, sd: 8.4 },
+          { age: 14.5, mean: 168.57, sd: 7.2 },
+          { age: 15.5, mean: 171.28, sd: 6.6 },
+          { age: 16.5, mean: 172.58, sd: 6.3 },
+          { age: 17.5, mean: 173.03, sd: 6.3 },
+          { age: 18.5, mean: 172.98, sd: 6.3 },
+          { age: 19.5, mean: 173.14, sd: 6.3 }
+        ]
+      },
+      female: {
+        label: '女生',
+        adultAverage: 160.75,
+        adultSd: 5.94,
+        matureAge: 17,
+        matureInclusive: true,
+        standards: [
+          { age: 6.5, mean: 120.20, sd: 5.16 },
+          { age: 7.5, mean: 125.46, sd: 5.63 },
+          { age: 8.5, mean: 131.29, sd: 6.08 },
+          { age: 9.5, mean: 137.34, sd: 6.95 },
+          { age: 10.5, mean: 143.92, sd: 7.36 },
+          { age: 11.5, mean: 150.78, sd: 7.19 },
+          { age: 12.5, mean: 154.90, sd: 6.69 },
+          { age: 13.5, mean: 158.15, sd: 5.99 },
+          { age: 14.5, mean: 159.59, sd: 5.74 },
+          { age: 15.5, mean: 160.22, sd: 5.87 },
+          { age: 16.5, mean: 160.74, sd: 5.87 },
+          { age: 17.5, mean: 160.75, sd: 5.93 },
+          { age: 18.5, mean: 160.75, sd: 5.78 },
+          { age: 19.5, mean: 160.75, sd: 5.93 }
+        ]
+      }
+    };
+
+    function fmt(n, digits) {
+      return Number(n).toFixed(digits == null ? 2 : digits);
+    }
+
+    function getAge(birthYear, birthMonth, measureYear, measureMonth) {
+      return (measureYear - birthYear) + (measureMonth - birthMonth) / 12;
+    }
+
+    function setDefaultMeasureDate() {
+      var now = new Date();
+      document.getElementById('measureYear').value = now.getFullYear();
+      document.getElementById('measureMonth').value = now.getMonth() + 1;
+    }
+
+    function interpolateStandard(age, standards) {
+      for (var i = 0; i < standards.length - 1; i++) {
+        var left = standards[i];
+        var right = standards[i + 1];
+        if (age >= left.age && age <= right.age) {
+          var ratio = (age - left.age) / (right.age - left.age);
+          return {
+            mean: left.mean + (right.mean - left.mean) * ratio,
+            sd: left.sd + (right.sd - left.sd) * ratio
+          };
+        }
+      }
+      return null;
+    }
+
+    function erf(x) {
+      var sign = x >= 0 ? 1 : -1;
+      x = Math.abs(x);
+      var a1 = 0.254829592;
+      var a2 = -0.284496736;
+      var a3 = 1.421413741;
+      var a4 = -1.453152027;
+      var a5 = 1.061405429;
+      var p = 0.3275911;
+      var t = 1 / (1 + p * x);
+      var y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+      return sign * y;
+    }
+
+    function normalCdf(z) {
+      return 0.5 * (1 + erf(z / Math.SQRT2));
+    }
+
+    function setRows(rows) {
+      document.getElementById('resultRows').innerHTML = rows.map(function(row) {
+        return '<tr><td>' + row[0] + '</td><td>' + row[1] + '</td></tr>';
+      }).join('');
+    }
+
+    function calculate() {
+      var sex = document.getElementById('sex').value || 'male';
+      var profile = heightProfiles[sex] || heightProfiles.male;
+      var birthYear = parseInt(document.getElementById('birthYear').value, 10);
+      var birthMonth = parseInt(document.getElementById('birthMonth').value, 10);
+      var measureYear = parseInt(document.getElementById('measureYear').value, 10);
+      var measureMonth = parseInt(document.getElementById('measureMonth').value, 10);
+      var currentHeight = parseFloat(document.getElementById('currentHeight').value);
+
+      if (!birthYear || !birthMonth || birthMonth < 1 || birthMonth > 12 || !measureYear || !measureMonth || measureMonth < 1 || measureMonth > 12 || !currentHeight || currentHeight <= 0) {
+        alert('请填写有效的出生年月、测量年月和测量身高');
+        return;
+      }
+
+      var age = getAge(birthYear, birthMonth, measureYear, measureMonth);
+      if (age < 0) {
+        alert('测量时间不能早于出生时间');
+        return;
+      }
+      var results = document.getElementById('results');
+      results.classList.add('show');
+      document.getElementById('ageValue').textContent = fmt(age, 1) + ' 岁';
+
+      if (age < 6.5) {
+        document.getElementById('percentileValue').textContent = '--';
+        document.getElementById('adultValue').textContent = '--';
+        document.getElementById('reportText').innerHTML = '<strong>结果：</strong>当前年龄约 <span class="hl">' + fmt(age, 1) + ' 岁</span>，年龄过小，暂不计算身高预测。';
+        setRows([
+          ['性别', profile.label],
+          ['当前年龄', fmt(age, 2) + ' 岁'],
+          ['测量身高', fmt(currentHeight, 1) + ' cm'],
+          ['计算状态', '年龄过小，暂不计算']
+        ]);
+        return;
+      }
+
+      var isMature = profile.matureInclusive ? age >= profile.matureAge : age > profile.matureAge;
+      var standard = isMature ? { mean: profile.adultAverage, sd: profile.adultSd } : interpolateStandard(age, profile.standards);
+      var z = (currentHeight - standard.mean) / standard.sd;
+      var percentile = Math.max(0.1, Math.min(99.9, normalCdf(z) * 100));
+      var predictedAdult = isMature ? currentHeight : profile.adultAverage + z * profile.adultSd;
+      var sign = z >= 0 ? '+' : '';
+
+      if (isMature) {
+        document.getElementById('percentileValue').textContent = fmt(percentile, 1) + '%';
+        document.getElementById('adultValue').textContent = fmt(currentHeight, 1) + ' cm';
+        document.getElementById('reportText').innerHTML = '<strong>结果：</strong>当前年龄约 <span class="hl">' + fmt(age, 1) + ' 岁</span>，已经发育完全，当前身高可视为成年身高；对应成年人身高约 <span class="hl">' + fmt(percentile, 1) + '%</span> 百分位。';
+        setRows([
+          ['性别', profile.label],
+          ['当前年龄', fmt(age, 2) + ' 岁'],
+          ['测量身高', fmt(currentHeight, 1) + ' cm'],
+          ['成年平均身高', fmt(profile.adultAverage, 2) + ' cm'],
+          ['成年标准差', fmt(profile.adultSd, 2) + ' cm'],
+          ['Z 值', sign + fmt(z, 2)],
+          ['成年人身高百分位', fmt(percentile, 2) + '%'],
+          ['计算状态', '已经发育完全']
+        ]);
+
+        window.heightPredictionData = {
+          reportType: 'heightGrowth',
+          title: '青少年生长状态评估',
+          price: '¥9.9',
+          sex: sex,
+          sexLabel: profile.label,
+          age: age,
+          currentHeight: currentHeight,
+          percentile: percentile,
+          predictedAdult: currentHeight,
+          zScore: z
+        };
+        return;
+      }
+
+      document.getElementById('percentileValue').textContent = fmt(percentile, 1) + '%';
+      document.getElementById('adultValue').textContent = fmt(predictedAdult, 1) + ' cm';
+      document.getElementById('reportText').innerHTML =
+        '<strong>结果解读：</strong>当前年龄约 <span class="hl">' + fmt(age, 1) +
+        ' 岁</span>，测量身高对应同龄约 <span class="hl">' + fmt(percentile, 1) +
+        '%</span> 百分位。综合当前身高位置和后续发育趋势，预测成年身高约为 <span class="hl">' +
+        fmt(predictedAdult, 1) + ' cm</span>。';
+
+      setRows([
+        ['性别', profile.label],
+        ['当前年龄', fmt(age, 2) + ' 岁'],
+        ['测量身高', fmt(currentHeight, 1) + ' cm'],
+        ['同龄平均身高', fmt(standard.mean, 2) + ' cm'],
+        ['同龄标准差', fmt(standard.sd, 2) + ' cm'],
+        ['Z 值', sign + fmt(z, 2)],
+        ['同龄百分位', fmt(percentile, 2) + '%'],
+        ['预测成年身高', fmt(predictedAdult, 2) + ' cm']
+      ]);
+
+
+      window.heightPredictionData = {
+        reportType: 'heightGrowth',
+        title: '青少年生长状态评估',
+        price: '¥9.9',
+        sex: sex,
+        sexLabel: profile.label,
+        age: age,
+        currentHeight: currentHeight,
+        percentile: percentile,
+        predictedAdult: predictedAdult,
+        zScore: z
+      };
+    }
+
+    document.querySelectorAll('input').forEach(function(input) {
+      input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') calculate();
+      });
+    });
+
+  </script>
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  <script>
+    function collectPaidReportData() {
+      var titleEl = document.querySelector('.page-header h1') || document.querySelector('h1');
+      var reportEl = document.getElementById('reportText');
+      var rowEls = Array.prototype.slice.call(document.querySelectorAll('#resultRows tr'));
+      var summaryEls = Array.prototype.slice.call(document.querySelectorAll('.summary-card'));
+      var resultEls = Array.prototype.slice.call(document.querySelectorAll('.result, [id$="Result"]'));
+
+      var rows = rowEls.map(function(row) {
+        return Array.prototype.slice.call(row.children).map(function(cell) {
+          return cell.textContent.trim();
+        }).join('：');
+      }).filter(Boolean);
+
+      var summaries = summaryEls.map(function(card) {
+        var value = card.querySelector('.summary-value');
+        var label = card.querySelector('.summary-label');
+        if (!value || !label) return '';
+        return label.textContent.trim() + '：' + value.textContent.trim();
+      }).filter(Boolean);
+
+      var looseResults = resultEls.map(function(el) {
+        return el.textContent.trim();
+      }).filter(function(text) {
+        return text && text !== '--';
+      });
+
+      var inputRows = Array.prototype.slice.call(document.querySelectorAll('.input-group')).map(function(group) {
+        var label = group.querySelector('label');
+        var input = group.querySelector('input');
+        if (!label || !input) return '';
+        return label.textContent.trim() + '：' + input.value;
+      }).filter(Boolean);
+
+      var vitaminD = parseFloat(document.getElementById('vitaminD').value);
+      var animalProtein = parseFloat(document.getElementById('animalProtein').value);
+      var calciumIntake = parseFloat(document.getElementById('calciumIntake').value);
+      var sleepHours = parseFloat(document.getElementById('sleepHours').value);
+      var exerciseLevel = parseFloat(document.getElementById('exerciseLevel').value);
+      vitaminD = isFinite(vitaminD) && vitaminD > 0 ? vitaminD : 22;
+      animalProtein = isFinite(animalProtein) && animalProtein > 0 ? animalProtein : 40;
+      calciumIntake = isFinite(calciumIntake) && calciumIntake > 0 ? calciumIntake : 500;
+      sleepHours = isFinite(sleepHours) && sleepHours > 0 ? sleepHours : 7;
+      exerciseLevel = isFinite(exerciseLevel) ? exerciseLevel : 50;
+
+      var data = {
+        title: titleEl ? titleEl.textContent.replace(/\s+/g, '') : document.title,
+        url: location.pathname.split('/').pop(),
+        createdAt: new Date().toLocaleString(),
+        inputs: inputRows,
+        summaries: summaries,
+        rows: rows,
+        looseResults: looseResults,
+        interpretation: reportEl ? reportEl.textContent.trim() : ''
+      };
+      if (window.heightPredictionData) {
+        Object.keys(window.heightPredictionData).forEach(function(key) {
+          data[key] = window.heightPredictionData[key];
+        });
+      }
+      data.vitaminD = vitaminD;
+      data.animalProtein = animalProtein;
+      data.calciumIntake = calciumIntake;
+      data.sleepHours = sleepHours;
+      data.exerciseLevel = exerciseLevel;
+
+      localStorage.setItem('paidReportData', JSON.stringify(data));
+    }
+
+    document.addEventListener('click', function(event) {
+      var link = event.target.closest && event.target.closest('.paid-report-action');
+      if (!link) return;
+      if (!window.heightPredictionData) {
+        event.preventDefault();
+        alert('请先完成身高预测计算');
+        return;
+      }
+      var vitaminD = parseFloat(document.getElementById('vitaminD').value);
+      var animalProtein = parseFloat(document.getElementById('animalProtein').value);
+      var calciumIntake = parseFloat(document.getElementById('calciumIntake').value);
+      var sleepHours = parseFloat(document.getElementById('sleepHours').value);
+      var exerciseLevel = parseFloat(document.getElementById('exerciseLevel').value);
+      vitaminD = isFinite(vitaminD) && vitaminD > 0 ? vitaminD : 22;
+      animalProtein = isFinite(animalProtein) && animalProtein > 0 ? animalProtein : 40;
+      calciumIntake = isFinite(calciumIntake) && calciumIntake > 0 ? calciumIntake : 500;
+      sleepHours = isFinite(sleepHours) && sleepHours > 0 ? sleepHours : 7;
+      exerciseLevel = isFinite(exerciseLevel) ? exerciseLevel : 50;
+      collectPaidReportData();
+    });
+  </script>
+
+</body>
+</html>
