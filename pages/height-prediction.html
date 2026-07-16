@@ -188,7 +188,8 @@
       font-weight: 500;
     }
 
-    .input-group input {
+    .input-group input,
+    .input-group select {
       width: 100%;
       padding: 13px 15px;
       border: 1px solid rgba(0, 191, 255, 0.3);
@@ -200,7 +201,13 @@
       transition: all 0.3s;
     }
 
-    .input-group input:focus {
+    .input-group select option {
+      background: #111;
+      color: #fff;
+    }
+
+    .input-group input:focus,
+    .input-group select:focus {
       border-color: #00bfff;
       box-shadow: 0 0 0 3px rgba(0, 191, 255, 0.1);
     }
@@ -550,6 +557,13 @@
     <div class="panel">
       <div class="form-grid">
         <div class="input-group">
+          <label>性别</label>
+          <select id="sex">
+            <option value="male">男生</option>
+            <option value="female">女生</option>
+          </select>
+        </div>
+        <div class="input-group">
           <label>出生年份</label>
           <input type="number" id="birthYear" placeholder="例如：2010" min="2000" max="2030" step="1">
         </div>
@@ -615,15 +629,30 @@
       <div class="form-grid">
         <div class="input-group">
           <label>血清25羟基维生素D（ng/mL）</label>
-          <input type="number" id="vitaminD" placeholder="例如：30" min="0" max="100" step="0.1">
+          <input type="number" id="vitaminD" placeholder="未填按22计算" min="0" max="100" step="0.1">
         </div>
         <div class="input-group">
           <label>动物蛋白质摄入量（g/天）</label>
-          <input type="number" id="animalProtein" placeholder="例如：60" min="0" max="200" step="1">
+          <input type="number" id="animalProtein" placeholder="未填按40计算" min="0" max="200" step="1">
         </div>
         <div class="input-group">
           <label>Ca摄入量（mg/天）</label>
-          <input type="number" id="calciumIntake" placeholder="例如：800" min="0" max="2500" step="10">
+          <input type="number" id="calciumIntake" placeholder="未填按500计算" min="0" max="2500" step="10">
+        </div>
+        <div class="input-group">
+          <label>睡眠时长（小时/天）</label>
+          <input type="number" id="sleepHours" placeholder="未填按7计算" min="0" max="14" step="0.1">
+        </div>
+        <div class="input-group">
+          <label>运动情况</label>
+          <select id="exerciseLevel">
+            <option value="">未填按偶尔运动计算</option>
+            <option value="0">完全不运动</option>
+            <option value="25">很少运动</option>
+            <option value="50">偶尔运动</option>
+            <option value="75">规律运动</option>
+            <option value="100">经常运动</option>
+          </select>
         </div>
       </div>
     </div>
@@ -634,12 +663,12 @@
       <div class="paid-report-head">
         <div>
           <div class="paid-report-title">生成青少年生长状态评估</div>
-          <div class="paid-report-subtitle">身高预测免费。完整报告会结合维生素D、动物蛋白和钙摄入，评估营养状态与生长潜能。</div>
+          <div class="paid-report-subtitle">身高预测免费。完整报告会结合维生素D、动物蛋白、钙摄入、睡眠和运动，评估生长状态与生长潜能。</div>
         </div>
         <div class="paid-report-price">¥9.9</div>
       </div>
       <div class="paid-report-list">
-        <div class="paid-report-item">营养进度：维D、动物蛋白、Ca 1:1:1 综合</div>
+        <div class="paid-report-item">综合进度：营养、睡眠、运动加权评估</div>
         <div class="paid-report-item">潜在影响：估算可能亏损的成年身高</div>
         <div class="paid-report-item">补足参考：给出优化后的身高参考值</div>
       </div>
@@ -655,22 +684,54 @@
   </footer>
 
   <script>
-    var heightStandards = [
-      { age: 6.5, mean: 121.71, sd: 5.4 },
-      { age: 7.5, mean: 126.87, sd: 5.7 },
-      { age: 8.5, mean: 132.40, sd: 5.9 },
-      { age: 9.5, mean: 137.76, sd: 6.4 },
-      { age: 10.5, mean: 143.09, sd: 6.9 },
-      { age: 11.5, mean: 149.66, sd: 8.0 },
-      { age: 12.5, mean: 156.34, sd: 8.9 },
-      { age: 13.5, mean: 163.48, sd: 8.4 },
-      { age: 14.5, mean: 168.57, sd: 7.2 },
-      { age: 15.5, mean: 171.28, sd: 6.6 },
-      { age: 16.5, mean: 172.58, sd: 6.3 },
-      { age: 17.5, mean: 173.03, sd: 6.3 },
-      { age: 18.5, mean: 172.98, sd: 6.3 },
-      { age: 19.5, mean: 173.14, sd: 6.3 }
-    ];
+    var heightProfiles = {
+      male: {
+        label: '男生',
+        adultAverage: 173.14,
+        adultSd: 6.3,
+        matureAge: 19,
+        matureInclusive: false,
+        standards: [
+          { age: 6.5, mean: 121.71, sd: 5.4 },
+          { age: 7.5, mean: 126.87, sd: 5.7 },
+          { age: 8.5, mean: 132.40, sd: 5.9 },
+          { age: 9.5, mean: 137.76, sd: 6.4 },
+          { age: 10.5, mean: 143.09, sd: 6.9 },
+          { age: 11.5, mean: 149.66, sd: 8.0 },
+          { age: 12.5, mean: 156.34, sd: 8.9 },
+          { age: 13.5, mean: 163.48, sd: 8.4 },
+          { age: 14.5, mean: 168.57, sd: 7.2 },
+          { age: 15.5, mean: 171.28, sd: 6.6 },
+          { age: 16.5, mean: 172.58, sd: 6.3 },
+          { age: 17.5, mean: 173.03, sd: 6.3 },
+          { age: 18.5, mean: 172.98, sd: 6.3 },
+          { age: 19.5, mean: 173.14, sd: 6.3 }
+        ]
+      },
+      female: {
+        label: '女生',
+        adultAverage: 160.75,
+        adultSd: 5.94,
+        matureAge: 17,
+        matureInclusive: true,
+        standards: [
+          { age: 6.5, mean: 120.20, sd: 5.16 },
+          { age: 7.5, mean: 125.46, sd: 5.63 },
+          { age: 8.5, mean: 131.29, sd: 6.08 },
+          { age: 9.5, mean: 137.34, sd: 6.95 },
+          { age: 10.5, mean: 143.92, sd: 7.36 },
+          { age: 11.5, mean: 150.78, sd: 7.19 },
+          { age: 12.5, mean: 154.90, sd: 6.69 },
+          { age: 13.5, mean: 158.15, sd: 5.99 },
+          { age: 14.5, mean: 159.59, sd: 5.74 },
+          { age: 15.5, mean: 160.22, sd: 5.87 },
+          { age: 16.5, mean: 160.74, sd: 5.87 },
+          { age: 17.5, mean: 160.75, sd: 5.93 },
+          { age: 18.5, mean: 160.75, sd: 5.78 },
+          { age: 19.5, mean: 160.75, sd: 5.93 }
+        ]
+      }
+    };
 
     function fmt(n, digits) {
       return Number(n).toFixed(digits == null ? 2 : digits);
@@ -686,10 +747,10 @@
       document.getElementById('measureMonth').value = now.getMonth() + 1;
     }
 
-    function interpolateStandard(age) {
-      for (var i = 0; i < heightStandards.length - 1; i++) {
-        var left = heightStandards[i];
-        var right = heightStandards[i + 1];
+    function interpolateStandard(age, standards) {
+      for (var i = 0; i < standards.length - 1; i++) {
+        var left = standards[i];
+        var right = standards[i + 1];
         if (age >= left.age && age <= right.age) {
           var ratio = (age - left.age) / (right.age - left.age);
           return {
@@ -726,6 +787,8 @@
     }
 
     function calculate() {
+      var sex = document.getElementById('sex').value || 'male';
+      var profile = heightProfiles[sex] || heightProfiles.male;
       var birthYear = parseInt(document.getElementById('birthYear').value, 10);
       var birthMonth = parseInt(document.getElementById('birthMonth').value, 10);
       var measureYear = parseInt(document.getElementById('measureYear').value, 10);
@@ -742,7 +805,6 @@
         alert('测量时间不能早于出生时间');
         return;
       }
-      var adultAverage = 173.14;
       var results = document.getElementById('results');
       results.classList.add('show');
       document.getElementById('ageValue').textContent = fmt(age, 1) + ' 岁';
@@ -752,6 +814,7 @@
         document.getElementById('adultValue').textContent = '--';
         document.getElementById('reportText').innerHTML = '<strong>结果：</strong>当前年龄约 <span class="hl">' + fmt(age, 1) + ' 岁</span>，年龄过小，暂不计算身高预测。';
         setRows([
+          ['性别', profile.label],
           ['当前年龄', fmt(age, 2) + ' 岁'],
           ['测量身高', fmt(currentHeight, 1) + ' cm'],
           ['计算状态', '年龄过小，暂不计算']
@@ -759,25 +822,42 @@
         return;
       }
 
-      if (age > 19) {
-        document.getElementById('percentileValue').textContent = '--';
-        document.getElementById('adultValue').textContent = fmt(currentHeight, 1) + ' cm';
-        document.getElementById('reportText').innerHTML = '<strong>结果：</strong>当前年龄约 <span class="hl">' + fmt(age, 1) + ' 岁</span>，已经发育完全，当前身高可视为成年身高。';
-        setRows([
-          ['当前年龄', fmt(age, 2) + ' 岁'],
-          ['测量身高', fmt(currentHeight, 1) + ' cm'],
-          ['计算状态', '已经发育完全']
-        ]);
-        return;
-      }
-
-      var standard = interpolateStandard(age);
+      var isMature = profile.matureInclusive ? age >= profile.matureAge : age > profile.matureAge;
+      var standard = isMature ? { mean: profile.adultAverage, sd: profile.adultSd } : interpolateStandard(age, profile.standards);
       var z = (currentHeight - standard.mean) / standard.sd;
       var percentile = Math.max(0.1, Math.min(99.9, normalCdf(z) * 100));
-      var adultAverage = 173.14;
-      var adultSd = 6.3;
-      var predictedAdult = adultAverage + z * adultSd;
+      var predictedAdult = isMature ? currentHeight : profile.adultAverage + z * profile.adultSd;
       var sign = z >= 0 ? '+' : '';
+
+      if (isMature) {
+        document.getElementById('percentileValue').textContent = fmt(percentile, 1) + '%';
+        document.getElementById('adultValue').textContent = fmt(currentHeight, 1) + ' cm';
+        document.getElementById('reportText').innerHTML = '<strong>结果：</strong>当前年龄约 <span class="hl">' + fmt(age, 1) + ' 岁</span>，已经发育完全，当前身高可视为成年身高；对应成年人身高约 <span class="hl">' + fmt(percentile, 1) + '%</span> 百分位。';
+        setRows([
+          ['性别', profile.label],
+          ['当前年龄', fmt(age, 2) + ' 岁'],
+          ['测量身高', fmt(currentHeight, 1) + ' cm'],
+          ['成年平均身高', fmt(profile.adultAverage, 2) + ' cm'],
+          ['成年标准差', fmt(profile.adultSd, 2) + ' cm'],
+          ['Z 值', sign + fmt(z, 2)],
+          ['成年人身高百分位', fmt(percentile, 2) + '%'],
+          ['计算状态', '已经发育完全']
+        ]);
+
+        window.heightPredictionData = {
+          reportType: 'heightGrowth',
+          title: '青少年生长状态评估',
+          price: '¥9.9',
+          sex: sex,
+          sexLabel: profile.label,
+          age: age,
+          currentHeight: currentHeight,
+          percentile: percentile,
+          predictedAdult: currentHeight,
+          zScore: z
+        };
+        return;
+      }
 
       document.getElementById('percentileValue').textContent = fmt(percentile, 1) + '%';
       document.getElementById('adultValue').textContent = fmt(predictedAdult, 1) + ' cm';
@@ -788,6 +868,7 @@
         fmt(predictedAdult, 1) + ' cm</span>。';
 
       setRows([
+        ['性别', profile.label],
         ['当前年龄', fmt(age, 2) + ' 岁'],
         ['测量身高', fmt(currentHeight, 1) + ' cm'],
         ['同龄平均身高', fmt(standard.mean, 2) + ' cm'],
@@ -802,6 +883,8 @@
         reportType: 'heightGrowth',
         title: '青少年生长状态评估',
         price: '¥9.9',
+        sex: sex,
+        sexLabel: profile.label,
         age: age,
         currentHeight: currentHeight,
         percentile: percentile,
@@ -856,6 +939,13 @@
       var vitaminD = parseFloat(document.getElementById('vitaminD').value);
       var animalProtein = parseFloat(document.getElementById('animalProtein').value);
       var calciumIntake = parseFloat(document.getElementById('calciumIntake').value);
+      var sleepHours = parseFloat(document.getElementById('sleepHours').value);
+      var exerciseLevel = parseFloat(document.getElementById('exerciseLevel').value);
+      vitaminD = isFinite(vitaminD) && vitaminD > 0 ? vitaminD : 22;
+      animalProtein = isFinite(animalProtein) && animalProtein > 0 ? animalProtein : 40;
+      calciumIntake = isFinite(calciumIntake) && calciumIntake > 0 ? calciumIntake : 500;
+      sleepHours = isFinite(sleepHours) && sleepHours > 0 ? sleepHours : 7;
+      exerciseLevel = isFinite(exerciseLevel) ? exerciseLevel : 50;
 
       var data = {
         title: titleEl ? titleEl.textContent.replace(/\s+/g, '') : document.title,
@@ -875,6 +965,8 @@
       data.vitaminD = vitaminD;
       data.animalProtein = animalProtein;
       data.calciumIntake = calciumIntake;
+      data.sleepHours = sleepHours;
+      data.exerciseLevel = exerciseLevel;
 
       localStorage.setItem('paidReportData', JSON.stringify(data));
     }
@@ -890,11 +982,13 @@
       var vitaminD = parseFloat(document.getElementById('vitaminD').value);
       var animalProtein = parseFloat(document.getElementById('animalProtein').value);
       var calciumIntake = parseFloat(document.getElementById('calciumIntake').value);
-      if (!vitaminD || !animalProtein || !calciumIntake) {
-        event.preventDefault();
-        alert('请填写维生素D、动物蛋白质摄入量和Ca摄入量');
-        return;
-      }
+      var sleepHours = parseFloat(document.getElementById('sleepHours').value);
+      var exerciseLevel = parseFloat(document.getElementById('exerciseLevel').value);
+      vitaminD = isFinite(vitaminD) && vitaminD > 0 ? vitaminD : 22;
+      animalProtein = isFinite(animalProtein) && animalProtein > 0 ? animalProtein : 40;
+      calciumIntake = isFinite(calciumIntake) && calciumIntake > 0 ? calciumIntake : 500;
+      sleepHours = isFinite(sleepHours) && sleepHours > 0 ? sleepHours : 7;
+      exerciseLevel = isFinite(exerciseLevel) ? exerciseLevel : 50;
       collectPaidReportData();
     });
   </script>
