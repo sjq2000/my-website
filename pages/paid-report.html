@@ -1239,11 +1239,39 @@
       return Math.max(0, Math.min(100, Number(value) / target * 100));
     }
 
+    function sleepScore(hours) {
+      if (!hours) return 0;
+      return Math.max(0, Math.min(100, Number(hours) / 8 * 100));
+    }
+
+    function exerciseLabel(score) {
+      var labels = {
+        0: '完全不运动',
+        25: '很少运动',
+        50: '偶尔运动',
+        75: '规律运动',
+        100: '经常运动'
+      };
+      return labels[Math.round(Number(score))] || '--';
+    }
+
     function renderHeightGrowthReport(data) {
-      var vitaminScore = nutritionScore(data.vitaminD, 30);
-      var proteinScore = nutritionScore(data.animalProtein, 60);
-      var calciumScore = nutritionScore(data.calciumIntake, 800);
-      var nutrition = Math.round((vitaminScore + proteinScore + calciumScore) / 3);
+      var vitaminD = Number(data.vitaminD);
+      var animalProtein = Number(data.animalProtein);
+      var calciumIntake = Number(data.calciumIntake);
+      var sleepHours = Number(data.sleepHours);
+      var exerciseLevel = Number(data.exerciseLevel);
+      vitaminD = isFinite(vitaminD) && vitaminD > 0 ? vitaminD : 22;
+      animalProtein = isFinite(animalProtein) && animalProtein > 0 ? animalProtein : 40;
+      calciumIntake = isFinite(calciumIntake) && calciumIntake > 0 ? calciumIntake : 500;
+      sleepHours = isFinite(sleepHours) && sleepHours > 0 ? sleepHours : 7;
+      exerciseLevel = isFinite(exerciseLevel) ? exerciseLevel : 50;
+      var vitaminScore = nutritionScore(vitaminD, 30);
+      var proteinScore = nutritionScore(animalProtein, 60);
+      var calciumScore = nutritionScore(calciumIntake, 800);
+      var sleepSupportScore = sleepScore(sleepHours);
+      var exerciseScore = Math.max(0, Math.min(100, exerciseLevel));
+      var nutrition = Math.round((vitaminScore + proteinScore + calciumScore + sleepSupportScore * 0.5 + exerciseScore * 0.5) / 4);
       var nutritionGap = Math.max(0, 1 - nutrition / 100);
       var deficit = 8 * (Math.exp(2 * nutritionGap) - 1) / (Math.exp(1.4) - 1);
       var baseHeight = Number(data.predictedAdult || 0);
@@ -1258,19 +1286,21 @@
         return '<div class="metric-pill"><span>' + item[0] + '</span><strong>' + item[1] + '</strong></div>';
       }).join('');
       var rows = [
-        ['血清25羟基维生素D', formatMaybeNumber(data.vitaminD, 1, ' ng/mL'), vitaminScore],
-        ['动物蛋白质摄入量', formatMaybeNumber(data.animalProtein, 0, ' g/天'), proteinScore],
-        ['Ca摄入量', formatMaybeNumber(data.calciumIntake, 0, ' mg/天'), calciumScore]
+        ['血清25羟基维生素D', formatMaybeNumber(vitaminD, 1, ' ng/mL'), vitaminScore],
+        ['动物蛋白质摄入量', formatMaybeNumber(animalProtein, 0, ' g/天'), proteinScore],
+        ['Ca摄入量', formatMaybeNumber(calciumIntake, 0, ' mg/天'), calciumScore],
+        ['睡眠时长', formatMaybeNumber(sleepHours, 1, ' 小时/天'), sleepSupportScore],
+        ['运动情况', exerciseLabel(exerciseLevel), exerciseScore]
       ].map(function(row) {
         return '<tr><td>' + row[0] + '</td><td>' + row[1] + '</td><td>' + Math.round(row[2]) + '%</td></tr>';
       }).join('');
 
       var html = '';
       html += '<div class="report-section"><h3>1. 核心结果</h3><div class="metric-pills">' + metrics + '</div><p>' + escapeHtml(status) + '。</p></div>';
-      html += '<div class="report-section"><h3>2. 营养进度</h3><div class="report-progress"><div class="report-progress-head"><span>生长营养支持度</span><span class="report-progress-value">' + nutrition + '%</span></div><div class="report-progress-track"><div class="report-progress-fill" style="width:' + nutrition + '%"></div></div></div></div>';
+      html += '<div class="report-section"><h3>2. 生长支持进度</h3><div class="report-progress"><div class="report-progress-head"><span>综合生长支持度</span><span class="report-progress-value">' + nutrition + '%</span></div><div class="report-progress-track"><div class="report-progress-fill" style="width:' + nutrition + '%"></div></div></div></div>';
       html += '<div class="report-section"><h3>3. 分项数据</h3><table class="report-table"><thead><tr><th>项目</th><th>输入值</th><th>完成度</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
-      html += '<div class="report-section"><h3>4. 身高影响</h3><p>当前预测成年身高约 <strong>' + formatMaybeNumber(baseHeight, 1, ' cm') + '</strong>。按营养支持度估算，若关键营养长期不足，可能亏损约 <strong>' + formatMaybeNumber(deficit, 1, ' cm') + '</strong> 成年身高；若后续补足营养，参考值可调整至约 <strong>' + formatMaybeNumber(optimizedHeight, 1, ' cm') + '</strong>。</p></div>';
-      html += '<div class="report-section"><h3>5. 建议</h3><p>建议把目标量具体化：25羟基维生素D尽量维持在30 ng/mL以上；动物蛋白质摄入量建议稳定到每天60 g左右，可由鸡蛋、牛奶、鱼虾、瘦肉、禽肉等分散到2-3餐；Ca摄入量建议达到每天800 mg左右，优先来自牛奶、酸奶、奶酪、豆制品和深绿色蔬菜。如果维生素D偏低，可以增加日晒并在医生或营养师建议下补充维D，8-12周后复查。睡眠建议保证8-9小时，运动以跳跃、球类、力量基础和户外活动为主。</p></div>';
+      html += '<div class="report-section"><h3>4. 身高影响</h3><p>当前预测成年身高约 <strong>' + formatMaybeNumber(baseHeight, 1, ' cm') + '</strong>。按综合生长支持度估算，若关键条件长期不足，可能亏损约 <strong>' + formatMaybeNumber(deficit, 1, ' cm') + '</strong> 成年身高；若后续补足营养，参考值可调整至约 <strong>' + formatMaybeNumber(optimizedHeight, 1, ' cm') + '</strong>。</p></div>';
+      html += '<div class="report-section"><h3>5. 建议</h3><p>建议把目标量具体化：25羟基维生素D尽量维持在30 ng/mL以上；动物蛋白质摄入量建议稳定到每天60 g左右，可由鸡蛋、牛奶、鱼虾、瘦肉、禽肉等分散到2-3餐；Ca摄入量建议达到每天800 mg左右，优先来自牛奶、酸奶、奶酪、豆制品和深绿色蔬菜。睡眠以每天8小时左右为目标，尽量固定入睡时间；运动以经常运动为目标，优先选择跳跃、球类、力量基础和户外活动。如果维生素D偏低，可以增加日晒并在医生或营养师建议下补充维D，8-12周后复查。</p></div>';
       return html;
     }
 

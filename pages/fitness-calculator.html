@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
@@ -743,10 +743,11 @@
         sprint50: pctValue('sprint50', 7.52, 0.62, true),
         jump: pctValue('score', 219.8, 23.3, false),
         grip: pctValue('grip', 41.83, 8.22, false),
+        chest: pctValue('chest', 87.75, 7.91, false),
         run1000: pctValue('runTime', 274.25, 42.94, true)
       };
 
-      var physiqueParts = [p.height, p.weight].filter(function(v) { return v != null; });
+      var physiqueParts = [p.height, p.weight, p.chest].filter(function(v) { return v != null; });
       var explosiveParts = [p.sprint50, p.jump].filter(function(v) { return v != null; });
       var ability = {
         physique: physiqueParts.length ? (physiqueParts.reduce(function(a, b) { return a + b; }, 0) / physiqueParts.length) * 100 : null,
@@ -763,11 +764,12 @@
         '50米跑：' + (document.getElementById('sprint50').value || '未填写'),
         '立定跳远：' + (document.getElementById('score').value || '未填写'),
         '握力：' + (document.getElementById('grip').value || '未填写'),
+        '胸围：' + (document.getElementById('chest').value || '未填写'),
         '1000米跑：' + (document.getElementById('runTime').value || '未填写')
       ];
 
       var rows = [
-        '体格：' + (ability.physique == null ? '未计算' : ability.physique.toFixed(1) + '分') + '（身高、体重各50%）',
+        '体格：' + (ability.physique == null ? '未计算' : ability.physique.toFixed(1) + '分') + '（身高、体重、胸围各33.3%）',
         '心肺：' + (ability.cardio == null ? '未计算' : ability.cardio.toFixed(1) + '分') + '（肺活量）',
         '爆发力：' + (ability.explosive == null ? '未计算' : ability.explosive.toFixed(1) + '分') + '（50米、立定跳远各50%）',
         '力量：' + (ability.strength == null ? '未计算' : ability.strength.toFixed(1) + '分') + '（握力）',
@@ -785,7 +787,7 @@
           return el.textContent.trim();
         }).filter(Boolean),
         fitnessProfile: ability,
-        interpretation: '五维能力值按照对应项目百分位换算为0-100分：体格=身高和体重平均，心肺=肺活量，爆发力=50米和立定跳远平均，力量=握力，耐力=1000米。'
+        interpretation: '五维能力值按照对应项目百分位换算为0-100分：体格=身高、体重、胸围平均，心肺=肺活量，爆发力=50米和立定跳远平均，力量=握力，耐力=1000米。'
       };
 
       localStorage.setItem('paidReportData', JSON.stringify(data));
