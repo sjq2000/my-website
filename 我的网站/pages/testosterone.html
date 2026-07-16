@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="睾酮水平评估工具，输入年龄和睾酮检测值，计算同龄百分位，并生成完整睾酮分析报告。">
+  <title>【SJQ】身体数据实验室 | 睾酮水平评估</title>
+  <link rel="canonical" href="https://sjqlab.top/pages/testosterone.html">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+      background-color: #0a0a0a; color: #e0e0e0; min-height: 100vh; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(ellipse at 20% 50%, rgba(0,191,255,0.08) 0%, transparent 50%),
+                  radial-gradient(ellipse at 80% 20%, rgba(0,100,255,0.06) 0%, transparent 50%);
+      z-index: -1;
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed; top: 0; width: 100%;
+      background: rgba(10,10,10,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0,191,255,0.15); z-index: 1000;
+      padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 64px;
+    }
+    .nav-brand { font-size: 20px; font-weight: 700; color: #00bfff; text-decoration: none; letter-spacing: 2px; }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a { color: #aaa; text-decoration: none; font-size: 15px; transition: color 0.3s; position: relative; }
+    .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: #00bfff; transition: width 0.3s; }
+    .nav-links a:hover { color: #00bfff; }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: #00bfff; }
+    .nav-links a.active::after { width: 100%; }
+    .menu-toggle { display: none; background: none; border: none; color: #00bfff; font-size: 24px; cursor: pointer; }
+    
+    /* Dropdown menu */
+    .nav-dropdown { position: relative; }
+    .nav-dropdown > a { cursor: pointer; }
+    .nav-dropdown > a::after { content: ' \25BE'; font-size: 10px; }
+    .nav-dropdown-menu {
+      display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+      background: rgba(10,10,10,0.95); backdrop-filter: blur(20px);
+      border: 1px solid rgba(0,191,255,0.15); border-radius: 10px;
+      padding: 8px 0; min-width: 160px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+    .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+    .nav-dropdown-menu a {
+      display: block; padding: 10px 20px; color: #aaa; text-decoration: none;
+      font-size: 14px; transition: all 0.2s; white-space: nowrap;
+    }
+    .nav-dropdown-menu a::after { display: none !important; }
+    .nav-dropdown-menu a:hover { color: #00bfff; background: rgba(0,191,255,0.08); }
+    .nav-dropdown-menu a.active { color: #00bfff; font-weight: 600; }
+
+
+    @media (max-width: 600px) {
+      .nav-dropdown-menu {
+        position: static; transform: none; background: transparent;
+        border: none; box-shadow: none; padding: 0 0 0 16px;
+        display: block !important;
+      }
+      .nav-dropdown-menu a { padding: 8px 0; }
+    }
+
+@media (max-width: 600px) {
+      .menu-toggle { display: block; }
+      .nav-links {
+        display: none; position: absolute; top: 64px; left: 0; width: 100%;
+        background: rgba(10,10,10,0.95); backdrop-filter: blur(20px);
+        flex-direction: column; padding: 20px; gap: 16px;
+        border-bottom: 1px solid rgba(0,191,255,0.15);
+      }
+      .nav-links.open { display: flex; }
+    }
+
+    /* Page container */
+    .page-container { max-width: 680px; margin: 0 auto; padding: 100px 24px 60px; }
+    .page-header { text-align: center; margin-bottom: 40px; }
+    .page-header h1 { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 12px; }
+    .page-header h1 span { color: #00bfff; }
+    .page-header .subtitle { font-size: 14px; color: #888; margin-top: 8px; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; color: #888; text-decoration: none; font-size: 14px; margin-bottom: 32px; transition: color 0.3s; }
+    .back-link:hover { color: #00bfff; }
+
+    /* Cards */
+    .card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(0,191,255,0.1);
+      border-radius: 12px; padding: 24px; margin-bottom: 16px; transition: all 0.3s;
+    }
+    .card:hover { border-color: rgba(0,191,255,0.25); background: rgba(0,191,255,0.03); }
+    .card h3 { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 16px; }
+
+    /* Inputs */
+    .input-group { margin-bottom: 14px; }
+    .input-group label { display: block; font-size: 13px; color: #888; margin-bottom: 6px; font-weight: 500; }
+    .input-row { display: flex; gap: 10px; align-items: center; }
+    input[type="number"] {
+      flex: 1; padding: 12px 16px; border: 1px solid rgba(0,191,255,0.3); border-radius: 8px;
+      background: rgba(0,0,0,0.4); color: #fff; font-size: 15px; outline: none; transition: all 0.3s;
+      -moz-appearance: textfield;
+    }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    input[type="number"]:focus { border-color: #00bfff; box-shadow: 0 0 0 3px rgba(0,191,255,0.1); }
+    input[type="number"]::placeholder { color: #555; }
+    input[type="text"] {
+      flex: 1; padding: 12px 16px; border: 1px solid rgba(0,191,255,0.3); border-radius: 8px;
+      background: rgba(0,0,0,0.4); color: #fff; font-size: 15px; outline: none; transition: all 0.3s;
+    }
+    input[type="text"]:focus { border-color: #00bfff; box-shadow: 0 0 0 3px rgba(0,191,255,0.1); }
+    input[type="text"]::placeholder { color: #555; }
+
+    /* Unit buttons */
+    .unit-selector { display: flex; gap: 6px; }
+    .unit-btn {
+      padding: 10px 14px; background: rgba(0,191,255,0.08); border: 1px solid rgba(0,191,255,0.2);
+      border-radius: 8px; color: #888; font-size: 13px; cursor: pointer; transition: all 0.3s; font-weight: 500;
+    }
+    .unit-btn.active { background: linear-gradient(135deg, #00bfff, #0080ff); border-color: transparent; color: #fff; }
+    .unit-btn:hover:not(.active) { border-color: rgba(0,191,255,0.4); color: #ccc; }
+
+    /* Buttons */
+    .btn-primary {
+      width: 100%; padding: 14px; border: none; border-radius: 8px;
+      background: linear-gradient(135deg, #00bfff, #0080ff); color: white;
+      font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s;
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,191,255,0.3); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* Conv info */
+    .conv-info {
+      background: rgba(0,191,255,0.05); border: 1px solid rgba(0,191,255,0.1);
+      border-radius: 8px; padding: 10px 14px; margin-top: 10px;
+      font-size: 12px; color: #666; line-height: 1.6;
+    }
+
+    /* Step indicator */
+    .step { display: none; }
+    .step.active { display: block; }
+    .step-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 24px; height: 24px; border-radius: 50%;
+      background: linear-gradient(135deg, #00bfff, #0080ff);
+      color: #fff; font-size: 12px; font-weight: 700; margin-right: 8px;
+    }
+    .step-label { font-size: 13px; color: #666; }
+
+    /* Pay section */
+    .pay-section { text-align: center; }
+    .pay-section p { color: #aaa; font-size: 14px; margin-bottom: 20px; line-height: 1.6; }
+    .pay-section strong { color: #fff; }
+    .qr-img {
+      width: 280px; height: 280px; border-radius: 16px; margin: 0 auto; display: block;
+      border: 2px solid rgba(0,191,255,0.2);
+    }
+    .price-tag {
+      display: inline-block; background: linear-gradient(135deg, #00bfff, #0080ff);
+      padding: 6px 20px; border-radius: 20px; font-weight: 600; font-size: 14px; margin-top: 16px; color: #fff;
+    }
+    .pay-note { font-size: 12px; color: #555; margin-top: 12px; }
+
+    /* Divider */
+    .divider {
+      display: flex; align-items: center; gap: 16px; margin: 20px 0;
+      color: #555; font-size: 13px;
+    }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+
+    /* Report */
+    .report { display: none; }
+    .report.visible { display: block; }
+    .no-data-msg { text-align: center; color: #ff6b6b; font-size: 14px; padding: 20px; }
+
+    .percentile-hero { text-align: center; padding: 16px 0; margin-bottom: 16px; }
+    .percentile-number { font-size: 3.5rem; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+    .percentile-label { font-size: 13px; color: #888; }
+    .grade-badge { display: inline-block; padding: 6px 18px; border-radius: 20px; font-size: 14px; font-weight: 600; margin: 10px 0 16px; }
+
+    .gauge-container { margin: 16px 0 24px; }
+    .gauge-bar {
+      height: 10px; border-radius: 5px;
+      background: linear-gradient(90deg, #ff4757 0%, #ff6b81 10%, #ffa502 25%, #f9ca24 40%, #2ed573 60%, #1e90ff 80%, #5352ed 95%, #3742fa 100%);
+      position: relative;
+    }
+    .gauge-marker {
+      position: absolute; top: -7px; width: 4px; height: 24px; background: #fff;
+      border-radius: 2px; transform: translateX(-50%);
+      box-shadow: 0 0 10px rgba(255,255,255,0.5);
+      transition: left 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .gauge-labels { display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: #555; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
+    .stat-item { background: rgba(0,191,255,0.04); border: 1px solid rgba(0,191,255,0.08); border-radius: 8px; padding: 12px 8px; text-align: center; }
+    .stat-value { font-size: 15px; font-weight: 600; color: #fff; }
+    .stat-label { font-size: 11px; color: #888; margin-top: 2px; }
+
+    .curve-container { margin: 16px 0; text-align: center; }
+    .curve-container canvas { max-width: 100%; border-radius: 8px; }
+
+    .report-text {
+      background: rgba(0,191,255,0.03); border: 1px solid rgba(0,191,255,0.08);
+      border-radius: 10px; padding: 18px; margin-bottom: 16px;
+      line-height: 1.8; font-size: 14px; color: #bbb;
+    }
+    .report-text strong { color: #fff; }
+    .report-text .hl { color: #00bfff; font-weight: 600; }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .anim { animation: fadeUp 0.5s ease forwards; }
+    .d1 { animation-delay:0.1s; opacity:0; }
+    .d2 { animation-delay:0.2s; opacity:0; }
+    .d3 { animation-delay:0.3s; opacity:0; }
+
+
+
+    /* Paid report upsell */
+    .paid-report-upsell {
+      margin: 22px 0 18px;
+      padding: 22px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.08), rgba(0, 191, 255, 0.04));
+    }
+
+    .paid-report-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .paid-report-title {
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .paid-report-subtitle {
+      color: #aaa;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .paid-report-price {
+      color: #00ff88;
+      font-size: 28px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .paid-report-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .paid-report-item {
+      color: #bbb;
+      font-size: 13px;
+      line-height: 1.6;
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .paid-report-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 44px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #00ff88, #00bfff);
+      color: #061010;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 800;
+      transition: all 0.3s;
+    }
+
+    .paid-report-action:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(0, 255, 136, 0.22);
+    }
+
+    @media (max-width: 760px) {
+      .paid-report-head { flex-direction: column; }
+      .paid-report-list { grid-template-columns: 1fr; }
+      .paid-report-price { font-size: 24px; }
+    }
+
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.05); padding: 40px; text-align: center;
+      color: #555; font-size: 14px;
+    }
+
+    .visit-counter {
+      margin-top: 8px;
+      color: #444;
+      font-size: 12px;
+    }
+
+    .visit-counter span {
+      color: #555;
+    }
+  
+
+    .nav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #eaf6ff !important;
+      text-decoration: none;
+      letter-spacing: 0;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 36px;
+      border-radius: 10px;
+      background: #15d8d2;
+      color: #051015;
+      font-size: 15px;
+      font-weight: 950;
+      letter-spacing: 0;
+      box-shadow: 0 8px 22px rgba(0, 191, 255, 0.18);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .brand-mark::after {
+      content: '';
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      width: 10px;
+      height: 5px;
+      border-right: 3px solid #2168ff;
+      border-bottom: 3px solid #2168ff;
+      border-radius: 0 0 8px 0;
+      transform: rotate(20deg);
+    }
+
+    .brand-text {
+      font-size: 15px;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 600px) {
+      .brand-text { font-size: 13px; }
+      .brand-mark { width: 48px; height: 32px; font-size: 14px; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="../index.html" class="nav-brand"><span class="brand-mark">SJQ</span><span class="brand-text">身体数据实验室</span></a>
+    <button class="menu-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+            <li class="nav-dropdown">
+        <a href="testosterone.html" class="active">项目</a>
+        <div class="nav-dropdown-menu">
+          <a href="fitness-calculator.html">体测计算器</a>
+          <a href="body-fat-calculator.html">体脂率计算器</a>
+          <a href="testosterone.html" class="active">睾酮评估</a>
+          <a href="muscle-potential.html">增肌潜力计算器</a>
+          <a href="height-prediction.html">身高预测计算器</a>
+          <a href="bio-age-calculator.html">生理年龄计算器</a>
+          <a href="private-service.html">私人分析服务</a>
+        </div>
+      </li>
+
+      <li><a href="column.html">专栏</a></li>
+      <li><a href="records.html">个人记录</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-container">
+    <a href="../index.html" class="back-link">← 返回首页</a>
+
+    <div class="page-header">
+      <h1>🧬 <span>睾酮水平评估</span></h1>
+      <p class="subtitle">基于年龄的正态分布模型 · 精准百分位分析</p>
+    </div>
+
+    <!-- Step 1: Input -->
+    <div class="step active" id="step1">
+      <div class="card">
+        <h3><span class="step-num">1</span>输入基本信息</h3>
+        <div class="input-group">
+          <label>年龄</label>
+          <input type="number" id="age" placeholder="请输入年龄（20-70）" min="20" max="70">
+        </div>
+        <div class="input-group">
+          <label>睾酮值</label>
+          <div class="input-row">
+            <input type="number" id="val" placeholder="输入数值" step="0.1">
+            <div class="unit-selector">
+              <button class="unit-btn active" data-u="ngdl" onclick="setU('ngdl')">ng/dL</button>
+              <button class="unit-btn" data-u="nmol" onclick="setU('nmol')">nmol/L</button>
+              <button class="unit-btn" data-u="ngml" onclick="setU('ngml')">ng/mL</button>
+            </div>
+          </div>
+          <div class="conv-info">
+            <strong>单位换算：</strong>1 ng/dL = 0.0347 nmol/L &nbsp;|&nbsp; 1 ng/mL = 100 ng/dL &nbsp;|&nbsp; 1 nmol/L ≈ 28.82 ng/dL
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="verify()">免费查看百分位</button>
+    </div>
+
+    <!-- Step 2: Free Result -->
+    <div class="step" id="step2">
+      <div class="card report" id="rc">
+        <h3>免费结果</h3>
+        <div id="noData" class="no-data-msg" style="display:none"></div>
+        <div id="rContent" style="display:none">
+          <div class="percentile-hero anim">
+            <div class="percentile-number" id="pNum">--</div>
+            <div class="percentile-label">同龄人百分位数</div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="goBack()" style="margin-top:16px;">返回修改</button>
+    </div>
+
+  </div>
+
+
+    <!-- paid-report-upsell:start -->
+    <div class="paid-report-upsell">
+      <div class="paid-report-head">
+        <div>
+          <div class="paid-report-title">生成完整睾酮报告</div>
+          <div class="paid-report-subtitle">免费只显示百分位。完整报告会展示同龄定位、数值换算、结果解读和建议。</div>
+        </div>
+        <div class="paid-report-price">¥4.9</div>
+      </div>
+      <div class="paid-report-list">
+        <div class="paid-report-item">同龄定位：百分位、均值差距和等级</div>
+        <div class="paid-report-item">数值换算：ng/dL、nmol/L、ng/mL</div>
+        <div class="paid-report-item">结果解读：生活方式和复查建议</div>
+      </div>
+      <a class="paid-report-action" href="paid-report.html">购买完整报告</a>
+    </div>
+    <!-- paid-report-upsell:end -->
+
+  <footer>
+    <p>© 2025 【SJQ】身体数据实验室 · Built with ❤️</p>
+    <p class="visit-counter">
+      访问量 <span id="busuanzi_value_site_pv">--</span> · 本页 <span id="busuanzi_value_page_pv">--</span>
+    </p>
+  </footer>
+
+<script>
+var M25=576,M55=467,SD=147,C=0.0347,unit='ngdl';
+
+function setU(u){unit=u;document.querySelectorAll('.unit-btn').forEach(function(b){b.classList.remove('active')});document.querySelector('[data-u="'+u+'"]').classList.add('active')}
+
+function ngdl(v,u){if(u==='nmol')return v/C;if(u==='ngml')return v*100;return v}
+
+function mean4age(a){if(a<=20)return null;if(a<=25)return M25;if(a<=55)return M25+(M55-M25)*(a-25)/30;if(a<=70)return M55;return null}
+
+function ncdf(x){var a1=.254829592,a2=-.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=.3275911,s=x<0?-1:1;x=Math.abs(x)/Math.SQRT2;var t=1/(1+p*x);return .5*(1+s*(1-(((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-x*x)))}
+
+function npdf(x){return Math.exp(-.5*x*x)/Math.sqrt(2*Math.PI)}
+
+async function verify(){
+  var age=parseInt(document.getElementById('age').value);
+  var v=parseFloat(document.getElementById('val').value);
+
+  if(isNaN(age)||isNaN(v)||v<=0){alert('请填写有效的年龄和睾酮值');return}
+
+  generateReport();
+  document.getElementById('step1').classList.remove('active');
+  document.getElementById('step2').classList.add('active');
+}
+
+function goBack(){
+  document.getElementById('step2').classList.remove('active');
+  document.getElementById('step1').classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function generateReport(){
+  window.testosteroneReportData = null;
+  var a=parseInt(document.getElementById('age').value),
+      v=parseFloat(document.getElementById('val').value),
+      rc=document.getElementById('rc'),nd=document.getElementById('noData'),ct=document.getElementById('rContent');
+  rc.classList.add('visible');
+  if(isNaN(a)||isNaN(v)||v<=0){nd.style.display='block';nd.innerHTML='⚠️ 请填写有效的年龄和睾酮值';ct.style.display='none';return}
+  var m=mean4age(a);
+  if(m===null){nd.style.display='block';nd.innerHTML='⚠️ 当前年龄暂无数据（仅支持 20-70 岁）';ct.style.display='none';return}
+  nd.style.display='none';ct.style.display='block';
+  var n=ngdl(v,unit),z=(n-m)/SD,p=ncdf(z)*100;
+  document.getElementById('pNum').textContent=p.toFixed(1)+'%';
+  var originalValue = v;
+  var nmol = n * C;
+  var ngml = n * 0.01;
+
+  var col,g,bg,em;
+  if(p<5){col='#ff4757';g='极低';bg='rgba(255,71,87,.15)';em='🔴'}
+  else if(p<15){col='#ff6b81';g='偏低';bg='rgba(255,107,129,.15)';em='🟠'}
+  else if(p<35){col='#ffa502';g='中低';bg='rgba(255,165,2,.15)';em='🟡'}
+  else if(p<65){col='#2ed573';g='正常';bg='rgba(46,213,115,.15)';em='🟢'}
+  else if(p<85){col='#1e90ff';g='中高';bg='rgba(30,144,255,.15)';em='🔵'}
+  else if(p<95){col='#5352ed';g='偏高';bg='rgba(83,82,237,.15)';em='🟣'}
+  else{col='#3742fa';g='极高';bg='rgba(55,66,250,.15)';em='⚡'}
+
+  document.getElementById('pNum').style.color=col;
+  window.testosteroneReportData = {
+    reportType: 'testosterone',
+    title: '睾酮水平完整报告',
+    price: '¥4.9',
+    age: a,
+    unit: unit,
+    originalValue: originalValue,
+    testosteroneNgdl: n,
+    testosteroneNmol: nmol,
+    testosteroneNgml: ngml,
+    meanNgdl: m,
+    zScore: z,
+    percentile: p,
+    grade: g
+  };
+}
+
+function draw(mean,val){
+  var c=document.getElementById('cv'),x=c.getContext('2d'),W=c.width,H=c.height,pad=40;
+  x.clearRect(0,0,W,H);x.fillStyle='rgba(255,255,255,.02)';x.beginPath();x.roundRect(0,0,W,H,8);x.fill();
+  var xL=mean-4*SD,xR=mean+4*SD,yM=npdf(0)/SD*1.1;
+  function tX(v){return pad+(v-xL)/(xR-xL)*(W-2*pad)}
+  function tY(v){return H-pad-(v/yM)*(H-2*pad)}
+  x.beginPath();x.moveTo(tX(xL),tY(0));
+  for(var i=xL;i<=xR;i+=2)x.lineTo(tX(i),tY(npdf((i-mean)/SD)/SD));
+  x.lineTo(tX(xR),tY(0));x.closePath();
+  var gr=x.createLinearGradient(0,0,0,H);gr.addColorStop(0,'rgba(0,191,255,.2)');gr.addColorStop(1,'rgba(0,191,255,.02)');
+  x.fillStyle=gr;x.fill();
+  x.beginPath();
+  for(var i=xL;i<=xR;i+=1){var cx=tX(i),cy=tY(npdf((i-mean)/SD)/SD);i===xL?x.moveTo(cx,cy):x.lineTo(cx,cy)}
+  x.strokeStyle='#00bfff';x.lineWidth=2.5;x.stroke();
+  var vx=tX(val),vy=tY(npdf((val-mean)/SD)/SD);
+  x.beginPath();x.moveTo(vx,tY(0));x.lineTo(vx,vy);x.strokeStyle='#ff6b6b';x.lineWidth=2;x.setLineDash([4,4]);x.stroke();x.setLineDash([]);
+  x.beginPath();x.arc(vx,vy,5,0,Math.PI*2);x.fillStyle='#ff6b6b';x.fill();
+  x.fillStyle='#666';x.font='11px sans-serif';x.textAlign='center';
+  x.fillText(Math.round(xL),tX(xL),H-10);x.fillText(Math.round(mean),tX(mean),H-10);x.fillText(Math.round(xR),tX(xR),H-10);
+  x.fillStyle='#ff6b6b';x.font='bold 12px sans-serif';x.fillText('你: '+Math.round(val),vx,20);
+}
+
+function report(age,mean,val,z,p,g){
+  var d=(val-mean).toFixed(0),ad=Math.abs(d),dir=d>=0?'高于':'低于',t='';
+  if(g==='极低')t='<strong>🔴 结果解读：睾酮水平极低</strong><br><br>你的睾酮水平 <span class="hl">'+val.toFixed(0)+' ng/dL</span>，处于同龄人中最低的 5% 区间，'+dir+'同龄均值约 <span class="hl">'+ad+' ng/dL</span>。<br><br><strong>可能表现：</strong>持续疲劳、性欲显著下降、肌肉量明显流失、情绪低落或抑郁倾向、骨密度降低、注意力难以集中。<br><br><strong>建议：</strong>强烈建议尽快就医，进行完整的激素面板检查（包括 LH、FSH、SHBG、雌二醇、催乳素）。可能需要睾酮替代治疗（TRT），需在内分泌科医生指导下进行。同时排查是否存在垂体或睾丸功能异常。';
+  else if(g==='偏低')t='<strong>🟠 结果解读：睾酮水平偏低</strong><br><br>你的睾酮水平 <span class="hl">'+val.toFixed(0)+' ng/dL</span>，处于同龄人中较低的 15% 区间，'+dir+'同龄均值约 <span class="hl">'+ad+' ng/dL</span>。<br><br><strong>可能表现：</strong>体力下降、恢复变慢、性欲偏低、腹部脂肪增加、晨勃减少、动力不足。<br><br><strong>建议：</strong>建议进一步医学检查确认。可从生活方式入手：保证 7-8 小时优质睡眠、增加强度训练（深蹲、硬拉、卧推等复合动作）、优化饮食（充足的锌、维生素D、优质脂肪）。症状持续建议咨询内分泌科。';
+  else if(g==='中低')t='<strong>🟡 结果解读：睾酮水平中低</strong><br><br>你的睾酮水平 <span class="hl">'+val.toFixed(0)+' ng/dL</span>，处于同龄人中偏低区间（15%-35%），'+dir+'同龄均值约 <span class="hl">'+ad+' ng/dL</span>。<br><br><strong>可能表现：</strong>整体状态尚可，但可能偶尔感到精力不足，增肌速度较慢，竞争欲望不太强。<br><br><strong>建议：</strong>通过生活方式优化有很大提升空间。重点：规律力量训练（每周 3-4 次）、确保充足睡眠、控制体脂率（15-20% 以下）、补充关键微量元素（锌 15-30mg/天、维生素D 2000-4000IU/天、镁）。减少酒精，管理压力。';
+  else if(g==='正常')t='<strong>🟢 结果解读：睾酮水平正常</strong><br><br>你的睾酮水平 <span class="hl">'+val.toFixed(0)+' ng/dL</span>，处于同龄人中最健康的中间区间（35%-65%），与同龄均值 <span class="hl">'+mean.toFixed(0)+' ng/dL</span> 非常接近。<br><br><strong>状态表现：</strong>精力充沛、肌肉量正常、性功能良好、情绪稳定、骨密度正常、认知功能良好。<br><br><strong>建议：</strong>睾酮水平处于理想正常范围。继续保持：规律运动、均衡饮食、充足睡眠。定期检测（每年 1-2 次）监测趋势。';
+  else if(g==='中高')t='<strong>🔵 结果解读：睾酮水平中高</strong><br><br>你的睾酮水平 <span class="hl">'+val.toFixed(0)+' ng/dL</span>，处于同龄人中较高的 65%-85% 区间，'+dir+'同龄均值约 <span class="hl">'+ad+' ng/dL</span>。<br><br><strong>状态表现：</strong>精力旺盛、肌肉量较好、恢复能力强、自信心强、性欲活跃、认知敏捷。<br><br><strong>建议：</strong>状态不错！保持当前生活方式。注意监测过高迹象：痤疮、攻击性增强、红细胞增多等。数值持续 >95th 建议排查病理性原因。';
+  else if(g==='偏高')t='<strong>🟣 结果解读：睾酮水平偏高</strong><br><br>你的睾酮水平 <span class="hl">'+val.toFixed(0)+' ng/dL</span>，处于同龄人中较高的 85%-95% 区间，'+dir+'同龄均值约 <span class="hl">'+ad+' ng/dL</span>。<br><br><strong>状态表现：</strong>肌肉发达、精力非常旺盛、竞争力极强、性欲强，但可能出现痤疮、情绪波动。<br><br><strong>建议：</strong>高睾酮有利有弊。建议医学检查排除病理原因（睾丸肿瘤、肾上腺增生等）。注意监测血红蛋白和红细胞压积。无病理原因且感觉良好则定期监测即可。';
+  else t='<strong>⚡ 结果解读：睾酮水平极高</strong><br><br>你的睾酮水平 <span class="hl">'+val.toFixed(0)+' ng/dL</span>，处于同龄人中最高 5% 区间，'+dir+'同龄均值约 <span class="hl">'+ad+' ng/dL</span>。<br><br><strong>注意事项：</strong>极高睾酮水平可能带来风险：红细胞增多症（血液黏稠度增加）、严重痤疮、脱发加速、情绪剧烈波动、肝功能负担、心血管风险增加。<br><br><strong>建议：</strong>务必尽快就医检查！排查使用外源性激素、睾丸或肾上腺肿瘤、先天性肾上腺增生等原因。持续极高水平可能导致严重健康问题，需要在专业医生指导下处理。';
+  document.getElementById('rTxt').innerHTML=t;
+}
+</script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  <script>
+    function collectPaidReportData() {
+      var titleEl = document.querySelector('.page-header h1') || document.querySelector('h1');
+      var reportEl = document.getElementById('reportText');
+      var rowEls = Array.prototype.slice.call(document.querySelectorAll('#resultRows tr'));
+      var summaryEls = Array.prototype.slice.call(document.querySelectorAll('.summary-card'));
+      var resultEls = Array.prototype.slice.call(document.querySelectorAll('.result, [id$="Result"]'));
+
+      var rows = rowEls.map(function(row) {
+        return Array.prototype.slice.call(row.children).map(function(cell) {
+          return cell.textContent.trim();
+        }).join('：');
+      }).filter(Boolean);
+
+      var summaries = summaryEls.map(function(card) {
+        var value = card.querySelector('.summary-value');
+        var label = card.querySelector('.summary-label');
+        if (!value || !label) return '';
+        return label.textContent.trim() + '：' + value.textContent.trim();
+      }).filter(Boolean);
+
+      var looseResults = resultEls.map(function(el) {
+        return el.textContent.trim();
+      }).filter(function(text) {
+        return text && text !== '--';
+      });
+
+      var inputRows = Array.prototype.slice.call(document.querySelectorAll('.input-group')).map(function(group) {
+        var label = group.querySelector('label');
+        var input = group.querySelector('input');
+        if (!label || !input) return '';
+        return label.textContent.trim() + '：' + input.value;
+      }).filter(Boolean);
+
+      var data = {
+        title: titleEl ? titleEl.textContent.replace(/\s+/g, '') : document.title,
+        url: location.pathname.split('/').pop(),
+        createdAt: new Date().toLocaleString(),
+        inputs: inputRows,
+        summaries: summaries,
+        rows: rows,
+        looseResults: looseResults,
+        interpretation: reportEl ? reportEl.textContent.trim() : ''
+      };
+
+      if (window.testosteroneReportData) {
+        data = Object.assign(data, window.testosteroneReportData, {
+          createdAt: new Date().toLocaleString(),
+          inputs: [
+            '年龄：' + window.testosteroneReportData.age,
+            '睾酮值：' + window.testosteroneReportData.originalValue + ' ' + window.testosteroneReportData.unit
+          ],
+          rows: [
+            '同龄百分位：' + window.testosteroneReportData.percentile.toFixed(1) + '%',
+            '睾酮：' + window.testosteroneReportData.testosteroneNgdl.toFixed(0) + ' ng/dL',
+            '同龄均值：' + window.testosteroneReportData.meanNgdl.toFixed(0) + ' ng/dL',
+            'Z-Score：' + window.testosteroneReportData.zScore.toFixed(2)
+          ]
+        });
+      }
+
+      localStorage.removeItem('paidReportUnlocked');
+      localStorage.setItem('paidReportData', JSON.stringify(data));
+    }
+
+    document.addEventListener('click', function(event) {
+      var link = event.target.closest && event.target.closest('.paid-report-action');
+      if (link) {
+        generateReport();
+        if (!window.testosteroneReportData) {
+          event.preventDefault();
+          alert('请先填写年龄和睾酮值，并查看免费百分位。');
+          return;
+        }
+        collectPaidReportData();
+      }
+    });
+  </script>
+
+</body>
+</html>
