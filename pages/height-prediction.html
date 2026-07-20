@@ -273,6 +273,52 @@
 
     .report strong { color: #fff; }
     .report .hl { color: #00bfff; font-weight: 700; }
+    .growth-chart-card {
+      margin-bottom: 18px;
+      padding: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.18);
+    }
+
+    .growth-chart-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .growth-chart-title {
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .growth-chart-meta {
+      color: #777;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .growth-chart-wrap {
+      position: relative;
+      width: 100%;
+      height: 390px;
+    }
+
+    #growthChart {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    @media (max-width: 640px) {
+      .growth-chart-card { padding: 14px 10px 12px; }
+      .growth-chart-head { padding: 0 4px; }
+      .growth-chart-wrap { height: 330px; }
+      .growth-chart-meta { display: none; }
+    }
 
     .note {
       color: #666;
@@ -532,11 +578,11 @@
       <li class="nav-dropdown">
         <a href="height-prediction.html" class="active">项目</a>
         <div class="nav-dropdown-menu">
+          <a href="height-prediction.html" class="active">身高预测计算器</a>
           <a href="fitness-calculator.html">体测计算器</a>
           <a href="body-fat-calculator.html">体脂率计算器</a>
           <a href="testosterone.html">睾酮评估</a>
           <a href="muscle-potential.html">增肌潜力计算器</a>
-          <a href="height-prediction.html" class="active">身高预测计算器</a>
           <a href="bio-age-calculator.html">生理年龄计算器</a>
           <a href="private-service.html">私人分析服务</a>
         </div>
@@ -602,6 +648,16 @@
         <div class="summary-card">
           <div class="summary-value" id="adultValue">--</div>
           <div class="summary-label">预测成年身高</div>
+        </div>
+      </div>
+
+      <div class="growth-chart-card" id="growthChartCard">
+        <div class="growth-chart-head">
+          <div class="growth-chart-title" id="growthChartTitle">身高发育曲线</div>
+          <div class="growth-chart-meta">年龄（岁） · 身高（cm）</div>
+        </div>
+        <div class="growth-chart-wrap">
+          <canvas id="growthChart" aria-label="身高发育百分位曲线"></canvas>
         </div>
       </div>
 
@@ -779,6 +835,160 @@
     function normalCdf(z) {
       return 0.5 * (1 + erf(z / Math.SQRT2));
     }
+    var lastGrowthChart = null;
+
+    function drawGrowthChart(profile, age, currentHeight, percentile) {
+      var canvas = document.getElementById('growthChart');
+      if (!canvas || !profile || !profile.standards.length) return;
+
+      lastGrowthChart = {
+        profile: profile,
+        age: age,
+        currentHeight: currentHeight,
+        percentile: percentile
+      };
+
+      document.getElementById('growthChartCard').style.display = 'block';
+      document.getElementById('growthChartTitle').textContent = profile.label + '身高发育百分位曲线';
+
+      var rect = canvas.getBoundingClientRect();
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var width = Math.max(300, rect.width);
+      var height = Math.max(280, rect.height);
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+
+      var ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, width, height);
+
+      var compact = width < 520;
+      var margin = { top: 28, right: compact ? 30 : 44, bottom: 42, left: compact ? 42 : 52 };
+      var plotWidth = width - margin.left - margin.right;
+      var plotHeight = height - margin.top - margin.bottom;
+      var standards = profile.standards;
+      var minAge = standards[0].age;
+      var maxAge = standards[standards.length - 1].age;
+      var zLines = [
+        { label: '3', z: -1.8808 },
+        { label: '10', z: -1.2816 },
+        { label: '25', z: -0.6745 },
+        { label: '50', z: 0 },
+        { label: '75', z: 0.6745 },
+        { label: '90', z: 1.2816 },
+        { label: '97', z: 1.8808 }
+      ];
+
+      var allHeights = [currentHeight];
+      standards.forEach(function(point) {
+        zLines.forEach(function(line) {
+          allHeights.push(point.mean + line.z * point.sd);
+        });
+      });
+      var minHeight = Math.floor((Math.min.apply(null, allHeights) - 3) / 5) * 5;
+      var maxHeight = Math.ceil((Math.max.apply(null, allHeights) + 3) / 5) * 5;
+
+      function xScale(value) {
+        return margin.left + (value - minAge) / (maxAge - minAge) * plotWidth;
+      }
+
+      function yScale(value) {
+        return margin.top + (maxHeight - value) / (maxHeight - minHeight) * plotHeight;
+      }
+
+      ctx.lineWidth = 1;
+      ctx.font = (compact ? '10px' : '11px') + ' system-ui, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      for (var h = minHeight; h <= maxHeight; h += 5) {
+        var y = yScale(h);
+        ctx.strokeStyle = h % 10 === 0 ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.055)';
+        ctx.beginPath();
+        ctx.moveTo(margin.left, y);
+        ctx.lineTo(width - margin.right, y);
+        ctx.stroke();
+        if (h % 10 === 0 || !compact) {
+          ctx.fillStyle = '#777';
+          ctx.fillText(String(h), margin.left - 8, y);
+        }
+      }
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      standards.forEach(function(point, index) {
+        var showLabel = !compact || index % 2 === 0 || index === standards.length - 1;
+        var x = xScale(point.age);
+        ctx.strokeStyle = 'rgba(255,255,255,0.065)';
+        ctx.beginPath();
+        ctx.moveTo(x, margin.top);
+        ctx.lineTo(x, height - margin.bottom);
+        ctx.stroke();
+        if (showLabel) {
+          ctx.fillStyle = '#777';
+          ctx.fillText(point.age.toFixed(1), x, height - margin.bottom + 9);
+        }
+      });
+
+      var lineColors = ['#5e7180', '#607f91', '#5599af', '#00bfff', '#5599af', '#607f91', '#5e7180'];
+      zLines.forEach(function(line, lineIndex) {
+        ctx.strokeStyle = lineColors[lineIndex];
+        ctx.lineWidth = line.z === 0 ? 2.8 : 1.5;
+        ctx.globalAlpha = line.z === 0 ? 1 : 0.82;
+        ctx.beginPath();
+        standards.forEach(function(point, index) {
+          var x = xScale(point.age);
+          var y = yScale(point.mean + line.z * point.sd);
+          if (index === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+
+        var end = standards[standards.length - 1];
+        var labelY = yScale(end.mean + line.z * end.sd);
+        ctx.fillStyle = line.z === 0 ? '#00bfff' : '#8aa0ad';
+        ctx.font = (compact ? '9px' : '10px') + ' system-ui, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(line.label, width - margin.right + 5, labelY);
+      });
+
+      ctx.fillStyle = '#77838b';
+      ctx.font = '10px system-ui, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('百分位', width - margin.right - 3, margin.top - 9);
+
+      var pointAge = Math.max(minAge, Math.min(maxAge, age));
+      var pointX = xScale(pointAge);
+      var pointY = yScale(currentHeight);
+      ctx.shadowColor = 'rgba(255, 78, 92, 0.65)';
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = '#ff4e5c';
+      ctx.beginPath();
+      ctx.arc(pointX, pointY, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      var label = fmt(currentHeight, 1) + ' cm · P' + fmt(percentile, 1);
+      ctx.font = '600 11px system-ui, sans-serif';
+      var labelWidth = ctx.measureText(label).width + 16;
+      var labelX = pointX + 10;
+      if (labelX + labelWidth > width - 6) labelX = pointX - labelWidth - 10;
+      var labelY = Math.max(6, pointY - 30);
+      ctx.fillStyle = 'rgba(255, 78, 92, 0.94)';
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(labelX, labelY, labelWidth, 23, 5);
+      else ctx.rect(labelX, labelY, labelWidth, 23);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(label, labelX + labelWidth / 2, labelY + 11.5);
+    }
 
     function setRows(rows) {
       document.getElementById('resultRows').innerHTML = rows.map(function(row) {
@@ -819,6 +1029,8 @@
           ['测量身高', fmt(currentHeight, 1) + ' cm'],
           ['计算状态', '年龄过小，暂不计算']
         ]);
+        lastGrowthChart = null;
+        document.getElementById('growthChartCard').style.display = 'none';
         return;
       }
 
@@ -828,6 +1040,7 @@
       var percentile = Math.max(0.1, Math.min(99.9, normalCdf(z) * 100));
       var predictedAdult = isMature ? currentHeight : profile.adultAverage + z * profile.adultSd;
       var sign = z >= 0 ? '+' : '';
+      drawGrowthChart(profile, age, currentHeight, percentile);
 
       if (isMature) {
         document.getElementById('percentileValue').textContent = fmt(percentile, 1) + '%';
@@ -899,6 +1112,15 @@
       });
     });
 
+    window.addEventListener('resize', function() {
+      if (!lastGrowthChart) return;
+      drawGrowthChart(
+        lastGrowthChart.profile,
+        lastGrowthChart.age,
+        lastGrowthChart.currentHeight,
+        lastGrowthChart.percentile
+      );
+    });
   </script>
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
