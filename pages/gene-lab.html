@@ -403,6 +403,17 @@
     .privacy-inline { color: #91a0ad; font-size: 13px; margin-top: 12px; }
     .data-guide { display: grid; gap: 9px; margin-top: 14px; color: #8f9ca9; font-size: 13px; }
     .data-guide code { color: #b8e8ea; }
+    .sample-manager { margin-top: 18px; padding: 18px; border: 1px solid rgba(255,255,255,.08); border-radius: 14px; background: rgba(255,255,255,.022); }
+    .sample-manager-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .sample-manager-head h3 { font-size: 16px; }
+    .sample-manager-head span { color: #7f8d99; font-size: 13px; }
+    .sample-add-row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; margin-bottom: 8px; }
+    .sample-list { display: grid; gap: 7px; max-height: 330px; margin-top: 12px; overflow-y: auto; scrollbar-width: thin; }
+    .sample-item { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 12px; align-items: center; padding: 11px 12px; border: 1px solid rgba(255,255,255,.065); border-radius: 9px; background: rgba(7,11,16,.66); }
+    .sample-item strong { display: block; overflow: hidden; color: #dce9ec; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+    .sample-item small { display: block; overflow: hidden; color: #687683; font: 12px/1.5 Consolas, monospace; text-overflow: ellipsis; white-space: nowrap; }
+    .sample-delete { min-height: 34px; padding: 6px 10px; border: 1px solid rgba(255,127,143,.25); border-radius: 8px; background: rgba(255,127,143,.06); color: #ff9dab; cursor: pointer; }
+    .sample-delete:hover { background: rgba(255,127,143,.13); }
 
     @media (max-width: 860px) {
       .data-workspace { grid-template-columns: 1fr; }
@@ -412,6 +423,7 @@
       .option-grid, .comparison-grid { grid-template-columns: 1fr; }
       .option-grid .control.span-2 { grid-column: span 1; }
       .data-preview textarea { min-height: 300px; }
+      .sample-add-row, .sample-manager .search-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -474,12 +486,24 @@
         <div class="panel-head"><div><h2>参考群体（SOURCE）</h2><p>每行必须是名称加 25 个数值坐标，无表头。</p></div><div class="toolbar"><label class="btn file-button">导入文件<input type="file" id="sourceFile" accept=".csv,.txt,text/csv,text/plain"></label><button class="btn ghost" type="button" data-format="source">整理格式</button><button class="btn danger" type="button" data-clear="source">清空</button></div></div>
         <textarea id="sourceInput" spellcheck="false" placeholder="参考群体名称,第1维,第2维,...,第25维"></textarea>
         <div class="data-meta"><span class="meta-chip">有效样本 <strong id="sourceCount">0</strong></span><span class="meta-chip">坐标维度 <strong id="sourceDims">—</strong></span></div><div class="validation" id="sourceValidation" aria-live="polite"></div>
+        <section class="sample-manager" aria-label="参考群体样本管理">
+          <div class="sample-manager-head"><h3>搜索与管理样本</h3><span>当前显示 <strong id="sourceVisibleCount">0</strong> 条</span></div>
+          <div class="search-row"><input class="text-input" id="sourceSearch" placeholder="按名称搜索；支持空格、?、! 组合筛选"><button class="btn danger" type="button" data-delete-filtered="source">删除搜索结果</button></div>
+          <div class="sample-add-row"><input class="text-input" id="sourceAddRow" placeholder="粘贴一整行：名称 + 25 个坐标"><button class="btn" type="button" data-add-row="source">新增参考样本</button></div>
+          <div class="validation" id="sourceManagerMessage" aria-live="polite"></div><div class="sample-list" id="sourceSampleList"><div class="empty-state" style="padding:20px">暂无参考样本</div></div>
+        </section>
       </div>
 
       <div class="tab-panel" id="panel-target" role="tabpanel">
         <div class="panel-head"><div><h2>目标样本（TARGET）</h2><p>可放入一个或多个 25 维样本。</p></div><div class="toolbar"><label class="btn file-button">导入文件<input type="file" id="targetFile" accept=".csv,.txt,text/csv,text/plain"></label><button class="btn ghost" type="button" data-format="target">整理格式</button><button class="btn danger" type="button" data-clear="target">清空</button></div></div>
         <textarea id="targetInput" spellcheck="false" placeholder="目标样本名称,第1维,第2维,...,第25维"></textarea>
         <div class="data-meta"><span class="meta-chip">有效样本 <strong id="targetCount">0</strong></span><span class="meta-chip">坐标维度 <strong id="targetDims">—</strong></span></div><div class="validation" id="targetValidation" aria-live="polite"></div>
+        <section class="sample-manager" aria-label="目标样本管理">
+          <div class="sample-manager-head"><h3>搜索与管理样本</h3><span>当前显示 <strong id="targetVisibleCount">0</strong> 条</span></div>
+          <div class="search-row"><input class="text-input" id="targetSearch" placeholder="按名称搜索；支持空格、?、! 组合筛选"><button class="btn danger" type="button" data-delete-filtered="target">删除搜索结果</button></div>
+          <div class="sample-add-row"><input class="text-input" id="targetAddRow" placeholder="粘贴一整行：名称 + 25 个坐标"><button class="btn" type="button" data-add-row="target">新增目标样本</button></div>
+          <div class="validation" id="targetManagerMessage" aria-live="polite"></div><div class="sample-list" id="targetSampleList"><div class="empty-state" style="padding:20px">暂无目标样本</div></div>
+        </section>
       </div>
 
       <div class="tab-panel" id="panel-distance" role="tabpanel">
@@ -560,7 +584,7 @@
         }
         if (values.length !== DIMENSIONS) { issues.push(`第 ${index + 1} 行有 ${values.length} 个坐标，必须是 ${DIMENSIONS} 个`); return; }
         if (names.has(name)) issues.push(`样本名“${name}”重复`);
-        names.add(name); rows.push({ name, values, line: [name, ...values].join(",") });
+        names.add(name); rows.push({ name, values, line: [name, ...values].join(","), lineIndex: index });
       });
       return { rows, issues, dims: rows.length ? DIMENSIONS : 0 };
     }
@@ -582,6 +606,7 @@
       if (parsed.issues.length) { validation.className = "validation"; validation.textContent = parsed.issues.slice(0, 4).join("；") + (parsed.issues.length > 4 ? `；另有 ${parsed.issues.length - 4} 项` : ""); }
       else if (parsed.rows.length) { validation.className = "validation ok"; validation.textContent = `已识别 ${parsed.rows.length} 个完整的 25 维样本`; }
       else { validation.className = "validation"; validation.textContent = ""; }
+      renderSampleManager(kind);
       refreshTargetControls();
     }
     sourceInput.addEventListener("input", () => refreshData("source")); targetInput.addEventListener("input", () => refreshData("target"));
@@ -597,6 +622,40 @@
     document.querySelectorAll("[data-format]").forEach(button => button.addEventListener("click", () => { const kind = button.dataset.format, input = kind === "source" ? sourceInput : targetInput, parsed = parseCoordinates(input.value); if (parsed.rows.length) input.value = parsed.rows.map(rowToLine).join("\n"); refreshData(kind); }));
     function bindSimpleFile(id, kind) { document.getElementById(id).addEventListener("change", async event => { const file = event.target.files[0]; if (!file) return; (kind === "source" ? sourceInput : targetInput).value = await file.text(); refreshData(kind); event.target.value = ""; }); }
     bindSimpleFile("sourceFile", "source"); bindSimpleFile("targetFile", "target");
+
+    function managerMessage(kind, text, ok = false) {
+      const element = document.getElementById(`${kind}ManagerMessage`); element.className = ok ? "validation ok" : "validation"; element.textContent = text;
+    }
+    function removeSampleLines(kind, lineIndexes) {
+      const input = kind === "source" ? sourceInput : targetInput, remove = new Set(lineIndexes), lines = input.value.split(/\r?\n/);
+      input.value = lines.filter((_, index) => !remove.has(index)).join("\n"); refreshData(kind);
+    }
+    function renderSampleManager(kind) {
+      const search = document.getElementById(`${kind}Search`), list = document.getElementById(`${kind}SampleList`), counter = document.getElementById(`${kind}VisibleCount`);
+      if (!search || !list || !counter) return;
+      const query = search.value, matches = state[kind].filter(row => matchesFilter(row.name, query)), visible = matches.slice(0, 250);
+      counter.textContent = matches.length + (matches.length > 250 ? "（仅展示前 250 条）" : "");
+      if (!visible.length) { list.innerHTML = `<div class="empty-state" style="padding:20px">${state[kind].length ? "没有匹配的样本" : "暂无样本"}</div>`; return; }
+      list.innerHTML = visible.map(row => `<article class="sample-item"><div><strong>${escapeHtml(row.name)}</strong><small>${row.values.slice(0,4).map(value => Number(value).toFixed(6)).join(", ")} … 共 25 维</small></div><button class="sample-delete" type="button" data-delete-line="${row.lineIndex}">删除</button></article>`).join("");
+      list.querySelectorAll("[data-delete-line]").forEach(button => button.addEventListener("click", () => { removeSampleLines(kind, [Number(button.dataset.deleteLine)]); managerMessage(kind, "已删除 1 个样本。", true); }));
+    }
+    ["source","target"].forEach(kind => {
+      document.getElementById(`${kind}Search`).addEventListener("input", () => renderSampleManager(kind));
+      document.querySelector(`[data-add-row="${kind}"]`).addEventListener("click", () => {
+        const field = document.getElementById(`${kind}AddRow`), parsed = parseCoordinates(field.value.trim());
+        if (parsed.issues.length || parsed.rows.length !== 1) { managerMessage(kind, parsed.issues[0] || "请粘贴一整行名称和 25 个坐标。"); return; }
+        if (state[kind].some(row => row.name === parsed.rows[0].name)) { managerMessage(kind, `样本名“${parsed.rows[0].name}”已经存在。`); return; }
+        const input = kind === "source" ? sourceInput : targetInput; input.value = input.value.trim() ? `${input.value.trim()}\n${rowToLine(parsed.rows[0])}` : rowToLine(parsed.rows[0]); field.value = ""; refreshData(kind); managerMessage(kind, `已新增“${parsed.rows[0].name}”。`, true);
+      });
+      document.getElementById(`${kind}AddRow`).addEventListener("keydown", event => { if (event.key === "Enter") { event.preventDefault(); document.querySelector(`[data-add-row="${kind}"]`).click(); } });
+      document.querySelector(`[data-delete-filtered="${kind}"]`).addEventListener("click", () => {
+        const query = document.getElementById(`${kind}Search`).value.trim();
+        if (!query) { managerMessage(kind, "请先输入搜索条件，避免误删全部样本。"); return; }
+        const matches = state[kind].filter(row => matchesFilter(row.name, query));
+        if (!matches.length) { managerMessage(kind, "没有可删除的匹配样本。"); return; }
+        removeSampleLines(kind, matches.map(row => row.lineIndex)); managerMessage(kind, `已删除 ${matches.length} 个搜索结果。`, true);
+      });
+    });
 
     function makeDemoVector(seed) { return Array.from({length:DIMENSIONS}, (_, i) => Number((Math.sin((i + 1) * (seed + 0.71)) * 0.062 + Math.cos((i + 2) * (seed * 0.37 + 0.43)) * 0.031 + seed * 0.0015).toFixed(6))); }
     function mixVectors(vectors, weights) { return Array.from({length:DIMENSIONS}, (_, i) => Number(vectors.reduce((sum, vector, index) => sum + vector[i] * weights[index], 0).toFixed(6))); }
