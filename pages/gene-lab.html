@@ -365,6 +365,54 @@
       .result-table { min-width: 620px; }
       .proportion-row { grid-template-columns: 105px 1fr 58px; gap: 8px; }
     }
+    .data-workspace { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 18px; }
+    .file-sidebar, .data-preview { min-width: 0; }
+    .file-list { display: grid; gap: 8px; margin-top: 12px; }
+    .file-card {
+      width: 100%; padding: 12px; text-align: left; border: 1px solid rgba(255,255,255,.08);
+      border-radius: 10px; background: rgba(255,255,255,.025); color: #aeb9c4; cursor: pointer;
+    }
+    .file-card:hover, .file-card.active { border-color: var(--line-strong); background: rgba(67,216,210,.08); color: var(--text); }
+    .file-card strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .file-card span { color: #758391; font-size: 12px; }
+    .search-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-bottom: 10px; }
+    .text-input, .number-input {
+      width: 100%; min-height: 42px; padding: 9px 12px; border: 1px solid rgba(255,255,255,.10);
+      border-radius: 10px; outline: none; background: #0b1017; color: var(--text);
+    }
+    .text-input:focus, .number-input:focus { border-color: var(--line-strong); box-shadow: 0 0 0 3px rgba(67,216,210,.07); }
+    .data-preview textarea { min-height: 360px; }
+    .target-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
+    .target-run { padding: 9px 13px; border: 1px solid rgba(255,255,255,.10); border-radius: 9px; background: rgba(255,255,255,.035); color: #b9c3cc; cursor: pointer; }
+    .target-run:hover { color: var(--cyan); border-color: var(--line-strong); }
+    .option-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .option-grid .control.span-2 { grid-column: span 2; }
+    .output-stack { display: grid; gap: 18px; margin-top: 22px; }
+    .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 16px; }
+    .comparison-block { min-width: 0; overflow-x: auto; }
+    .comparison-block h4 { margin-bottom: 8px; color: #a9e9e7; font-size: 14px; }
+    .bar-mode-1 { height: 8px; margin-top: 7px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.07); }
+    .bar-mode-1 i { display: block; height: 100%; background: linear-gradient(90deg, var(--cyan), var(--blue)); }
+    .multi-wrap { margin-top: 18px; overflow-x: auto; border: 1px solid rgba(255,255,255,.08); border-radius: 13px; }
+    .multi-table { width: max-content; min-width: 100%; border-collapse: collapse; font-size: 13px; }
+    .multi-table th, .multi-table td { min-width: 86px; padding: 10px 12px; border-right: 1px solid rgba(255,255,255,.05); border-bottom: 1px solid rgba(255,255,255,.05); text-align: center; }
+    .multi-table th { position: sticky; top: 0; background: #111822; color: #b9c6d1; }
+    .multi-table th:first-child, .multi-table td:first-child { position: sticky; left: 0; min-width: 180px; text-align: left; background: #0d131b; z-index: 1; }
+    .multi-table td { font-variant-numeric: tabular-nums; }
+    .mode-help { margin-top: 10px; color: #758391; font-size: 13px; }
+    .privacy-inline { color: #91a0ad; font-size: 13px; margin-top: 12px; }
+    .data-guide { display: grid; gap: 9px; margin-top: 14px; color: #8f9ca9; font-size: 13px; }
+    .data-guide code { color: #b8e8ea; }
+
+    @media (max-width: 860px) {
+      .data-workspace { grid-template-columns: 1fr; }
+      .option-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      .option-grid, .comparison-grid { grid-template-columns: 1fr; }
+      .option-grid .control.span-2 { grid-column: span 1; }
+      .data-preview textarea { min-height: 300px; }
+    }
   </style>
 </head>
 <body>
@@ -373,370 +421,335 @@
     <button class="menu-toggle" type="button" aria-label="打开导航" aria-expanded="false">☰</button>
     <ul class="nav-links">
       <li><a href="../index.html">Home</a></li>
-      <li class="nav-dropdown">
-        <a href="fitness-calculator.html" class="active">项目</a>
-        <div class="nav-dropdown-menu">
-          <a href="fitness-calculator.html">体测计算器</a>
-          <a href="body-fat-calculator.html">体脂率计算器</a>
-          <a href="testosterone.html">睾酮评估</a>
-          <a href="muscle-potential.html">增肌潜力计算器</a>
-          <a href="height-prediction.html">身高预测计算器</a>
-          <a href="bio-age-calculator.html">生理年龄计算器</a>
-          <a href="gene-lab.html" class="active">基因分析实验室</a>
-          <a href="private-service.html">私人分析服务</a>
-        </div>
-      </li>
-      <li><a href="column.html">专栏</a></li>
-      <li><a href="records.html">个人记录</a></li>
+      <li class="nav-dropdown"><a href="fitness-calculator.html" class="active">项目</a><div class="nav-dropdown-menu">
+        <a href="fitness-calculator.html">体测计算器</a><a href="body-fat-calculator.html">体脂率计算器</a><a href="testosterone.html">睾酮评估</a>
+        <a href="muscle-potential.html">增肌潜力计算器</a><a href="height-prediction.html">身高预测计算器</a><a href="bio-age-calculator.html">生理年龄计算器</a>
+        <a href="gene-lab.html" class="active">基因分析实验室</a><a href="private-service.html">私人分析服务</a>
+      </div></li>
+      <li><a href="column.html">专栏</a></li><li><a href="records.html">个人记录</a></li>
     </ul>
   </nav>
 
   <main>
     <header class="page-header">
-      <div class="eyebrow">SJQ Gene Lab</div>
+      <div class="eyebrow">SJQ G25 Workbench</div>
       <h1>基因<span>坐标实验室</span></h1>
-      <p>受 VAHADUO 工作流启发的中文坐标分析工具。粘贴 Global25 或同类多维坐标，即可进行群体距离排序和单样本混合拟合。</p>
-      <div class="status-row">
-        <span class="status-pill"><span class="status-dot"></span>仅在浏览器本地计算</span>
-        <span class="status-pill secondary">无需注册 · 不上传数据</span>
-      </div>
+      <p>中文 Global25 坐标工作台：文件筛选、参考与目标数据、欧氏距离、双目标比较、单样本拟合和多样本批量分析。</p>
+      <div class="status-row"><span class="status-pill"><span class="status-dot"></span>严格校验 25 维</span><span class="status-pill secondary">本地计算 · 数据不上传</span></div>
     </header>
 
-    <section class="lab-shell" aria-label="基因坐标分析工作区">
-      <div class="tab-list" role="tablist" aria-label="分析步骤">
-        <button class="tab-button active" type="button" role="tab" aria-selected="true" data-tab="guide">使用说明</button>
+    <section class="lab-shell" aria-label="Global25 中文分析工作区">
+      <div class="tab-list" role="tablist" aria-label="工具页签">
+        <button class="tab-button active" type="button" role="tab" aria-selected="true" data-tab="data">数据</button>
         <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="source">参考群体 <span id="sourceBadge">0</span></button>
         <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="target">目标样本 <span id="targetBadge">0</span></button>
-        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="distance">距离分析</button>
-        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="fit">混合拟合</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="distance">距离</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="single">单样本</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="multi">多样本</button>
       </div>
 
-      <div class="tab-panel active" id="panel-guide" role="tabpanel">
-        <div class="panel-head">
-          <div><h2>四步完成分析</h2><p>支持逗号分隔的 CSV/TXT 数据，每行一个样本。</p></div>
-          <button class="btn primary" type="button" id="loadDemo">载入演示数据</button>
+      <div class="tab-panel active" id="panel-data" role="tabpanel">
+        <div class="panel-head"><div><h2>数据文件与筛选</h2><p>可同时打开多个 CSV/TXT 文件，筛选样本后追加或替换到参考群体与目标样本。</p></div><button class="btn primary" type="button" id="loadDemo">载入 25 维演示数据</button></div>
+        <div class="data-workspace">
+          <div class="file-sidebar">
+            <label class="btn file-button" style="width:100%">打开文件<input type="file" id="dataFiles" accept=".csv,.txt,text/csv,text/plain" multiple></label>
+            <button class="btn danger" type="button" id="removeDataFile" style="width:100%;margin-top:8px">移除当前文件</button>
+            <div class="file-list" id="dataFileList"><div class="empty-state" style="padding:22px 10px">尚未打开文件</div></div>
+          </div>
+          <div class="data-preview">
+            <div class="search-row"><input class="text-input" id="dataFilter" placeholder="输入名称筛选；空格=并且，?=或者，!=排除"><button class="btn ghost" type="button" id="resetFilter">清除</button></div>
+            <textarea id="dataPreview" readonly spellcheck="false" placeholder="打开文件后，筛选结果会显示在这里。"></textarea>
+            <div class="toolbar" style="margin-top:10px">
+              <select id="dataAddMode" style="width:auto;min-width:130px"><option value="append">追加到</option><option value="replace">替换到</option></select>
+              <button class="btn" type="button" data-add-to="source">参考群体</button><button class="btn" type="button" data-add-to="target">目标样本</button>
+            </div>
+            <div class="data-meta"><span class="meta-chip">筛选结果 <strong id="filteredCount">0</strong></span><span class="meta-chip">要求 <strong>名称 + 25 个坐标</strong></span></div>
+          </div>
         </div>
-        <div class="steps">
-          <article class="step"><div class="step-num">1</div><h3>放入参考群体</h3><p>粘贴或导入用于比较、拟合的群体坐标。</p></article>
-          <article class="step"><div class="step-num">2</div><h3>放入目标样本</h3><p>粘贴你的样本坐标；可一次放入多行。</p></article>
-          <article class="step"><div class="step-num">3</div><h3>查看距离</h3><p>按欧氏距离排序，寻找坐标空间中的近邻。</p></article>
-          <article class="step"><div class="step-num">4</div><h3>运行混合拟合</h3><p>估计参考坐标的非负组合及拟合残差。</p></article>
-        </div>
-        <p>标准格式：第一列是样本名，后面各列为数值坐标。参考群体与目标样本必须具有相同维度。</p>
-        <pre class="format-example">样本名称,0.012345,-0.023456,0.034567,...
-另一个样本,0.010000,-0.020000,0.030000,...</pre>
-        <div class="note">演示数据是用于测试流程的三维虚构坐标，不代表任何真实族群。距离表示数学相似性，不等于血缘、族源或医学结论。</div>
+        <div class="data-guide"><div><code>abc def</code>：同时包含 abc 和 def</div><div><code>abc ? def</code>：包含 abc 或 def</div><div><code>abc !def</code>：包含 abc 且排除 def</div><div><code>,abc</code>：名称以 abc 开头；<code>abc,</code>：名称以 abc 结尾</div></div>
+        <div class="note" style="margin-top:18px">演示数据为 25 维虚构坐标，只用于确认流程和算法，不代表真实族群。Global25 的每一维是 PCA 坐标轴，不是 25 个独立“血统百分比”。</div>
       </div>
 
       <div class="tab-panel" id="panel-source" role="tabpanel">
-        <div class="panel-head">
-          <div><h2>参考群体</h2><p>每行：名称 + 一组坐标。支持 CSV、TXT 和直接粘贴。</p></div>
-          <div class="toolbar">
-            <label class="btn file-button">导入文件<input type="file" id="sourceFile" accept=".csv,.txt,text/csv,text/plain"></label>
-            <button class="btn ghost" type="button" data-format="source">整理格式</button>
-            <button class="btn danger" type="button" data-clear="source">清空</button>
-          </div>
-        </div>
-        <div class="editor-wrap"><textarea id="sourceInput" spellcheck="false" placeholder="参考群体A,0.012345,-0.023456,0.034567&#10;参考群体B,-0.010000,0.021000,0.014000"></textarea></div>
-        <div class="data-meta"><span class="meta-chip">有效样本 <strong id="sourceCount">0</strong></span><span class="meta-chip">坐标维度 <strong id="sourceDims">—</strong></span></div>
-        <div class="validation" id="sourceValidation" aria-live="polite"></div>
+        <div class="panel-head"><div><h2>参考群体（SOURCE）</h2><p>每行必须是名称加 25 个数值坐标，无表头。</p></div><div class="toolbar"><label class="btn file-button">导入文件<input type="file" id="sourceFile" accept=".csv,.txt,text/csv,text/plain"></label><button class="btn ghost" type="button" data-format="source">整理格式</button><button class="btn danger" type="button" data-clear="source">清空</button></div></div>
+        <textarea id="sourceInput" spellcheck="false" placeholder="参考群体名称,第1维,第2维,...,第25维"></textarea>
+        <div class="data-meta"><span class="meta-chip">有效样本 <strong id="sourceCount">0</strong></span><span class="meta-chip">坐标维度 <strong id="sourceDims">—</strong></span></div><div class="validation" id="sourceValidation" aria-live="polite"></div>
       </div>
 
       <div class="tab-panel" id="panel-target" role="tabpanel">
-        <div class="panel-head">
-          <div><h2>目标样本</h2><p>可放入一个或多个样本，距离分析会批量运行。</p></div>
-          <div class="toolbar">
-            <label class="btn file-button">导入文件<input type="file" id="targetFile" accept=".csv,.txt,text/csv,text/plain"></label>
-            <button class="btn ghost" type="button" data-format="target">整理格式</button>
-            <button class="btn danger" type="button" data-clear="target">清空</button>
-          </div>
-        </div>
-        <div class="editor-wrap"><textarea id="targetInput" spellcheck="false" placeholder="我的样本,0.011234,-0.020345,0.030456"></textarea></div>
-        <div class="data-meta"><span class="meta-chip">有效样本 <strong id="targetCount">0</strong></span><span class="meta-chip">坐标维度 <strong id="targetDims">—</strong></span></div>
-        <div class="validation" id="targetValidation" aria-live="polite"></div>
+        <div class="panel-head"><div><h2>目标样本（TARGET）</h2><p>可放入一个或多个 25 维样本。</p></div><div class="toolbar"><label class="btn file-button">导入文件<input type="file" id="targetFile" accept=".csv,.txt,text/csv,text/plain"></label><button class="btn ghost" type="button" data-format="target">整理格式</button><button class="btn danger" type="button" data-clear="target">清空</button></div></div>
+        <textarea id="targetInput" spellcheck="false" placeholder="目标样本名称,第1维,第2维,...,第25维"></textarea>
+        <div class="data-meta"><span class="meta-chip">有效样本 <strong id="targetCount">0</strong></span><span class="meta-chip">坐标维度 <strong id="targetDims">—</strong></span></div><div class="validation" id="targetValidation" aria-live="polite"></div>
       </div>
 
       <div class="tab-panel" id="panel-distance" role="tabpanel">
-        <div class="panel-head"><div><h2>距离分析</h2><p>计算每个目标与所有参考群体之间的欧氏距离；数值越小越接近。</p></div></div>
-        <div class="control-grid">
-          <div class="control"><label for="distanceTop">显示前几名</label><select id="distanceTop"><option value="5">前 5 名</option><option value="10" selected>前 10 名</option><option value="20">前 20 名</option><option value="50">前 50 名</option><option value="all">全部</option></select></div>
-          <div class="control"><label for="distanceScale">距离显示</label><select id="distanceScale"><option value="1">原始欧氏距离</option><option value="100" selected>距离 × 100</option></select></div>
-          <div class="control"><label>&nbsp;</label><button class="btn primary" type="button" id="runDistance" style="width:100%">运行全部目标</button></div>
+        <div class="panel-head"><div><h2>距离（DISTANCE）</h2><p>单目标欧氏距离，或比较两个目标相对每个参考群体的差值、比值与 D3。</p></div></div>
+        <div class="option-grid">
+          <div class="control"><label for="distanceMode">模式</label><select id="distanceMode"><option value="single">单目标距离</option><option value="difference">差值 AC − BC</option><option value="ratio">比值 AC ÷ BC</option><option value="d3">D3 (AC − BC) ÷ (AC + BC)</option></select></div>
+          <div class="control"><label for="distanceTop">最大输出数量</label><input class="number-input" id="distanceTop" type="number" min="1" value="25"></div>
+          <div class="control"><label for="distanceGradient">颜色渐变</label><select id="distanceGradient"><option value="yes">开启</option><option value="no">关闭</option></select></div>
+          <div class="control"><label for="distanceScale">距离显示</label><select id="distanceScale"><option value="1">原始距离</option><option value="100" selected>距离 × 100</option></select></div>
+          <div class="control"><label for="compareA">目标 A</label><select id="compareA"></select></div><div class="control"><label for="compareB">目标 B</label><select id="compareB"></select></div>
+          <div class="control"><label for="gradientFrom">渐变起点</label><input class="number-input" id="gradientFrom" type="number" step="0.01" min="0" value="0"></div>
+          <div class="control"><label for="gradientTo">渐变终点</label><input class="number-input" id="gradientTo" type="number" step="0.01" min="0" value="0.2"></div>
         </div>
-        <div class="toolbar"><button class="btn ghost" type="button" id="copyDistance">复制结果</button></div>
-        <div class="result-area" id="distanceResults"><div class="empty-state">先加入参考群体和目标样本，再运行距离分析。</div></div>
+        <div class="toolbar"><button class="btn primary" type="button" id="runDistanceMode">运行当前模式</button><button class="btn" type="button" id="runAllDistance">运行全部单目标</button><button class="btn ghost" type="button" id="copyDistance">复制结果</button><button class="btn danger" type="button" id="clearDistance">清空输出</button></div>
+        <div class="target-actions" id="distanceTargets"></div><p class="mode-help" id="distanceModeHelp">单目标模式：点击目标按钮或“运行全部单目标”。</p>
+        <div class="output-stack" id="distanceResults"><div class="empty-state">请先准备参考群体与目标样本。</div></div>
       </div>
 
-      <div class="tab-panel" id="panel-fit" role="tabpanel">
-        <div class="panel-head"><div><h2>单样本混合拟合</h2><p>寻找参考坐标的非负加权组合，使组合坐标尽量接近目标样本。</p></div></div>
-        <div class="control-grid">
-          <div class="control"><label for="fitTarget">目标样本</label><select id="fitTarget"><option value="">请先载入目标样本</option></select></div>
-          <div class="control"><label for="fitPool">候选参考数量</label><select id="fitPool"><option value="30">最近 30 个</option><option value="60" selected>最近 60 个</option><option value="120">最近 120 个</option><option value="all">全部参考</option></select></div>
-          <div class="control"><label>&nbsp;</label><button class="btn primary" type="button" id="runFit" style="width:100%">开始拟合</button></div>
+      <div class="tab-panel" id="panel-single" role="tabpanel">
+        <div class="panel-head"><div><h2>单样本（SINGLE）</h2><p>为一个目标寻找参考群体的非负加权组合。</p></div></div>
+        <div class="option-grid">
+          <div class="control"><label for="singleTarget">目标样本</label><select id="singleTarget"></select></div>
+          <div class="control"><label for="singleCycles">计算轮次</label><select id="singleCycles"><option value="0.25">0.25×</option><option value="1" selected>1×</option><option value="4">4×</option></select></div>
+          <div class="control"><label for="singleReduce">限制成分数</label><select id="singleReduce"><option value="0">不限制</option><option value="2">2P</option><option value="3">3P</option><option value="4">4P</option><option value="5">5P</option><option value="6">6P</option></select></div>
+          <div class="control"><label for="singleAdc">距离附加列 ADC</label><select id="singleAdc"><option value="0">关闭</option><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1">1×</option></select></div>
+          <div class="control"><label for="singleRecalc">ADC 后重算</label><select id="singleRecalc"><option value="yes">是</option><option value="no">否</option></select></div>
+          <div class="control"><label for="singleZeros">显示零值</label><select id="singleZeros"><option value="no">否</option><option value="yes">是</option></select></div>
+          <div class="control"><label for="singleAggregate">按冒号前名称合并</label><select id="singleAggregate"><option value="yes">是</option><option value="no">否</option></select></div>
+          <div class="control"><label for="singleBars">条形图</label><select id="singleBars"><option value="1">模式 1</option><option value="2">模式 2</option><option value="0">关闭</option></select></div>
         </div>
-        <div class="toolbar"><button class="btn ghost" type="button" id="copyFit">复制结果</button></div>
-        <div class="result-area" id="fitResults"><div class="empty-state">选择一个目标样本并开始拟合。</div></div>
+        <div class="toolbar"><button class="btn primary" type="button" id="runSingle">运行当前目标</button><button class="btn" type="button" id="runAllSingle">运行全部目标</button><button class="btn ghost" type="button" id="copySingle">复制结果</button><button class="btn danger" type="button" id="clearSingle">清空输出</button></div>
+        <div class="target-actions" id="singleTargets"></div><div class="output-stack" id="singleResults"><div class="empty-state">选择目标样本并开始拟合。</div></div>
+      </div>
+
+      <div class="tab-panel" id="panel-multi" role="tabpanel">
+        <div class="panel-head"><div><h2>多样本（MULTI）</h2><p>批量拟合所有目标，并生成参考成分 × 目标样本对照表。</p></div></div>
+        <div class="option-grid">
+          <div class="control"><label for="multiCycles">计算轮次</label><select id="multiCycles"><option value="0.25">0.25×</option><option value="1" selected>1×</option><option value="4">4×</option></select></div>
+          <div class="control"><label for="multiFast">快速模式</label><select id="multiFast"><option value="no">否</option><option value="yes">是</option></select></div>
+          <div class="control"><label for="multiAdc">距离附加列 ADC</label><select id="multiAdc"><option value="0">关闭</option><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1">1×</option></select></div>
+          <div class="control"><label for="multiRecalc">ADC 后重算</label><select id="multiRecalc"><option value="yes">是</option><option value="no">否</option></select></div>
+          <div class="control"><label for="multiZeros">显示零值</label><select id="multiZeros"><option value="no">否</option><option value="yes">是</option></select></div>
+          <div class="control"><label for="multiAggregate">按冒号前名称合并</label><select id="multiAggregate"><option value="yes">是</option><option value="no">否</option></select></div>
+        </div>
+        <div class="toolbar"><button class="btn primary" type="button" id="runMulti">运行批量分析</button><button class="btn ghost" type="button" id="copyMultiCsv">复制 CSV</button><button class="btn ghost" type="button" id="copyMultiTsv">复制 TSV</button><button class="btn danger" type="button" id="clearMulti">清空输出</button></div>
+        <div id="multiResults"><div class="empty-state" style="margin-top:22px">至少需要一个参考群体和一个目标样本。</div></div>
       </div>
     </section>
 
-    <aside class="science-note">
-      <h3>如何理解结果</h3>
-      <p>本工具处理的是用户提供的数值坐标，不读取原始 DNA 文件。距离仅描述所选坐标系和参考面板中的接近程度；混合比例是数学模型结果，会随参考样本、维度、缩放方式和优化参数改变。请勿将结果用于医疗诊断、亲缘鉴定或身份认定。</p>
-    </aside>
+    <aside class="science-note"><h3>25 个坐标是什么</h3><p>Global25 的 25 个数值是样本在 25 条主成分轴上的位置。单个维度没有固定的“某族血统”含义；结果只能结合相同缩放方式和同一参考面板解释。距离是坐标空间的相似度，拟合比例是数学近似，不等于族源证明、亲缘鉴定或医学诊断。</p></aside>
   </main>
-
-  <footer>© 2025 【SJQ】身体数据实验室 · Gene Lab 在你的浏览器中运行</footer>
+  <footer>© 2025 【SJQ】身体数据实验室 · G25 Workbench 在浏览器本地运行</footer>
 
   <script>
-    const state = { source: [], target: [], sourceError: "", targetError: "", distanceText: "", fitText: "" };
+    const DIMENSIONS = 25;
+    const state = { source: [], target: [], sourceError: "", targetError: "", files: [], activeFile: -1, filteredLines: [], distanceBlocks: [], distanceText: [], singleBlocks: [], singleText: [], multiCsv: "", multiTsv: "" };
     const sourceInput = document.getElementById("sourceInput");
     const targetInput = document.getElementById("targetInput");
 
-    function switchTab(name) {
-      document.querySelectorAll(".tab-button").forEach(button => {
-        const active = button.dataset.tab === name;
-        button.classList.toggle("active", active);
-        button.setAttribute("aria-selected", String(active));
-      });
-      document.querySelectorAll(".tab-panel").forEach(panel => panel.classList.toggle("active", panel.id === `panel-${name}`));
-    }
-
-    document.querySelectorAll(".tab-button").forEach(button => button.addEventListener("click", () => switchTab(button.dataset.tab)));
-    const menuToggle = document.querySelector(".menu-toggle");
-    menuToggle.addEventListener("click", () => {
-      const open = document.querySelector(".nav-links").classList.toggle("open");
-      menuToggle.setAttribute("aria-expanded", String(open));
-    });
-
+    function escapeHtml(value) { return String(value).replace(/[&<>'\"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[c])); }
+    function formatNumber(value, digits = 8) { return Number(value).toFixed(digits); }
     function splitLine(line) {
       if (line.includes(",")) return line.split(",").map(cell => cell.trim().replace(/^['\"]|['\"]$/g, ""));
       if (line.includes("\t")) return line.split("\t").map(cell => cell.trim());
       return line.trim().split(/\s+/);
     }
-
+    function rowToLine(row) { return [row.name, ...row.values.map(value => Number(value).toFixed(6))].join(","); }
     function parseCoordinates(text) {
-      const rows = [];
-      const issues = [];
-      let expectedDims = null;
-      const names = new Set();
+      const rows = [], issues = [], names = new Set();
       text.split(/\r?\n/).forEach((raw, index) => {
         const line = raw.trim();
-        if (!line || line.startsWith("#")) return;
-        const cells = splitLine(line);
-        if (cells.length < 2) { issues.push(`第 ${index + 1} 行缺少坐标`); return; }
-        const name = cells.shift().trim();
-        const values = cells.map(Number);
+        if (!line || line.startsWith("#") || line.startsWith(",")) return;
+        const cells = splitLine(line), name = String(cells.shift() || "").trim(), values = cells.map(Number);
         if (!name || values.some(value => !Number.isFinite(value))) {
-          const mayBeHeader = index === 0 && values.every(value => !Number.isFinite(value));
-          if (!mayBeHeader) issues.push(`第 ${index + 1} 行包含无效名称或数值`);
+          const header = index === 0 && values.every(value => !Number.isFinite(value));
+          if (!header) issues.push(`第 ${index + 1} 行包含无效名称或数值`);
           return;
         }
-        if (expectedDims === null) expectedDims = values.length;
-        if (values.length !== expectedDims) { issues.push(`第 ${index + 1} 行为 ${values.length} 维，应为 ${expectedDims} 维`); return; }
+        if (values.length !== DIMENSIONS) { issues.push(`第 ${index + 1} 行有 ${values.length} 个坐标，必须是 ${DIMENSIONS} 个`); return; }
         if (names.has(name)) issues.push(`样本名“${name}”重复`);
-        names.add(name);
-        rows.push({ name, values });
+        names.add(name); rows.push({ name, values, line: [name, ...values].join(",") });
       });
-      return { rows, dims: expectedDims || 0, issues };
+      return { rows, issues, dims: rows.length ? DIMENSIONS : 0 };
     }
+    function switchTab(name) {
+      document.querySelectorAll(".tab-button").forEach(button => { const active = button.dataset.tab === name; button.classList.toggle("active", active); button.setAttribute("aria-selected", String(active)); });
+      document.querySelectorAll(".tab-panel").forEach(panel => panel.classList.toggle("active", panel.id === `panel-${name}`));
+    }
+    document.querySelectorAll(".tab-button").forEach(button => button.addEventListener("click", () => switchTab(button.dataset.tab)));
+    const menuToggle = document.querySelector(".menu-toggle");
+    menuToggle.addEventListener("click", () => { const open = document.querySelector(".nav-links").classList.toggle("open"); menuToggle.setAttribute("aria-expanded", String(open)); });
 
     function refreshData(kind) {
-      const input = kind === "source" ? sourceInput : targetInput;
-      const parsed = parseCoordinates(input.value);
-      state[kind] = parsed.rows;
-      state[`${kind}Error`] = parsed.issues.join("；");
+      const input = kind === "source" ? sourceInput : targetInput, parsed = parseCoordinates(input.value);
+      state[kind] = parsed.rows; state[`${kind}Error`] = parsed.issues.join("；");
       document.getElementById(`${kind}Count`).textContent = parsed.rows.length;
-      document.getElementById(`${kind}Dims`).textContent = parsed.dims || "—";
+      document.getElementById(`${kind}Dims`).textContent = parsed.rows.length ? `${DIMENSIONS} / ${DIMENSIONS}` : "—";
       document.getElementById(`${kind}Badge`).textContent = parsed.rows.length;
       const validation = document.getElementById(`${kind}Validation`);
-      if (parsed.issues.length) {
-        validation.className = "validation";
-        validation.textContent = parsed.issues.slice(0, 3).join("；") + (parsed.issues.length > 3 ? `；另有 ${parsed.issues.length - 3} 项` : "");
-      } else if (parsed.rows.length) {
-        validation.className = "validation ok";
-        validation.textContent = `已识别 ${parsed.rows.length} 个 ${parsed.dims} 维样本`;
-      } else {
-        validation.className = "validation";
-        validation.textContent = "";
-      }
-      refreshFitTargets();
+      if (parsed.issues.length) { validation.className = "validation"; validation.textContent = parsed.issues.slice(0, 4).join("；") + (parsed.issues.length > 4 ? `；另有 ${parsed.issues.length - 4} 项` : ""); }
+      else if (parsed.rows.length) { validation.className = "validation ok"; validation.textContent = `已识别 ${parsed.rows.length} 个完整的 25 维样本`; }
+      else { validation.className = "validation"; validation.textContent = ""; }
+      refreshTargetControls();
     }
-
-    sourceInput.addEventListener("input", () => refreshData("source"));
-    targetInput.addEventListener("input", () => refreshData("target"));
-
-    function dimensionsMatch() {
-      if (!state.source.length || !state.target.length) return false;
-      return state.source[0].values.length === state.target[0].values.length;
-    }
-
+    sourceInput.addEventListener("input", () => refreshData("source")); targetInput.addEventListener("input", () => refreshData("target"));
     function requireData() {
-      if (!state.source.length) return "请先加入至少一个有效的参考群体。";
-      if (!state.target.length) return "请先加入至少一个有效的目标样本。";
-      if (state.sourceError || state.targetError) return "数据中仍有格式问题，请先修正红色提示。";
-      if (!dimensionsMatch()) return `维度不一致：参考群体为 ${state.source[0].values.length} 维，目标样本为 ${state.target[0].values.length} 维。`;
+      if (!state.source.length) return "请先加入至少一个有效的 25 维参考群体。";
+      if (!state.target.length) return "请先加入至少一个有效的 25 维目标样本。";
+      if (state.sourceError || state.targetError) return "数据仍有格式问题，请先修正红色提示。";
       return "";
     }
+    function euclidean(a, b) { let sum = 0; for (let i = 0; i < a.length; i++) { const d = a[i] - b[i]; sum += d * d; } return Math.sqrt(sum); }
 
-    function euclidean(a, b) {
-      let sum = 0;
-      for (let i = 0; i < a.length; i++) { const delta = a[i] - b[i]; sum += delta * delta; }
-      return Math.sqrt(sum);
+    document.querySelectorAll("[data-clear]").forEach(button => button.addEventListener("click", () => { const kind = button.dataset.clear; (kind === "source" ? sourceInput : targetInput).value = ""; refreshData(kind); }));
+    document.querySelectorAll("[data-format]").forEach(button => button.addEventListener("click", () => { const kind = button.dataset.format, input = kind === "source" ? sourceInput : targetInput, parsed = parseCoordinates(input.value); if (parsed.rows.length) input.value = parsed.rows.map(rowToLine).join("\n"); refreshData(kind); }));
+    function bindSimpleFile(id, kind) { document.getElementById(id).addEventListener("change", async event => { const file = event.target.files[0]; if (!file) return; (kind === "source" ? sourceInput : targetInput).value = await file.text(); refreshData(kind); event.target.value = ""; }); }
+    bindSimpleFile("sourceFile", "source"); bindSimpleFile("targetFile", "target");
+
+    function makeDemoVector(seed) { return Array.from({length:DIMENSIONS}, (_, i) => Number((Math.sin((i + 1) * (seed + 0.71)) * 0.062 + Math.cos((i + 2) * (seed * 0.37 + 0.43)) * 0.031 + seed * 0.0015).toFixed(6))); }
+    function mixVectors(vectors, weights) { return Array.from({length:DIMENSIONS}, (_, i) => Number(vectors.reduce((sum, vector, index) => sum + vector[i] * weights[index], 0).toFixed(6))); }
+    function loadDemoData() {
+      const vectors = [makeDemoVector(1), makeDemoVector(2), makeDemoVector(3), makeDemoVector(4), makeDemoVector(5)];
+      const sources = vectors.map((values, i) => ({name:`演示参考${String.fromCharCode(65 + i)}`, values}));
+      const targets = [
+        {name:"演示目标_45A_35B_20C", values:mixVectors(vectors.slice(0,3), [0.45,0.35,0.20])},
+        {name:"演示目标_25A_50D_25E", values:mixVectors([vectors[0],vectors[3],vectors[4]], [0.25,0.50,0.25])}
+      ];
+      sourceInput.value = sources.map(rowToLine).join("\n"); targetInput.value = targets.map(rowToLine).join("\n"); refreshData("source"); refreshData("target");
+      state.files = [
+        {name:"25维演示参考", rows:sources, lines:sources.map(rowToLine)},
+        {name:"25维演示目标", rows:targets, lines:targets.map(rowToLine)}
+      ]; state.activeFile = 0; renderFileList(); filterActiveFile();
     }
+    document.getElementById("loadDemo").addEventListener("click", loadDemoData);
 
-    function escapeHtml(value) {
-      return String(value).replace(/[&<>'\"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", "\"": "&quot;" }[char]));
-    }
-
-    function formatNumber(value, digits = 6) { return Number(value).toFixed(digits); }
-
-    document.getElementById("loadDemo").addEventListener("click", () => {
-      sourceInput.value = "北方参考（演示）,0.1000,0.2000,-0.1000\n南方参考（演示）,-0.1500,0.0500,0.2000\n西方参考（演示）,0.3000,-0.2000,0.1000";
-      targetInput.value = "演示样本,0.0525,0.0675,0.0450";
-      refreshData("source"); refreshData("target"); switchTab("source");
+    document.getElementById("dataFiles").addEventListener("change", async event => {
+      for (const file of event.target.files) {
+        const text = await file.text(), parsed = parseCoordinates(text);
+        state.files.push({ name:file.name.replace(/\.(csv|txt)$/i, "").replace(/_/g, " "), rows:parsed.rows, lines:parsed.rows.map(rowToLine) });
+      }
+      if (state.activeFile < 0 && state.files.length) state.activeFile = 0;
+      renderFileList(); filterActiveFile(); event.target.value = "";
     });
-
-    document.querySelectorAll("[data-clear]").forEach(button => button.addEventListener("click", () => {
-      const kind = button.dataset.clear;
-      (kind === "source" ? sourceInput : targetInput).value = "";
-      refreshData(kind);
+    function renderFileList() {
+      const list = document.getElementById("dataFileList");
+      if (!state.files.length) { list.innerHTML = '<div class="empty-state" style="padding:22px 10px">尚未打开文件</div>'; return; }
+      list.innerHTML = state.files.map((file, index) => `<button class="file-card ${index === state.activeFile ? "active" : ""}" type="button" data-file-index="${index}"><strong>${escapeHtml(file.name)}</strong><span>${file.rows.length} 个有效样本</span></button>`).join("");
+      list.querySelectorAll("[data-file-index]").forEach(button => button.addEventListener("click", () => { state.activeFile = Number(button.dataset.fileIndex); renderFileList(); filterActiveFile(); }));
+    }
+    function tokenMatches(name, token) {
+      let negate = token.startsWith("!"); if (negate) token = token.slice(1);
+      const starts = token.startsWith(","), ends = token.endsWith(","); token = token.replace(/^,|,$/g, "");
+      const lower = name.toLowerCase(), needle = token.toLowerCase();
+      let match = starts && ends ? lower === needle : starts ? lower.startsWith(needle) : ends ? lower.endsWith(needle) : lower.includes(needle);
+      return negate ? !match : match;
+    }
+    function matchesFilter(name, query) {
+      const groups = query.trim().replace(/\s*\?\s*/g, "?").split("?").map(group => group.trim().split(/\s+/).filter(Boolean)).filter(group => group.length);
+      if (!groups.length) return true;
+      return groups.some(group => group.every(token => tokenMatches(name, token)));
+    }
+    function filterActiveFile() {
+      const file = state.files[state.activeFile], query = document.getElementById("dataFilter").value;
+      state.filteredLines = file ? file.rows.filter(row => matchesFilter(row.name, query)).map(rowToLine) : [];
+      document.getElementById("dataPreview").value = state.filteredLines.join("\n"); document.getElementById("filteredCount").textContent = state.filteredLines.length;
+    }
+    document.getElementById("dataFilter").addEventListener("input", filterActiveFile);
+    document.getElementById("resetFilter").addEventListener("click", () => { document.getElementById("dataFilter").value = ""; filterActiveFile(); });
+    document.getElementById("removeDataFile").addEventListener("click", () => { if (state.activeFile < 0) return; state.files.splice(state.activeFile, 1); state.activeFile = state.files.length ? Math.min(state.activeFile, state.files.length - 1) : -1; renderFileList(); filterActiveFile(); });
+    document.querySelectorAll("[data-add-to]").forEach(button => button.addEventListener("click", () => {
+      if (!state.filteredLines.length) return;
+      const kind = button.dataset.addTo, input = kind === "source" ? sourceInput : targetInput, mode = document.getElementById("dataAddMode").value;
+      input.value = mode === "replace" || !input.value.trim() ? state.filteredLines.join("\n") : `${input.value.trim()}\n${state.filteredLines.join("\n")}`;
+      refreshData(kind); switchTab(kind);
     }));
 
-    document.querySelectorAll("[data-format]").forEach(button => button.addEventListener("click", () => {
-      const kind = button.dataset.format;
-      const input = kind === "source" ? sourceInput : targetInput;
-      const parsed = parseCoordinates(input.value);
-      if (parsed.rows.length) input.value = parsed.rows.map(row => [row.name, ...row.values].join(",")).join("\n");
-      refreshData(kind);
-    }));
-
-    function bindFileInput(id, kind) {
-      document.getElementById(id).addEventListener("change", event => {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-          (kind === "source" ? sourceInput : targetInput).value = String(reader.result || "");
-          refreshData(kind);
-        };
-        reader.readAsText(file, "UTF-8");
-        event.target.value = "";
-      });
+    function setSelectOptions(id, previous = "") {
+      const select = document.getElementById(id); select.innerHTML = state.target.length ? state.target.map((row,index) => `<option value="${index}">${escapeHtml(row.name)}</option>`).join("") : '<option value="">请先加入目标样本</option>';
+      if (previous !== "" && state.target[Number(previous)]) select.value = previous; else if (state.target.length) select.selectedIndex = 0;
     }
-    bindFileInput("sourceFile", "source"); bindFileInput("targetFile", "target");
-
-    function refreshFitTargets() {
-      const select = document.getElementById("fitTarget");
-      const previous = select.value;
-      select.innerHTML = state.target.length
-        ? state.target.map((row, index) => `<option value="${index}">${escapeHtml(row.name)}</option>`).join("")
-        : '<option value="">请先载入目标样本</option>';
-      if (previous !== "" && state.target[Number(previous)]) select.value = previous;
-      else if (state.target.length) select.selectedIndex = 0;
+    function refreshTargetControls() {
+      ["singleTarget","compareA","compareB"].forEach(id => setSelectOptions(id, document.getElementById(id)?.value || ""));
+      if (state.target.length > 1) document.getElementById("compareB").selectedIndex = Math.min(1, state.target.length - 1);
+      const buttons = state.target.map((row,index) => `<button class="target-run" type="button" data-target-index="${index}">${escapeHtml(row.name)}</button>`).join("");
+      document.getElementById("distanceTargets").innerHTML = buttons; document.getElementById("singleTargets").innerHTML = buttons;
+      document.querySelectorAll("#distanceTargets [data-target-index]").forEach(button => button.addEventListener("click", () => runSingleDistance(Number(button.dataset.targetIndex))));
+      document.querySelectorAll("#singleTargets [data-target-index]").forEach(button => button.addEventListener("click", () => runSingleFit(Number(button.dataset.targetIndex))));
     }
 
-    document.getElementById("runDistance").addEventListener("click", () => {
-      const error = requireData();
-      const container = document.getElementById("distanceResults");
-      if (error) { container.innerHTML = `<div class="empty-state">${escapeHtml(error)}</div>`; return; }
-      const topValue = document.getElementById("distanceTop").value;
-      const scale = Number(document.getElementById("distanceScale").value);
-      const textBlocks = [];
-      container.innerHTML = state.target.map(target => {
-        const ranked = state.source.map(source => ({ name: source.name, distance: euclidean(target.values, source.values) })).sort((a, b) => a.distance - b.distance);
-        const shown = topValue === "all" ? ranked : ranked.slice(0, Number(topValue));
-        const max = Math.max(...shown.map(item => item.distance), Number.EPSILON);
-        textBlocks.push([`目标：${target.name}`, ...shown.map((item, index) => `${index + 1}. ${item.name}\t${formatNumber(item.distance * scale)}`)].join("\n"));
-        const rows = shown.map((item, index) => `<tr><td>${index + 1}</td><td>${escapeHtml(item.name)}</td><td class="distance-cell"><span class="distance-value">${formatNumber(item.distance * scale)}</span><span class="mini-bar"><i style="width:${Math.max(4, 100 - item.distance / max * 82)}%"></i></span></td></tr>`).join("");
-        return `<article class="result-card"><div class="result-head"><h3>${escapeHtml(target.name)}</h3><span>${target.values.length} 维 · ${shown.length} 条结果</span></div><table class="result-table"><thead><tr><th>排名</th><th>参考群体</th><th>距离${scale === 100 ? " × 100" : ""}</th></tr></thead><tbody>${rows}</tbody></table></article>`;
-      }).join("");
-      state.distanceText = textBlocks.join("\n\n");
+    function gradientStyle(value, min, max) {
+      if (document.getElementById("distanceGradient").value !== "yes") return "";
+      const pct = max === min ? 0.5 : Math.max(0, Math.min(1, (value - min) / (max - min))), hue = 155 - pct * 115;
+      return `background-color:hsla(${hue},70%,42%,.22);color:hsl(${hue},80%,78%)`;
+    }
+    function distanceTable(rows, valueLabel, scale = 1) {
+      if (!rows.length) return '<div class="empty-state">没有可显示的结果。</div>';
+      const values = rows.map(row => row.value), min = Math.min(...values), max = Math.max(...values);
+      return `<table class="result-table"><thead><tr><th>排名</th><th>参考群体</th><th>${escapeHtml(valueLabel)}</th></tr></thead><tbody>${rows.map((row,index) => `<tr><td>${index + 1}</td><td>${escapeHtml(row.name)}</td><td style="${gradientStyle(row.value,min,max)}">${formatNumber(row.value * scale, 8)}</td></tr>`).join("")}</tbody></table>`;
+    }
+    function pushDistanceBlock(html, text) { if (state.distanceBlocks.length === 0) document.getElementById("distanceResults").innerHTML = ""; state.distanceBlocks.unshift(html); state.distanceText.unshift(text); document.getElementById("distanceResults").innerHTML = state.distanceBlocks.join(""); }
+    function runSingleDistance(index) {
+      const error = requireData(); if (error) { document.getElementById("distanceResults").innerHTML = `<div class="empty-state">${escapeHtml(error)}</div>`; return; }
+      const target = state.target[index], limit = Math.max(1, Number(document.getElementById("distanceTop").value) || 25), scale = Number(document.getElementById("distanceScale").value);
+      const ranked = state.source.map(source => ({name:source.name,value:euclidean(target.values,source.values)})).filter(row => row.name !== target.name).sort((a,b) => a.value - b.value).slice(0,limit);
+      const html = `<article class="result-card"><div class="result-head"><h3>到 ${escapeHtml(target.name)} 的距离</h3><span>25 维 · ${ranked.length} 条</span></div>${distanceTable(ranked, scale === 100 ? "距离 × 100" : "欧氏距离", scale)}</article>`;
+      const text = [`目标：${target.name}`,...ranked.map((row,i)=>`${i+1}. ${row.name}\t${formatNumber(row.value*scale,8)}`)].join("\n"); pushDistanceBlock(html,text);
+    }
+    function runComparison() {
+      const error = requireData(); if (error) { document.getElementById("distanceResults").innerHTML = `<div class="empty-state">${escapeHtml(error)}</div>`; return; }
+      const a = state.target[Number(document.getElementById("compareA").value)], b = state.target[Number(document.getElementById("compareB").value)], mode = document.getElementById("distanceMode").value;
+      if (!a || !b || a === b) { document.getElementById("distanceModeHelp").textContent = "比较模式需要两个不同的目标样本。"; return; }
+      const formulas = {difference:{label:"差值 AC − BC",center:0,fn:(ac,bc)=>ac-bc},ratio:{label:"比值 AC ÷ BC",center:1,fn:(ac,bc)=>bc===0?NaN:ac/bc},d3:{label:"D3",center:0,fn:(ac,bc)=>(ac+bc)===0?NaN:(ac-bc)/(ac+bc)}}, config = formulas[mode], limit = Math.max(1,Number(document.getElementById("distanceTop").value)||25);
+      const all = state.source.map(source => { const ac=euclidean(a.values,source.values),bc=euclidean(b.values,source.values); return {name:source.name,value:config.fn(ac,bc)}; }).filter(row=>Number.isFinite(row.value)).sort((x,y)=>x.value-y.value);
+      const low = all.filter(row=>row.value<config.center).slice(0,limit), high = all.filter(row=>row.value>config.center).slice(-limit).reverse();
+      const html = `<article class="result-card"><div class="result-head"><h3>${escapeHtml(config.label)}</h3><span>A：${escapeHtml(a.name)} · B：${escapeHtml(b.name)}</span></div><div class="comparison-grid"><div class="comparison-block"><h4>更接近 A / 数值较低</h4>${distanceTable(low,config.label,1)}</div><div class="comparison-block"><h4>更接近 B / 数值较高</h4>${distanceTable(high,config.label,1)}</div></div></article>`;
+      const text = [`${config.label}\nA: ${a.name}\nB: ${b.name}`,"较低：",...low.map(row=>`${row.name}\t${formatNumber(row.value,8)}`),"较高：",...high.map(row=>`${row.name}\t${formatNumber(row.value,8)}`)].join("\n"); pushDistanceBlock(html,text);
+    }
+    document.getElementById("distanceMode").addEventListener("change", event => { document.getElementById("distanceModeHelp").textContent = event.target.value === "single" ? "单目标模式：选择目标 A 后运行，或点击任意目标按钮。" : "比较模式：选择不同的目标 A 与 B 后运行。"; });
+    document.getElementById("runDistanceMode").addEventListener("click", () => document.getElementById("distanceMode").value === "single" ? runSingleDistance(Number(document.getElementById("compareA").value)) : runComparison());
+    document.getElementById("runAllDistance").addEventListener("click", () => { const error=requireData(); if(error){document.getElementById("distanceResults").innerHTML=`<div class="empty-state">${escapeHtml(error)}</div>`;return;} state.target.forEach((_,i)=>runSingleDistance(i)); });
+    document.getElementById("clearDistance").addEventListener("click",()=>{state.distanceBlocks=[];state.distanceText=[];document.getElementById("distanceResults").innerHTML='<div class="empty-state">输出已清空。</div>';});
+
+    function projectSimplex(vector) { const sorted=[...vector].sort((a,b)=>b-a); let sum=0,rho=0; for(let i=0;i<sorted.length;i++){sum+=sorted[i];if(sorted[i]-(sum-1)/(i+1)>0)rho=i+1;} const theta=(sorted.slice(0,rho).reduce((s,v)=>s+v,0)-1)/Math.max(rho,1); return vector.map(v=>Math.max(v-theta,0)); }
+    function spectralStep(sourceVectors) { const dims=sourceVectors[0].length; let v=Array(dims).fill(1/Math.sqrt(dims)); for(let k=0;k<16;k++){const p=sourceVectors.map(row=>row.reduce((s,x,i)=>s+x*v[i],0)),n=Array(dims).fill(0);sourceVectors.forEach((row,r)=>row.forEach((x,c)=>n[c]+=x*p[r]));const norm=Math.sqrt(n.reduce((s,x)=>s+x*x,0))||1;v=n.map(x=>x/norm);} const p=sourceVectors.map(row=>row.reduce((s,x,i)=>s+x*v[i],0)),lambda=p.reduce((s,x)=>s+x*x,0);return 1/Math.max(2*lambda,1e-10); }
+    function fitVectors(targetValues, sourceVectors, iterations) {
+      const count=sourceVectors.length,dims=targetValues.length;if(count===1)return{weights:[1]};let weights=Array(count).fill(1/count),accelerated=[...weights],momentum=1,step=spectralStep(sourceVectors)*.92;
+      for(let k=0;k<iterations;k++){const prediction=Array(dims).fill(0);sourceVectors.forEach((row,r)=>row.forEach((x,c)=>prediction[c]+=accelerated[r]*x));const residual=prediction.map((x,c)=>x-targetValues[c]),gradient=sourceVectors.map(row=>2*row.reduce((s,x,c)=>s+x*residual[c],0)),next=projectSimplex(accelerated.map((w,i)=>w-step*gradient[i])),nextM=(1+Math.sqrt(1+4*momentum*momentum))/2;accelerated=next.map((w,i)=>w+((momentum-1)/nextM)*(w-weights[i]));weights=next;momentum=nextM;} return{weights};
+    }
+    function fitOptions(prefix) { return { cycles:Number(document.getElementById(`${prefix}Cycles`).value), reduce:prefix==="single"?Number(document.getElementById("singleReduce").value):0, adc:Number(document.getElementById(`${prefix}Adc`).value), recalc:document.getElementById(`${prefix}Recalc`).value==="yes", aggregate:document.getElementById(`${prefix}Aggregate`).value==="yes", zeros:document.getElementById(`${prefix}Zeros`).value==="yes", fast:prefix==="multi"&&document.getElementById("multiFast").value==="yes" }; }
+    function fitTarget(target, options) {
+      const start=performance.now(),iterations=options.fast?450:options.cycles===.25?800:options.cycles===4?4200:1900,refs=[...state.source];
+      let vectors=refs.map(ref=>options.adc?ref.values.concat(euclidean(ref.values,target.values)*options.adc):[...ref.values]),targetVector=options.adc?target.values.concat(0):[...target.values],result=fitVectors(targetVector,vectors,iterations),selected=refs.map((ref,i)=>({ref,weight:result.weights[i]}));
+      if(options.reduce>0&&selected.length>options.reduce){selected.sort((a,b)=>b.weight-a.weight);selected=selected.slice(0,options.reduce);vectors=selected.map(item=>options.adc?item.ref.values.concat(euclidean(item.ref.values,target.values)*options.adc):[...item.ref.values]);result=fitVectors(targetVector,vectors,iterations);selected=selected.map((item,i)=>({ref:item.ref,weight:result.weights[i]}));}
+      if(options.adc&&options.recalc){vectors=selected.map(item=>item.ref.values);result=fitVectors(target.values,vectors,Math.max(600,Math.floor(iterations/2)));selected=selected.map((item,i)=>({ref:item.ref,weight:result.weights[i]}));}
+      const weights=state.source.map(ref=>{const found=selected.find(item=>item.ref===ref);return found?found.weight:0;}),prediction=Array(DIMENSIONS).fill(0);state.source.forEach((ref,r)=>ref.values.forEach((x,c)=>prediction[c]+=weights[r]*x));
+      return {weights,distance:euclidean(prediction,target.values),elapsed:(performance.now()-start)/1000,iterations};
+    }
+    function componentsFor(result,options) {
+      const map=new Map();state.source.forEach((ref,i)=>{const name=options.aggregate?ref.name.split(":")[0]:ref.name;map.set(name,(map.get(name)||0)+result.weights[i]);});
+      let items=[...map].map(([name,weight])=>({name,weight})).sort((a,b)=>b.weight-a.weight);if(!options.zeros)items=items.filter(item=>item.weight>=.0005);return items;
+    }
+    function renderSingleCard(target,result,options) {
+      const items=componentsFor(result,options),barMode=Number(document.getElementById("singleBars").value),rows=items.map(item=>{const pct=item.weight*100,bar=barMode===1?`<div class="bar-mode-1"><i style="width:${Math.min(100,pct)}%"></i></div>`:"",style=barMode===2?`style="background:linear-gradient(90deg,rgba(67,216,210,.22) ${pct}%,transparent ${pct}%)"`:"";return `<div class="proportion-row" ${style}><span class="proportion-name" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</span><span>${bar}</span><span class="proportion-value">${pct.toFixed(1)}%</span></div>`;}).join("");
+      return {html:`<article class="result-card"><div class="result-head"><h3>${escapeHtml(target.name)}</h3><span>来源 ${state.source.length} · 迭代 ${result.iterations} · ${result.elapsed.toFixed(2)} 秒</span></div><div class="fit-summary"><div class="fit-score"><div><strong>${(result.distance*100).toFixed(4)}%</strong><span>${formatNumber(result.distance,8)} · 拟合距离</span></div></div><div class="proportion-list">${rows||'<div class="empty-state">没有非零成分</div>'}</div></div></article>`,text:[`目标：${target.name}`,`距离：${(result.distance*100).toFixed(4)}% / ${formatNumber(result.distance,8)}`,...items.map(item=>`${(item.weight*100).toFixed(1)}\t${item.name}`)].join("\n")};
+    }
+    async function runSingleFit(index) {
+      const error=requireData();if(error){document.getElementById("singleResults").innerHTML=`<div class="empty-state">${escapeHtml(error)}</div>`;return;}const target=state.target[index],options=fitOptions("single"),container=document.getElementById("singleResults");container.innerHTML='<div class="empty-state">正在本地计算…</div>';await new Promise(resolve=>requestAnimationFrame(resolve));const rendered=renderSingleCard(target,fitTarget(target,options),options);state.singleBlocks.unshift(rendered.html);state.singleText.unshift(rendered.text);container.innerHTML=state.singleBlocks.join("");
+    }
+    document.getElementById("runSingle").addEventListener("click",()=>runSingleFit(Number(document.getElementById("singleTarget").value)));
+    document.getElementById("runAllSingle").addEventListener("click",async()=>{const error=requireData();if(error){document.getElementById("singleResults").innerHTML=`<div class="empty-state">${escapeHtml(error)}</div>`;return;}for(let i=0;i<state.target.length;i++)await runSingleFit(i);});
+    document.getElementById("clearSingle").addEventListener("click",()=>{state.singleBlocks=[];state.singleText=[];document.getElementById("singleResults").innerHTML='<div class="empty-state">输出已清空。</div>';});
+
+    document.getElementById("runMulti").addEventListener("click",async()=>{
+      const error=requireData(),container=document.getElementById("multiResults");if(error){container.innerHTML=`<div class="empty-state" style="margin-top:22px">${escapeHtml(error)}</div>`;return;}const options=fitOptions("multi");container.innerHTML='<div class="empty-state" style="margin-top:22px">正在批量计算…</div>';await new Promise(resolve=>requestAnimationFrame(resolve));
+      const results=state.target.map(target=>({target,result:fitTarget(target,options)})),groupNames=options.aggregate?[...new Set(state.source.map(ref=>ref.name.split(":")[0]))]:state.source.map(ref=>ref.name),matrix=new Map(groupNames.map(name=>[name,Array(state.target.length).fill(0)]));
+      results.forEach((entry,t)=>state.source.forEach((ref,s)=>{const name=options.aggregate?ref.name.split(":")[0]:ref.name;matrix.get(name)[t]+=entry.result.weights[s];}));
+      let rows=[...matrix].map(([name,values])=>({name,values,average:values.reduce((s,v)=>s+v,0)/values.length})).sort((a,b)=>b.average-a.average);if(!options.zeros)rows=rows.filter(row=>row.values.some(v=>v>=.0005));
+      const color=value=>value===0?"rgba(255,255,255,.025)":`hsla(${205-value*80},${40+value*50}%,${25+value*35}%,.72)`,header=state.target.map((target,i)=>`<th>${escapeHtml(target.name)}<br><small>距 ${(results[i].result.distance*100).toFixed(3)}%</small></th>`).join(""),body=rows.map(row=>`<tr><td>${escapeHtml(row.name)}</td>${row.values.map(v=>`<td style="background:${color(v)}">${(v*100).toFixed(1)}</td>`).join("")}<td style="background:${color(row.average)}">${(row.average*100).toFixed(1)}</td></tr>`).join("");
+      container.innerHTML=`<div class="multi-wrap"><table class="multi-table"><thead><tr><th>参考成分</th>${header}<th>平均</th></tr></thead><tbody>${body}</tbody></table></div>`;
+      const csvRows=[["参考成分",...state.target.map(t=>t.name),"平均"],...rows.map(row=>[row.name,...row.values.map(v=>(v*100).toFixed(1)),(row.average*100).toFixed(1)])];state.multiCsv=csvRows.map(row=>row.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(",")).join("\n");state.multiTsv=csvRows.map(row=>row.join("\t")).join("\n");
     });
+    document.getElementById("clearMulti").addEventListener("click",()=>{state.multiCsv="";state.multiTsv="";document.getElementById("multiResults").innerHTML='<div class="empty-state" style="margin-top:22px">输出已清空。</div>';});
 
-    function projectSimplex(vector) {
-      const sorted = [...vector].sort((a, b) => b - a);
-      let cumulative = 0;
-      let rho = 0;
-      for (let i = 0; i < sorted.length; i++) {
-        cumulative += sorted[i];
-        if (sorted[i] - (cumulative - 1) / (i + 1) > 0) rho = i + 1;
-      }
-      const theta = (sorted.slice(0, rho).reduce((sum, value) => sum + value, 0) - 1) / Math.max(rho, 1);
-      return vector.map(value => Math.max(value - theta, 0));
-    }
+    async function copyText(text,button,label="复制结果") { if(!text){button.textContent="暂无结果";setTimeout(()=>button.textContent=label,1000);return;}try{await navigator.clipboard.writeText(text);}catch(_){const helper=document.createElement("textarea");helper.value=text;document.body.appendChild(helper);helper.select();document.execCommand("copy");helper.remove();}button.textContent="已复制";setTimeout(()=>button.textContent=label,1000); }
+    document.getElementById("copyDistance").addEventListener("click",event=>copyText(state.distanceText.join("\n\n"),event.currentTarget));
+    document.getElementById("copySingle").addEventListener("click",event=>copyText(state.singleText.join("\n\n"),event.currentTarget));
+    document.getElementById("copyMultiCsv").addEventListener("click",event=>copyText(state.multiCsv,event.currentTarget,"复制 CSV"));
+    document.getElementById("copyMultiTsv").addEventListener("click",event=>copyText(state.multiTsv,event.currentTarget,"复制 TSV"));
 
-    function spectralStep(sources) {
-      const dims = sources[0].values.length;
-      let vector = Array(dims).fill(1 / Math.sqrt(dims));
-      for (let iteration = 0; iteration < 18; iteration++) {
-        const projected = sources.map(source => source.values.reduce((sum, value, i) => sum + value * vector[i], 0));
-        const next = Array(dims).fill(0);
-        sources.forEach((source, row) => source.values.forEach((value, col) => { next[col] += value * projected[row]; }));
-        const norm = Math.sqrt(next.reduce((sum, value) => sum + value * value, 0)) || 1;
-        vector = next.map(value => value / norm);
-      }
-      const projected = sources.map(source => source.values.reduce((sum, value, i) => sum + value * vector[i], 0));
-      const lambda = projected.reduce((sum, value) => sum + value * value, 0);
-      return 1 / Math.max(2 * lambda, 1e-10);
-    }
-
-    function fitMixture(target, candidates, iterations = 2600) {
-      const count = candidates.length;
-      const dims = target.values.length;
-      let weights = Array(count).fill(1 / count);
-      let accelerated = [...weights];
-      let momentum = 1;
-      const step = spectralStep(candidates) * 0.92;
-      for (let iteration = 0; iteration < iterations; iteration++) {
-        const prediction = Array(dims).fill(0);
-        candidates.forEach((source, row) => source.values.forEach((value, col) => { prediction[col] += accelerated[row] * value; }));
-        const residual = prediction.map((value, col) => value - target.values[col]);
-        const gradient = candidates.map(source => 2 * source.values.reduce((sum, value, col) => sum + value * residual[col], 0));
-        const nextWeights = projectSimplex(accelerated.map((weight, i) => weight - step * gradient[i]));
-        const nextMomentum = (1 + Math.sqrt(1 + 4 * momentum * momentum)) / 2;
-        accelerated = nextWeights.map((weight, i) => weight + ((momentum - 1) / nextMomentum) * (weight - weights[i]));
-        weights = nextWeights;
-        momentum = nextMomentum;
-      }
-      const prediction = Array(dims).fill(0);
-      candidates.forEach((source, row) => source.values.forEach((value, col) => { prediction[col] += weights[row] * value; }));
-      return { weights, distance: euclidean(prediction, target.values) };
-    }
-
-    document.getElementById("runFit").addEventListener("click", () => {
-      const error = requireData();
-      const container = document.getElementById("fitResults");
-      if (error) { container.innerHTML = `<div class="empty-state">${escapeHtml(error)}</div>`; return; }
-      const target = state.target[Number(document.getElementById("fitTarget").value)];
-      if (!target) { container.innerHTML = '<div class="empty-state">请选择目标样本。</div>'; return; }
-      const poolValue = document.getElementById("fitPool").value;
-      const ranked = state.source.map(source => ({ ...source, proximity: euclidean(target.values, source.values) })).sort((a, b) => a.proximity - b.proximity);
-      const candidates = poolValue === "all" ? ranked : ranked.slice(0, Number(poolValue));
-      container.innerHTML = '<div class="empty-state">正在本地拟合，请稍候…</div>';
-      window.setTimeout(() => {
-        const result = fitMixture(target, candidates);
-        let components = candidates.map((source, index) => ({ name: source.name, weight: result.weights[index] })).filter(item => item.weight >= 0.001).sort((a, b) => b.weight - a.weight);
-        if (!components.length) components = [{ name: candidates[0].name, weight: 1 }];
-        const rows = components.map(item => `<div class="proportion-row"><span class="proportion-name" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</span><span class="proportion-track"><i style="width:${Math.min(100, item.weight * 100)}%"></i></span><span class="proportion-value">${(item.weight * 100).toFixed(2)}%</span></div>`).join("");
-        container.innerHTML = `<article class="result-card"><div class="result-head"><h3>${escapeHtml(target.name)}</h3><span>${candidates.length} 个候选参考 · ${components.length} 个显示成分</span></div><div class="fit-summary"><div class="fit-score"><div><strong>${formatNumber(result.distance * 100)}</strong><span>拟合距离 × 100</span></div></div><div class="proportion-list">${rows}</div></div></article>`;
-        state.fitText = [`目标：${target.name}`, `拟合距离 × 100：${formatNumber(result.distance * 100)}`, ...components.map(item => `${item.name}\t${(item.weight * 100).toFixed(2)}%`)].join("\n");
-      }, 30);
-    });
-
-    async function copyText(text, button) {
-      if (!text) { button.textContent = "暂无结果"; window.setTimeout(() => button.textContent = "复制结果", 1200); return; }
-      try {
-        await navigator.clipboard.writeText(text);
-        button.textContent = "已复制";
-      } catch (_) {
-        const helper = document.createElement("textarea"); helper.value = text; document.body.appendChild(helper); helper.select(); document.execCommand("copy"); helper.remove(); button.textContent = "已复制";
-      }
-      window.setTimeout(() => button.textContent = "复制结果", 1200);
-    }
-    document.getElementById("copyDistance").addEventListener("click", event => copyText(state.distanceText, event.currentTarget));
-    document.getElementById("copyFit").addEventListener("click", event => copyText(state.fitText, event.currentTarget));
-
-    refreshData("source"); refreshData("target");
+    refreshData("source"); refreshData("target"); renderFileList(); filterActiveFile();
   </script>
 </body>
 </html>
