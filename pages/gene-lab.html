@@ -410,6 +410,7 @@
     .library-banner { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 18px; padding: 14px 16px; border: 1px solid rgba(67,216,210,.18); border-radius: 12px; background: rgba(67,216,210,.055); color: #96a5b1; font-size: 13px; }
     .library-banner strong { color: #b9f2ef; font-size: 14px; }
     .library-search-row { display: grid; grid-template-columns: minmax(0,1fr) minmax(190px,auto); gap: 8px; margin-bottom: 8px; }
+    .library-search-row.has-action { grid-template-columns: minmax(0,1fr) minmax(190px,auto) auto; }
     .library-results { max-height: 380px; margin-bottom: 18px; }
     .library-divider { height: 1px; margin: 20px 0 16px; background: rgba(255,255,255,.075); }
     .source-chip { display: inline-flex; margin-top: 5px; padding: 2px 7px; border: 1px solid rgba(67,216,210,.16); border-radius: 999px; color: #7cb9b8; font-size: 12px; }
@@ -431,7 +432,7 @@
       .option-grid, .comparison-grid { grid-template-columns: 1fr; }
       .option-grid .control.span-2 { grid-column: span 1; }
       .data-preview textarea { min-height: 300px; }
-      .sample-add-row, .sample-manager .search-row, .library-search-row { grid-template-columns: 1fr; }
+      .sample-add-row, .sample-manager .search-row, .library-search-row, .library-search-row.has-action { grid-template-columns: 1fr; }
       .library-banner { align-items: flex-start; flex-direction: column; }
     }
   </style>
@@ -498,7 +499,8 @@
         <div class="data-meta"><span class="meta-chip">有效样本 <strong id="sourceCount">0</strong></span><span class="meta-chip">坐标维度 <strong id="sourceDims">—</strong></span></div><div class="validation" id="sourceValidation" aria-live="polite"></div>
         <section class="sample-manager" aria-label="参考群体样本管理">
           <div class="sample-manager-head"><h3>搜索全球 G25 坐标库</h3><span id="sourceLibrarySummary">正在载入…</span></div>
-          <div class="library-search-row"><input class="text-input" id="sourceLibrarySearch" placeholder="搜索 11,247 条数据；支持空格、?、! 组合筛选"><select id="sourceLibrarySource"><option value="">全部数据源</option></select></div>
+          <div class="library-search-row has-action"><input class="text-input" id="sourceLibrarySearch" placeholder="搜索 11,247 条数据；支持空格、?、! 组合筛选"><select id="sourceLibrarySource"><option value="">全部数据源</option></select><button class="btn primary" type="button" id="sourceAddAll" disabled>一键全选加入</button></div>
+          <p class="mode-help">不输入关键词时加入当前数据源的全部记录；输入关键词时加入全部搜索结果。同名记录会自动加来源后缀。</p>
           <div class="validation" id="sourceLibraryMessage" aria-live="polite"></div><div class="sample-list library-results" id="sourceLibraryList"><div class="empty-state" style="padding:20px">坐标库载入后即可搜索</div></div>
           <div class="library-divider"></div>
           <div class="sample-manager-head"><h3>管理已选参考样本</h3><span>当前显示 <strong id="sourceVisibleCount">0</strong> 条</span></div>
@@ -654,11 +656,13 @@
     }
     function renderLibraryResults(kind) {
       const search = document.getElementById(`${kind}LibrarySearch`), sourceSelect = document.getElementById(`${kind}LibrarySource`), list = document.getElementById(`${kind}LibraryList`), summary = document.getElementById(`${kind}LibrarySummary`);
-      if (state.library.loading) { summary.textContent = "正在载入…"; return; }
-      if (!state.library.rows.length) { summary.textContent = "载入失败"; list.innerHTML = '<div class="empty-state" style="padding:20px">坐标库暂时无法载入</div>'; return; }
+      const addAllButton = kind === "source" ? document.getElementById("sourceAddAll") : null;
+      if (state.library.loading) { summary.textContent = "正在载入…"; if (addAllButton) addAllButton.disabled = true; return; }
+      if (!state.library.rows.length) { summary.textContent = "载入失败"; if (addAllButton) addAllButton.disabled = true; list.innerHTML = '<div class="empty-state" style="padding:20px">坐标库暂时无法载入</div>'; return; }
       const query = search.value.trim(), sourceId = sourceSelect.value;
-      if (!query) { summary.textContent = `共 ${state.library.total.toLocaleString("zh-CN")} 条`; list.innerHTML = '<div class="empty-state" style="padding:20px">输入名称开始搜索全球 G25 坐标库</div>'; return; }
       const matches = state.library.rows.filter(row => (!sourceId || row.sourceId === sourceId) && matchesFilter(row.name, query)), visible = matches.slice(0, 200);
+      if (addAllButton) { addAllButton.disabled = !matches.length; addAllButton.textContent = `一键全选加入（${matches.length.toLocaleString("zh-CN")}）`; }
+      if (!query) { summary.textContent = `共 ${matches.length.toLocaleString("zh-CN")} 条`; list.innerHTML = '<div class="empty-state" style="padding:20px">输入名称可搜索；也可以一键加入当前数据源的全部记录</div>'; return; }
       summary.textContent = matches.length > 200 ? `找到 ${matches.length.toLocaleString("zh-CN")} 条，显示前 200 条` : `找到 ${matches.length.toLocaleString("zh-CN")} 条`;
       if (!visible.length) { list.innerHTML = '<div class="empty-state" style="padding:20px">没有匹配的数据</div>'; return; }
       list.innerHTML = visible.map(row => `<article class="sample-item"><div><strong>${escapeHtml(row.name)}</strong><small>${row.values.slice(0,4).map(value => Number(value).toFixed(6)).join(", ")} … 共 25 维</small><span class="source-chip">${escapeHtml(row.sourceLabel)}</span></div><button class="sample-add" type="button" data-library-add="${row.index}">添加</button></article>`).join("");
@@ -671,6 +675,30 @@
       const input = kind === "source" ? sourceInput : targetInput, line = rowToLine(libraryRow);
       input.value = input.value.trim() ? `${input.value.trim()}\n${line}` : line;
       refreshData(kind); libraryMessage(kind, `已从“${libraryRow.sourceLabel}”添加“${libraryRow.name}”。`, true);
+    }
+    async function addAllLibraryMatches() {
+      const button = document.getElementById("sourceAddAll"), query = document.getElementById("sourceLibrarySearch").value.trim(), sourceId = document.getElementById("sourceLibrarySource").value;
+      const matches = state.library.rows.filter(row => (!sourceId || row.sourceId === sourceId) && matchesFilter(row.name, query));
+      if (!matches.length) { libraryMessage("source", "当前没有可加入的记录。"); return; }
+      const originalLabel = button.textContent; button.disabled = true; button.textContent = "正在加入…"; libraryMessage("source", `正在处理 ${matches.length.toLocaleString("zh-CN")} 条记录…`);
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      const nameCounts = new Map(); matches.forEach(row => nameCounts.set(row.name, (nameCounts.get(row.name) || 0) + 1));
+      const usedNames = new Set(state.source.map(row => row.name)), lines = []; let skipped = 0, renamed = 0;
+      matches.forEach(row => {
+        const sourceTag = row.sourceLabel.split("·").pop().trim();
+        let name = nameCounts.get(row.name) > 1 ? `${row.name} [${sourceTag}]` : row.name;
+        if (usedNames.has(name)) { skipped++; return; }
+        usedNames.add(name); if (name !== row.name) renamed++;
+        lines.push(rowToLine({name, values: row.values}));
+      });
+      if (lines.length) sourceInput.value = sourceInput.value.trim() ? `${sourceInput.value.trim()}\n${lines.join("\n")}` : lines.join("\n");
+      refreshData("source");
+      const details = [`已加入 ${lines.length.toLocaleString("zh-CN")} 条`];
+      if (renamed) details.push(`${renamed.toLocaleString("zh-CN")} 条同名记录已加来源后缀`);
+      if (skipped) details.push(`跳过 ${skipped.toLocaleString("zh-CN")} 条已存在记录`);
+      libraryMessage("source", details.join("；") + "。", true);
+      button.disabled = false; button.textContent = originalLabel;
+      renderLibraryResults("source");
     }
     async function loadG25Library() {
       try {
@@ -720,6 +748,7 @@
         removeSampleLines(kind, matches.map(row => row.lineIndex)); managerMessage(kind, `已删除 ${matches.length} 个搜索结果。`, true);
       });
     });
+    document.getElementById("sourceAddAll").addEventListener("click", addAllLibraryMatches);
     loadG25Library();
 
     function makeDemoVector(seed) { return Array.from({length:DIMENSIONS}, (_, i) => Number((Math.sin((i + 1) * (seed + 0.71)) * 0.062 + Math.cos((i + 2) * (seed * 0.37 + 0.43)) * 0.031 + seed * 0.0015).toFixed(6))); }
