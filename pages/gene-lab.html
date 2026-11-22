@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="中文基因坐标分析工具：在浏览器本地完成参考群体、目标样本、欧氏距离和单样本混合拟合。">
+  <meta name="description" content="中文基因坐标分析工具：在浏览器本地完成数据导入、参考群体、目标样本、基因距离、单样本拟合和多样本拟合。">
   <title>【SJQ】身体数据实验室 | 基因坐标实验室</title>
   <link rel="canonical" href="https://sjqlab.top/pages/gene-lab.html">
   <style>
@@ -456,22 +456,22 @@
     <header class="page-header">
       <div class="eyebrow">SJQ G25 Workbench</div>
       <h1>基因<span>坐标实验室</span></h1>
-      <p>中文 Global25 坐标工作台：文件筛选、参考与目标数据、欧氏距离、双目标比较、单样本拟合和多样本批量分析。</p>
+      <p>中文 Global25 坐标工作台：数据导入、参考与目标数据、基因距离、双目标比较、单样本拟合和多样本拟合。</p>
       <div class="status-row"><span class="status-pill"><span class="status-dot"></span>严格校验 25 维</span><span class="status-pill secondary">本地计算 · 数据不上传</span></div>
     </header>
 
     <section class="lab-shell" aria-label="Global25 中文分析工作区">
       <div class="tab-list" role="tablist" aria-label="工具页签">
-        <button class="tab-button active" type="button" role="tab" aria-selected="true" data-tab="data">数据</button>
+        <button class="tab-button active" type="button" role="tab" aria-selected="true" data-tab="data">数据导入</button>
         <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="source">参考群体 <span id="sourceBadge">0</span></button>
         <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="target">目标样本 <span id="targetBadge">0</span></button>
-        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="distance">距离</button>
-        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="single">单样本</button>
-        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="multi">多样本</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="distance">基因距离</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="single">单样本拟合</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="multi">多样本拟合</button>
       </div>
 
       <div class="tab-panel active" id="panel-data" role="tabpanel">
-        <div class="panel-head"><div><h2>数据文件与筛选</h2><p>可同时打开多个 CSV/TXT 文件，筛选样本后追加或替换到参考群体与目标样本。</p></div><button class="btn primary" type="button" id="loadDemo">载入 25 维演示数据</button></div>
+        <div class="panel-head"><div><h2>数据导入与筛选</h2><p>可同时打开多个 CSV/TXT 文件，筛选样本后追加或替换到参考群体与目标样本。</p></div><button class="btn primary" type="button" id="loadDemo">载入 25 维演示数据</button></div>
         <div class="library-banner"><div><strong id="libraryBannerCount">正在载入全球 G25 坐标库…</strong><div>参考群体和目标样本页均可搜索并一键加入。</div></div><span id="libraryBannerSources">3 套数据源</span></div>
         <div class="data-workspace">
           <div class="file-sidebar">
@@ -527,7 +527,7 @@
       </div>
 
       <div class="tab-panel" id="panel-distance" role="tabpanel">
-        <div class="panel-head"><div><h2>距离（DISTANCE）</h2><p>单目标欧氏距离，或比较两个目标相对每个参考群体的差值、比值与 D3。</p></div></div>
+        <div class="panel-head"><div><h2>基因距离（DISTANCE）</h2><p>计算单目标的 G25 欧氏距离，或比较两个目标相对每个参考群体的差值、比值与 D3。</p></div></div>
         <div class="option-grid">
           <div class="control"><label for="distanceMode">模式</label><select id="distanceMode"><option value="single">单目标距离</option><option value="difference">差值 AC − BC</option><option value="ratio">比值 AC ÷ BC</option><option value="d3">D3 (AC − BC) ÷ (AC + BC)</option></select></div>
           <div class="control"><label for="distanceTop">最大输出数量</label><input class="number-input" id="distanceTop" type="number" min="1" value="25"></div>
@@ -543,7 +543,7 @@
       </div>
 
       <div class="tab-panel" id="panel-single" role="tabpanel">
-        <div class="panel-head"><div><h2>单样本（SINGLE）</h2><p>为一个目标寻找参考群体的非负加权组合。</p></div></div>
+        <div class="panel-head"><div><h2>单样本拟合（SINGLE）</h2><p>为一个目标寻找参考群体的非负加权组合。</p></div></div>
         <div class="option-grid">
           <div class="control"><label for="singleTarget">目标样本</label><select id="singleTarget"></select></div>
           <div class="control"><label for="singleCycles">计算轮次</label><select id="singleCycles"><option value="0.25">0.25×</option><option value="1" selected>1×</option><option value="4">4×</option></select></div>
@@ -559,7 +559,7 @@
       </div>
 
       <div class="tab-panel" id="panel-multi" role="tabpanel">
-        <div class="panel-head"><div><h2>多样本（MULTI）</h2><p>批量拟合所有目标，并生成参考成分 × 目标样本对照表。</p></div></div>
+        <div class="panel-head"><div><h2>多样本拟合（MULTI）</h2><p>批量拟合所有目标，并生成参考成分 × 目标样本对照表。</p></div></div>
         <div class="option-grid">
           <div class="control"><label for="multiCycles">计算轮次</label><select id="multiCycles"><option value="0.25">0.25×</option><option value="1" selected>1×</option><option value="4">4×</option></select></div>
           <div class="control"><label for="multiFast">快速模式</label><select id="multiFast"><option value="no">否</option><option value="yes">是</option></select></div>
