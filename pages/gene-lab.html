@@ -407,6 +407,14 @@
     .sample-manager-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
     .sample-manager-head h3 { font-size: 16px; }
     .sample-manager-head span { color: #7f8d99; font-size: 13px; }
+    .library-banner { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 18px; padding: 14px 16px; border: 1px solid rgba(67,216,210,.18); border-radius: 12px; background: rgba(67,216,210,.055); color: #96a5b1; font-size: 13px; }
+    .library-banner strong { color: #b9f2ef; font-size: 14px; }
+    .library-search-row { display: grid; grid-template-columns: minmax(0,1fr) minmax(190px,auto); gap: 8px; margin-bottom: 8px; }
+    .library-results { max-height: 380px; margin-bottom: 18px; }
+    .library-divider { height: 1px; margin: 20px 0 16px; background: rgba(255,255,255,.075); }
+    .source-chip { display: inline-flex; margin-top: 5px; padding: 2px 7px; border: 1px solid rgba(67,216,210,.16); border-radius: 999px; color: #7cb9b8; font-size: 12px; }
+    .sample-add { min-height: 34px; padding: 6px 11px; border: 1px solid rgba(67,216,210,.28); border-radius: 8px; background: rgba(67,216,210,.075); color: #8ee5e1; cursor: pointer; }
+    .sample-add:hover { background: rgba(67,216,210,.15); }
     .sample-add-row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; margin-bottom: 8px; }
     .sample-list { display: grid; gap: 7px; max-height: 330px; margin-top: 12px; overflow-y: auto; scrollbar-width: thin; }
     .sample-item { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 12px; align-items: center; padding: 11px 12px; border: 1px solid rgba(255,255,255,.065); border-radius: 9px; background: rgba(7,11,16,.66); }
@@ -423,7 +431,8 @@
       .option-grid, .comparison-grid { grid-template-columns: 1fr; }
       .option-grid .control.span-2 { grid-column: span 1; }
       .data-preview textarea { min-height: 300px; }
-      .sample-add-row, .sample-manager .search-row { grid-template-columns: 1fr; }
+      .sample-add-row, .sample-manager .search-row, .library-search-row { grid-template-columns: 1fr; }
+      .library-banner { align-items: flex-start; flex-direction: column; }
     }
   </style>
 </head>
@@ -462,6 +471,7 @@
 
       <div class="tab-panel active" id="panel-data" role="tabpanel">
         <div class="panel-head"><div><h2>数据文件与筛选</h2><p>可同时打开多个 CSV/TXT 文件，筛选样本后追加或替换到参考群体与目标样本。</p></div><button class="btn primary" type="button" id="loadDemo">载入 25 维演示数据</button></div>
+        <div class="library-banner"><div><strong id="libraryBannerCount">正在载入全球 G25 坐标库…</strong><div>参考群体和目标样本页均可搜索并一键加入。</div></div><span id="libraryBannerSources">3 套数据源</span></div>
         <div class="data-workspace">
           <div class="file-sidebar">
             <label class="btn file-button" style="width:100%">打开文件<input type="file" id="dataFiles" accept=".csv,.txt,text/csv,text/plain" multiple></label>
@@ -487,8 +497,12 @@
         <textarea id="sourceInput" spellcheck="false" placeholder="参考群体名称,第1维,第2维,...,第25维"></textarea>
         <div class="data-meta"><span class="meta-chip">有效样本 <strong id="sourceCount">0</strong></span><span class="meta-chip">坐标维度 <strong id="sourceDims">—</strong></span></div><div class="validation" id="sourceValidation" aria-live="polite"></div>
         <section class="sample-manager" aria-label="参考群体样本管理">
-          <div class="sample-manager-head"><h3>搜索与管理样本</h3><span>当前显示 <strong id="sourceVisibleCount">0</strong> 条</span></div>
-          <div class="search-row"><input class="text-input" id="sourceSearch" placeholder="按名称搜索；支持空格、?、! 组合筛选"><button class="btn danger" type="button" data-delete-filtered="source">删除搜索结果</button></div>
+          <div class="sample-manager-head"><h3>搜索全球 G25 坐标库</h3><span id="sourceLibrarySummary">正在载入…</span></div>
+          <div class="library-search-row"><input class="text-input" id="sourceLibrarySearch" placeholder="搜索 11,247 条数据；支持空格、?、! 组合筛选"><select id="sourceLibrarySource"><option value="">全部数据源</option></select></div>
+          <div class="validation" id="sourceLibraryMessage" aria-live="polite"></div><div class="sample-list library-results" id="sourceLibraryList"><div class="empty-state" style="padding:20px">坐标库载入后即可搜索</div></div>
+          <div class="library-divider"></div>
+          <div class="sample-manager-head"><h3>管理已选参考样本</h3><span>当前显示 <strong id="sourceVisibleCount">0</strong> 条</span></div>
+          <div class="search-row"><input class="text-input" id="sourceSearch" placeholder="搜索已选样本"><button class="btn danger" type="button" data-delete-filtered="source">删除搜索结果</button></div>
           <div class="sample-add-row"><input class="text-input" id="sourceAddRow" placeholder="粘贴一整行：名称 + 25 个坐标"><button class="btn" type="button" data-add-row="source">新增参考样本</button></div>
           <div class="validation" id="sourceManagerMessage" aria-live="polite"></div><div class="sample-list" id="sourceSampleList"><div class="empty-state" style="padding:20px">暂无参考样本</div></div>
         </section>
@@ -499,8 +513,12 @@
         <textarea id="targetInput" spellcheck="false" placeholder="目标样本名称,第1维,第2维,...,第25维"></textarea>
         <div class="data-meta"><span class="meta-chip">有效样本 <strong id="targetCount">0</strong></span><span class="meta-chip">坐标维度 <strong id="targetDims">—</strong></span></div><div class="validation" id="targetValidation" aria-live="polite"></div>
         <section class="sample-manager" aria-label="目标样本管理">
-          <div class="sample-manager-head"><h3>搜索与管理样本</h3><span>当前显示 <strong id="targetVisibleCount">0</strong> 条</span></div>
-          <div class="search-row"><input class="text-input" id="targetSearch" placeholder="按名称搜索；支持空格、?、! 组合筛选"><button class="btn danger" type="button" data-delete-filtered="target">删除搜索结果</button></div>
+          <div class="sample-manager-head"><h3>搜索全球 G25 坐标库</h3><span id="targetLibrarySummary">正在载入…</span></div>
+          <div class="library-search-row"><input class="text-input" id="targetLibrarySearch" placeholder="搜索 11,247 条数据；支持空格、?、! 组合筛选"><select id="targetLibrarySource"><option value="">全部数据源</option></select></div>
+          <div class="validation" id="targetLibraryMessage" aria-live="polite"></div><div class="sample-list library-results" id="targetLibraryList"><div class="empty-state" style="padding:20px">坐标库载入后即可搜索</div></div>
+          <div class="library-divider"></div>
+          <div class="sample-manager-head"><h3>管理已选目标样本</h3><span>当前显示 <strong id="targetVisibleCount">0</strong> 条</span></div>
+          <div class="search-row"><input class="text-input" id="targetSearch" placeholder="搜索已选样本"><button class="btn danger" type="button" data-delete-filtered="target">删除搜索结果</button></div>
           <div class="sample-add-row"><input class="text-input" id="targetAddRow" placeholder="粘贴一整行：名称 + 25 个坐标"><button class="btn" type="button" data-add-row="target">新增目标样本</button></div>
           <div class="validation" id="targetManagerMessage" aria-live="polite"></div><div class="sample-list" id="targetSampleList"><div class="empty-state" style="padding:20px">暂无目标样本</div></div>
         </section>
@@ -559,7 +577,7 @@
 
   <script>
     const DIMENSIONS = 25;
-    const state = { source: [], target: [], sourceError: "", targetError: "", files: [], activeFile: -1, filteredLines: [], distanceBlocks: [], distanceText: [], singleBlocks: [], singleText: [], multiCsv: "", multiTsv: "" };
+    const state = { source: [], target: [], sourceError: "", targetError: "", files: [], activeFile: -1, filteredLines: [], library: { loading: true, rows: [], sources: [], total: 0 }, distanceBlocks: [], distanceText: [], singleBlocks: [], singleText: [], multiCsv: "", multiTsv: "" };
     const sourceInput = document.getElementById("sourceInput");
     const targetInput = document.getElementById("targetInput");
 
@@ -626,6 +644,50 @@
     function managerMessage(kind, text, ok = false) {
       const element = document.getElementById(`${kind}ManagerMessage`); element.className = ok ? "validation ok" : "validation"; element.textContent = text;
     }
+    function libraryMessage(kind, text, ok = false) {
+      const element = document.getElementById(`${kind}LibraryMessage`); element.className = ok ? "validation ok" : "validation"; element.textContent = text;
+    }
+    function populateLibrarySourceOptions(kind) {
+      const select = document.getElementById(`${kind}LibrarySource`), previous = select.value;
+      select.innerHTML = `<option value="">全部数据源（${state.library.total.toLocaleString("zh-CN")}）</option>` + state.library.sources.map(source => `<option value="${escapeHtml(source.id)}">${escapeHtml(source.label)}（${source.count.toLocaleString("zh-CN")}）</option>`).join("");
+      if ([...select.options].some(option => option.value === previous)) select.value = previous;
+    }
+    function renderLibraryResults(kind) {
+      const search = document.getElementById(`${kind}LibrarySearch`), sourceSelect = document.getElementById(`${kind}LibrarySource`), list = document.getElementById(`${kind}LibraryList`), summary = document.getElementById(`${kind}LibrarySummary`);
+      if (state.library.loading) { summary.textContent = "正在载入…"; return; }
+      if (!state.library.rows.length) { summary.textContent = "载入失败"; list.innerHTML = '<div class="empty-state" style="padding:20px">坐标库暂时无法载入</div>'; return; }
+      const query = search.value.trim(), sourceId = sourceSelect.value;
+      if (!query) { summary.textContent = `共 ${state.library.total.toLocaleString("zh-CN")} 条`; list.innerHTML = '<div class="empty-state" style="padding:20px">输入名称开始搜索全球 G25 坐标库</div>'; return; }
+      const matches = state.library.rows.filter(row => (!sourceId || row.sourceId === sourceId) && matchesFilter(row.name, query)), visible = matches.slice(0, 200);
+      summary.textContent = matches.length > 200 ? `找到 ${matches.length.toLocaleString("zh-CN")} 条，显示前 200 条` : `找到 ${matches.length.toLocaleString("zh-CN")} 条`;
+      if (!visible.length) { list.innerHTML = '<div class="empty-state" style="padding:20px">没有匹配的数据</div>'; return; }
+      list.innerHTML = visible.map(row => `<article class="sample-item"><div><strong>${escapeHtml(row.name)}</strong><small>${row.values.slice(0,4).map(value => Number(value).toFixed(6)).join(", ")} … 共 25 维</small><span class="source-chip">${escapeHtml(row.sourceLabel)}</span></div><button class="sample-add" type="button" data-library-add="${row.index}">添加</button></article>`).join("");
+      list.querySelectorAll("[data-library-add]").forEach(button => button.addEventListener("click", () => addLibrarySample(kind, Number(button.dataset.libraryAdd))));
+    }
+    function addLibrarySample(kind, index) {
+      const libraryRow = state.library.rows[index];
+      if (!libraryRow) { libraryMessage(kind, "没有找到该坐标记录。"); return; }
+      if (state[kind].some(row => row.name === libraryRow.name)) { libraryMessage(kind, `“${libraryRow.name}”已经在已选样本中。`); return; }
+      const input = kind === "source" ? sourceInput : targetInput, line = rowToLine(libraryRow);
+      input.value = input.value.trim() ? `${input.value.trim()}\n${line}` : line;
+      refreshData(kind); libraryMessage(kind, `已从“${libraryRow.sourceLabel}”添加“${libraryRow.name}”。`, true);
+    }
+    async function loadG25Library() {
+      try {
+        const response = await fetch("../assets/data/g25-library.json");
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const payload = await response.json(), rows = [];
+        payload.sources.forEach(source => source.rows.forEach(row => rows.push({ index: rows.length, name: row[0], values: row.slice(1), sourceId: source.id, sourceLabel: source.label })));
+        state.library = { loading: false, rows, sources: payload.sources.map(({id,label,count}) => ({id,label,count})), total: payload.total };
+        document.getElementById("libraryBannerCount").textContent = `内置全球 G25 坐标库：${payload.total.toLocaleString("zh-CN")} 条`;
+        document.getElementById("libraryBannerSources").textContent = payload.sources.map(source => `${source.label} ${source.count.toLocaleString("zh-CN")}`).join(" · ");
+        ["source","target"].forEach(kind => { populateLibrarySourceOptions(kind); renderLibraryResults(kind); });
+      } catch (error) {
+        state.library = { loading: false, rows: [], sources: [], total: 0 };
+        document.getElementById("libraryBannerCount").textContent = "全球 G25 坐标库载入失败";
+        ["source","target"].forEach(kind => renderLibraryResults(kind));
+      }
+    }
     function removeSampleLines(kind, lineIndexes) {
       const input = kind === "source" ? sourceInput : targetInput, remove = new Set(lineIndexes), lines = input.value.split(/\r?\n/);
       input.value = lines.filter((_, index) => !remove.has(index)).join("\n"); refreshData(kind);
@@ -640,6 +702,8 @@
       list.querySelectorAll("[data-delete-line]").forEach(button => button.addEventListener("click", () => { removeSampleLines(kind, [Number(button.dataset.deleteLine)]); managerMessage(kind, "已删除 1 个样本。", true); }));
     }
     ["source","target"].forEach(kind => {
+      document.getElementById(`${kind}LibrarySearch`).addEventListener("input", () => { libraryMessage(kind, ""); renderLibraryResults(kind); });
+      document.getElementById(`${kind}LibrarySource`).addEventListener("change", () => { libraryMessage(kind, ""); renderLibraryResults(kind); });
       document.getElementById(`${kind}Search`).addEventListener("input", () => renderSampleManager(kind));
       document.querySelector(`[data-add-row="${kind}"]`).addEventListener("click", () => {
         const field = document.getElementById(`${kind}AddRow`), parsed = parseCoordinates(field.value.trim());
@@ -656,6 +720,7 @@
         removeSampleLines(kind, matches.map(row => row.lineIndex)); managerMessage(kind, `已删除 ${matches.length} 个搜索结果。`, true);
       });
     });
+    loadG25Library();
 
     function makeDemoVector(seed) { return Array.from({length:DIMENSIONS}, (_, i) => Number((Math.sin((i + 1) * (seed + 0.71)) * 0.062 + Math.cos((i + 2) * (seed * 0.37 + 0.43)) * 0.031 + seed * 0.0015).toFixed(6))); }
     function mixVectors(vectors, weights) { return Array.from({length:DIMENSIONS}, (_, i) => Number(vectors.reduce((sum, vector, index) => sum + vector[i] * weights[index], 0).toFixed(6))); }
