@@ -193,6 +193,45 @@
       font-size: 18px;
     }
 
+    .stripe-pay-btn, .contact-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 22px;
+      border-radius: 10px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 900;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stripe-pay-btn {
+      background: linear-gradient(135deg, #635bff, #00bfff);
+      box-shadow: 0 10px 28px rgba(99, 91, 255, 0.25);
+    }
+
+    .stripe-pay-btn:hover, .contact-btn:hover { transform: translateY(-1px); }
+
+    .contact-btn {
+      margin-top: 14px;
+      background: rgba(0, 191, 255, 0.14);
+      border: 1px solid rgba(0, 191, 255, 0.3);
+    }
+
+    .payment-success {
+      display: none;
+      margin-bottom: 18px;
+      padding: 24px;
+      border: 1px solid rgba(0, 255, 136, 0.35);
+      border-radius: 12px;
+      background: rgba(0, 255, 136, 0.08);
+    }
+
+    .payment-success h2 { color: #00ff88; margin-bottom: 10px; }
+    .payment-success p { color: #b7c2c8; line-height: 1.8; }
+
     .section-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -420,8 +459,15 @@
           <div class="price">59 元 / 次</div>
           <p class="note">一次性个人分析服务，非医学诊断。</p>
         </div>
-        <div>联系方式：<span class="wechat">提交需求后提供</span></div>
+        <a class="stripe-pay-btn" href="https://buy.stripe.com/fZu3cx1I983f9B3fcD3ZK02">前往 Stripe 安全支付 ¥59</a>
       </div>
+      <p class="note">支持银行卡、Apple Pay 和 Link。支付完成后会自动返回本页并显示资料提交方式。</p>
+    </div>
+
+    <div class="payment-success" id="paymentSuccess">
+      <h2>已从 Stripe 返回</h2>
+      <p>请将姓名、年龄、身高体重、运动项目、体测/专项成绩、训练年限和希望分析的问题发送到以下邮箱。通常会按收到资料的顺序开始分析。</p>
+      <a class="contact-btn" href="mailto:songjueqing@gmail.com?subject=SJQ%E7%A7%81%E4%BA%BA%E5%88%86%E6%9E%90%E6%9C%8D%E5%8A%A1%E8%B5%84%E6%96%99">发送资料到 songjueqing@gmail.com</a>
     </div>
 
     <div class="section-grid">
@@ -459,13 +505,13 @@
       <div class="flow">
         <div class="step">
           <div class="step-number">01</div>
-          <div class="step-title">添加微信</div>
-          <p>说明基本情况和想分析的问题。</p>
+          <div class="step-title">在线支付</div>
+          <p>通过 Stripe 完成一次性服务付款。</p>
         </div>
         <div class="step">
           <div class="step-number">02</div>
-          <div class="step-title">发送数据</div>
-          <p>按项目提交身体和成绩数据。</p>
+          <div class="step-title">邮件发送数据</div>
+          <p>支付返回后按提示提交身体和成绩数据。</p>
         </div>
         <div class="step">
           <div class="step-number">03</div>
@@ -482,12 +528,25 @@
   </div>
 
   <footer>
-    <p>&copy; 2025 【SJQ】身体数据实验室 &middot; Built with &#10084;&#65039;</p>
+    <p>&copy; 2026 【SJQ】身体数据实验室 &middot; BOYUAN BAI &middot; ABN 18 395 906 312</p>
+    <p class="visit-counter">联系邮箱：<a href="mailto:songjueqing@gmail.com" style="color:#666;">songjueqing@gmail.com</a></p>
     <p class="visit-counter">
       访问量 <span id="busuanzi_value_site_pv">--</span> &middot; 本页 <span id="busuanzi_value_page_pv">--</span>
     </p>
   </footer>
 
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('payment') !== 'success') return;
+      var success = document.getElementById('paymentSuccess');
+      if (success) {
+        success.style.display = 'block';
+        success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      history.replaceState({}, document.title, window.location.pathname);
+    })();
+  </script>
 </body>
 </html>

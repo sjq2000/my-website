@@ -164,8 +164,7 @@
     }
 
     .pay-strip {
-      display: grid;
-      grid-template-columns: 132px minmax(0, 1fr);
+      display: block;
       gap: 18px;
       align-items: center;
       margin-bottom: 18px;
@@ -173,14 +172,6 @@
       border-radius: 12px;
       border: 1px solid rgba(0, 255, 136, 0.2);
       background: linear-gradient(135deg, rgba(0, 255, 136, 0.08), rgba(0, 191, 255, 0.04));
-    }
-
-    .pay-qr {
-      width: 132px;
-      height: 132px;
-      object-fit: cover;
-      border-radius: 10px;
-      background: #fff;
     }
 
     .pay-title {
@@ -219,6 +210,36 @@
       background: rgba(0, 191, 255, 0.09);
       border-color: rgba(0, 191, 255, 0.28);
       color: rgba(234, 246, 255, 0.9);
+    }
+
+    .stripe-pay-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      margin-top: 16px;
+      padding: 0 22px;
+      border: 0;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #635bff, #00bfff);
+      color: #fff;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 900;
+      box-shadow: 0 10px 28px rgba(99, 91, 255, 0.25);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stripe-pay-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 34px rgba(99, 91, 255, 0.32);
+    }
+
+    .payment-note {
+      margin-top: 10px;
+      color: #8f9aa3;
+      font-size: 13px;
+      line-height: 1.7;
     }
 
     .panel {
@@ -747,13 +768,14 @@
 
     <div class="page-header">
       <h1>完整<span>分析报告</span></h1>
-      <p>从计算器结果生成报告，扫码支付后确认查看。</p>
+      <p>从计算器结果生成报告，通过 Stripe 安全支付后自动返回并解锁。</p>
     </div>
 
     <div class="pay-strip" id="payStrip">
-      <img class="pay-qr" src="payment-qr-cropped.png" alt="微信收款码">
       <div class="pay-copy">
         <div class="pay-title">完整分析报告 <span id="reportPrice">¥9.9</span></div>
+        <p class="payment-note">支持银行卡、Apple Pay 和 Link。支付完成后将自动返回本页。</p>
+        <a class="stripe-pay-btn" id="stripePayButton" href="https://buy.stripe.com/cNi4gB72t97j9B3fcD3ZK00">前往 Stripe 安全支付 ¥9.9</a>
       </div>
     </div>
 
@@ -770,12 +792,12 @@
           <div><a href="height-prediction.html" style="color:#00bfff;text-decoration:none;font-weight:800;">去身高预测计算器测试 &rarr;</a></div>
         </div>
       </div>
-      <button class="paid-confirm-btn subtle" onclick="confirmPayment()">&#128274; 查看报告</button>
     </div>
   </div>
 
   <footer>
-    <p>&copy; 2025 【SJQ】身体数据实验室 &middot; Built with &#10084;&#65039;</p>
+    <p>&copy; 2026 【SJQ】身体数据实验室 &middot; BOYUAN BAI &middot; ABN 18 395 906 312</p>
+    <p class="visit-counter">联系邮箱：<a href="mailto:songjueqing@gmail.com" style="color:#666;">songjueqing@gmail.com</a></p>
     <p class="visit-counter">
       访问量 <span id="busuanzi_value_site_pv">--</span> &middot; 本页 <span id="busuanzi_value_page_pv">--</span>
     </p>
@@ -1327,7 +1349,7 @@
     }
 
     function renderLockedReport(data) {
-      return '<div class="report-section"><h3>报告已生成，支付后查看</h3><p>已检测到 <strong>' + escapeHtml(data.title || '当前计算器') + '</strong> 的计算结果。请先扫码支付，支付完成后点击上方按钮确认查看。</p><div class="locked-preview">可预览：本报告将包含输入数据、核心结果、能力图表、结果解读和训练建议。</div></div>';
+      return '<div class="report-section"><h3>报告已生成，支付后查看</h3><p>已检测到 <strong>' + escapeHtml(data.title || '当前计算器') + '</strong> 的计算结果。请点击上方按钮前往 Stripe 支付，完成后会自动返回并解锁。</p><div class="locked-preview">可预览：本报告将包含输入数据、核心结果、能力图表、结果解读和训练建议。</div></div>';
     }
 
     function getReportUnlockKey(data) {
@@ -1352,23 +1374,23 @@
       return 'report-' + Math.abs(hash);
     }
 
-    function confirmPayment() {
-      if (confirm('是否确定已完成支付？')) {
-        var raw = localStorage.getItem('paidReportData');
-        if (!raw) {
-          alert('还没有检测到报告数据，请先回到计算器完成计算。');
-          return;
-        }
-        var data;
-        try { data = JSON.parse(raw); } catch (e) {
-          alert('报告数据读取失败，请回到计算器重新计算一次。');
-          return;
-        }
+    var PAYMENT_LINKS = {
+      standard: 'https://buy.stripe.com/cNi4gB72t97j9B3fcD3ZK00',
+      testosterone: 'https://buy.stripe.com/dRm6oJ1I90AN3cF8Of3ZK01'
+    };
+
+    function applyPaymentReturn() {
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('payment') !== 'success') return;
+      var raw = localStorage.getItem('paidReportData');
+      if (!raw) return;
+      try {
+        var data = JSON.parse(raw);
         localStorage.removeItem('paidReportUnlocked');
         localStorage.setItem('paidReportUnlockedKey', getReportUnlockKey(data));
-        renderGeneratedReport();
-        var report = document.getElementById('generatedReport');
-        if (report) report.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.replaceState({}, document.title, window.location.pathname);
+      } catch (e) {
+        // Invalid cached data is handled by renderGeneratedReport().
       }
     }
 
@@ -1404,8 +1426,15 @@
       }
 
       time.textContent = data.createdAt || '刚刚生成';
+      var isTestosterone = data.reportType === 'testosterone';
+      var displayPrice = isTestosterone ? '¥4.9' : '¥9.9';
       var priceEl = document.getElementById('reportPrice');
-      if (priceEl) priceEl.textContent = data.price || '¥9.9';
+      if (priceEl) priceEl.textContent = displayPrice;
+      var payButton = document.getElementById('stripePayButton');
+      if (payButton) {
+        payButton.href = isTestosterone ? PAYMENT_LINKS.testosterone : PAYMENT_LINKS.standard;
+        payButton.textContent = '前往 Stripe 安全支付 ' + displayPrice;
+      }
       var payStrip = document.getElementById('payStrip');
       var unlockedKey = localStorage.getItem('paidReportUnlockedKey');
       var currentKey = getReportUnlockKey(data);
@@ -1433,6 +1462,7 @@
       }
     }
 
+    applyPaymentReturn();
     renderGeneratedReport();
   </script>
 </body>
