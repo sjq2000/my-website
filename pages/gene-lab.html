@@ -694,75 +694,96 @@
 
       <div class="tab-panel" id="panel-single" role="tabpanel">
         <div class="panel-head"><div><h2>成分拟合</h2><p>把样本拆成参考人群的加权组合，百分比加起来 100%。先看一个样本，想批量看就切「多样本拟合」。</p></div></div>
-        <div class="sub-h">① 要分析的人（单样本 / 多样本）</div>
-        <div class="seg" role="tablist" style="margin:6px 0 14px">
-          <button class="seg-btn active" type="button" data-fitview="one">单样本拟合</button>
-          <button class="seg-btn" type="button" data-fitview="all">多样本拟合</button>
-        </div>
-        <p class="mode-help" id="fitModeHelp" hidden>一次把所有样本都拆开，结果排成一张对照表。</p>
+        <div class="an-block">
+          <div class="an-h"><span class="an-i">1</span><h3>要分析的人</h3><p>一行就够：名字 + 25 个坐标（和「距离分析」用的是同一份数据，两边同步）。多个样本就多行。</p></div>
+          <div class="an-body">
 
-        <p class="sub-note">一行就够：名字 + 25 个坐标（和②距离分析用的是同一份数据，两边同步）。</p>
-        <textarea id="fitInput" spellcheck="false" placeholder="例如：我的成分,0.0228,-0.4459,…,共 25 个数字"></textarea>
-        <div class="row-actions" style="margin:8px 0 4px">
-          <button class="btn ghost" type="button" id="fitFromConvert">从①成分换算带过来</button>
-          <span class="meta-chip">已识别 <strong id="fitCount">0</strong> 个样本</span>
-        </div>
-        <p class="sub-note">在下面粘一行「名字 + 25 个坐标」，或用②里已有的样本；切「多样本拟合」会把所有样本都算一遍。</p>
-                <div class="sub-h">② 用来拟合的样本</div>
-        <p class="sub-note" id="fitSrcNote">点「＋ 添加参考人群」从库里挑，一般 5～15 个就够；不选则用「距离分析」的整张名单（3,000+ 条，结果容易碎）。单样本与多样本都使用这里的名单。</p>
-        <div class="chips" id="fitChips"></div>
-        <div class="toolbar" style="margin-top:8px">
-          <button class="btn ghost" type="button" id="fitAddOpen">＋ 添加参考人群</button>
-          <button class="btn ghost" type="button" id="fitClearRefs">清空参考</button>
-          <span class="meta-chip">已选 <strong id="fitRefCount">0</strong> 个</span>
-        </div>
-        <div id="fitPicker" hidden style="margin-top:10px">
-          <input class="text-input" id="fitSearch" placeholder="搜名字，如 Han_ 或 Manchu">
-          <div class="filterbar" style="margin-top:8px">
-            <label>地理<select id="fitFacetContinent"></select></label>
-            <label>国家<select id="fitFacetCountry"></select></label>
-            <label>时间<select id="fitFacetPeriod">
-              <option value="modern" selected>现代</option>
-              <option value="ancient">古代</option>
-              <option value="all">全部</option>
-            </select></label>
-            <span class="meta-chip" id="fitFacetCount">—</span>
+            <div class="seg" role="tablist" style="margin:0 0 14px">
+              <button class="seg-btn active" type="button" data-fitview="one">单样本拟合</button>
+              <button class="seg-btn" type="button" data-fitview="all">多样本拟合</button>
+            </div>
+            <p class="mode-help" id="fitModeHelp" hidden>一次把所有样本都拆开，结果排成一张对照表。</p>
+
+            <div class="panel-head"><div><h2>我的样本</h2><p>26 个数字一行：先名称，再 25 个坐标。</p></div><div class="toolbar"><button class="btn ghost" type="button" id="fitFromConvert">从成分换算带过来</button><button class="btn ghost" type="button" id="fitFormatBtn">整理格式</button><button class="btn danger" type="button" id="fitClearInput">清空</button></div></div>
+            <textarea id="fitInput" spellcheck="false" placeholder="例如：我的成分,0.0228,-0.4459,…,共 25 个数字"></textarea>
+            <div class="data-meta"><span class="meta-chip">已识别 <strong id="fitCount">0</strong> 个样本</span></div>
+            <div class="validation" id="fitValidation" aria-live="polite"></div>
+
           </div>
-          <div class="fit-picker-list" id="fitPickerList"></div>
         </div>
-        <div id="fitOne">
-        <details class="adv"><summary>高级选项（一般不用动）</summary>
-        <div class="option-grid">
-          <div class="control"><label for="singleTarget">目标样本</label><select id="singleTarget"></select></div>
-          <div class="control"><label for="singleCycles">计算轮次</label><select id="singleCycles"><option value="0.25">0.25×</option><option value="1" selected>1×</option><option value="4">4×</option></select></div>
-          <div class="control"><label for="singleReduce">限制成分数</label><select id="singleReduce"><option value="0">不限制</option><option value="2">2P</option><option value="3">3P</option><option value="4">4P</option><option value="5">5P</option><option value="6" selected>6P（推荐）</option></select></div>
-          <div class="control"><label for="singleAdc">距离附加列 ADC</label><select id="singleAdc"><option value="0">关闭</option><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1">1×</option></select></div>
-          <div class="control"><label for="singleRecalc">ADC 后重算</label><select id="singleRecalc"><option value="yes">是</option><option value="no">否</option></select></div>
-          <div class="control"><label for="singleZeros">显示零值</label><select id="singleZeros"><option value="no">否</option><option value="yes">是</option></select></div>
-          <div class="control"><label for="singleAggregate">按冒号前名称合并</label><select id="singleAggregate"><option value="yes">是</option><option value="no">否</option></select></div>
-          <div class="control"><label for="singleBars">条形图</label><select id="singleBars"><option value="1">模式 1</option><option value="2">模式 2</option><option value="0">关闭</option></select></div>
-        </div>
-        </details>
-        <div class="toolbar"><button class="btn primary" type="button" id="runSingle">拟合这个样本</button><button class="btn" type="button" id="runAllSingle" style="display:none">全部一起拆</button><button class="btn ghost" type="button" id="copySingle" style="display:none">复制结果</button><button class="btn danger" type="button" id="clearSingle">清空输出</button></div>
-        <div class="sub-h">③ 结果</div>
-        <div class="target-actions" id="singleTargets"></div><div class="output-stack" id="singleResults"><div class="empty-state">选择目标样本并开始拟合。</div></div>
-      
-        </div>
-        <div id="fitAll" hidden>
 
-        <details class="adv"><summary>高级选项（一般不用动）</summary>
-        <div class="option-grid">
-          <div class="control"><label for="multiCycles">计算轮次</label><select id="multiCycles"><option value="0.25">0.25×</option><option value="1" selected>1×</option><option value="4">4×</option></select></div>
-          <div class="control"><label for="multiFast">快速模式</label><select id="multiFast"><option value="no">否</option><option value="yes">是</option></select></div>
-          <div class="control"><label for="multiAdc">距离附加列 ADC</label><select id="multiAdc"><option value="0">关闭</option><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1">1×</option></select></div>
-          <div class="control"><label for="multiRecalc">ADC 后重算</label><select id="multiRecalc"><option value="yes">是</option><option value="no">否</option></select></div>
-          <div class="control"><label for="multiZeros">显示零值</label><select id="multiZeros"><option value="no">否</option><option value="yes">是</option></select></div>
-          <div class="control"><label for="multiAggregate">按冒号前名称合并</label><select id="multiAggregate"><option value="yes">是</option><option value="no">否</option></select></div>
+        <div class="an-block">
+          <div class="an-h"><span class="an-i">2</span><h3>用来拟合的样本</h3><p id="fitSrcNote">点「＋ 添加参考人群」从库里挑，一般 5～15 个就够；不选则沿用「距离分析」的整张名单（3,000+ 条，结果容易碎）。单样本与多样本都用这里的名单。</p></div>
+          <div class="an-body">
+
+            <div class="toolbar" style="margin:0 0 10px">
+              <button class="btn primary" type="button" id="fitAddOpen">＋ 添加参考人群</button>
+              <button class="btn ghost" type="button" id="fitClearRefs">清空参考</button>
+              <span class="meta-chip">已选 <strong id="fitRefCount">0</strong> 个</span>
+            </div>
+
+            <div id="fitPicker" hidden>
+              <div class="library-search-row"><input class="text-input" id="fitSearch" placeholder="搜名字，如 Han_ 或 Manchu"></div>
+              <div class="filterbar" style="margin-top:8px">
+                <label>地理<select id="fitFacetContinent"></select></label>
+                <label>国家<select id="fitFacetCountry"></select></label>
+                <label>时间<select id="fitFacetPeriod">
+                  <option value="modern" selected>现代</option>
+                  <option value="ancient">古代</option>
+                  <option value="all">全部</option>
+                </select></label>
+                <span class="meta-chip" id="fitFacetCount">—</span>
+              </div>
+              <div class="fit-picker-list" id="fitPickerList"></div>
+            </div>
+
+            <section class="sample-manager" aria-label="已选参考人群管理">
+              <div class="sample-manager-head"><h3>管理已选参考人群</h3><span>当前显示 <strong id="fitRefVisible">0</strong> 条</span></div>
+              <div class="search-row"><input class="text-input" id="fitRefSearch" placeholder="搜索已选参考人群"></div>
+              <div class="sample-list" id="fitChips"><div class="empty-state" style="padding:20px">还没有选择参考人群</div></div>
+            </section>
+
+          </div>
         </div>
-        </details>
-        <div class="toolbar"><button class="btn primary" type="button" id="runMulti">批量拟合</button><button class="btn ghost" type="button" id="copyMultiCsv">复制 CSV</button><button class="btn ghost" type="button" id="copyMultiTsv">复制 TSV</button><button class="btn danger" type="button" id="clearMulti">清空输出</button></div>
-        <div id="multiResults"><div class="empty-state" style="margin-top:22px">至少需要一个参考群体和一个目标样本。</div></div>
-      
+
+        <div class="an-block">
+          <div class="an-h"><span class="an-i">3</span><h3>结果</h3><p>单样本看一个；多样本批量输出对照表。</p></div>
+          <div class="an-body">
+
+            <div id="fitOne">
+              <details class="adv"><summary>高级选项（一般不用动）</summary>
+              <div class="option-grid">
+                <div class="control"><label for="singleTarget">目标样本</label><select id="singleTarget"></select></div>
+                <div class="control"><label for="singleCycles">计算轮次</label><select id="singleCycles"><option value="0.25">0.25×</option><option value="1" selected>1×</option><option value="4">4×</option></select></div>
+                <div class="control"><label for="singleReduce">限制成分数</label><select id="singleReduce"><option value="0">不限制</option><option value="2">2P</option><option value="3">3P</option><option value="4">4P</option><option value="5">5P</option><option value="6" selected>6P（推荐）</option></select></div>
+                <div class="control"><label for="singleAdc">距离附加列 ADC</label><select id="singleAdc"><option value="0">关闭</option><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1">1×</option></select></div>
+                <div class="control"><label for="singleRecalc">ADC 后重算</label><select id="singleRecalc"><option value="yes">是</option><option value="no">否</option></select></div>
+                <div class="control"><label for="singleZeros">显示零值</label><select id="singleZeros"><option value="no">否</option><option value="yes">是</option></select></div>
+                <div class="control"><label for="singleAggregate">按冒号前名称合并</label><select id="singleAggregate"><option value="yes">是</option><option value="no">否</option></select></div>
+                <div class="control"><label for="singleBars">条形图</label><select id="singleBars"><option value="1">模式 1</option><option value="2">模式 2</option><option value="0">关闭</option></select></div>
+              </div>
+              </details>
+              <div class="toolbar"><button class="btn primary" type="button" id="runSingle">拟合这个样本</button><button class="btn" type="button" id="runAllSingle" style="display:none">全部一起拆</button><button class="btn ghost" type="button" id="copySingle" style="display:none">复制结果</button><button class="btn danger" type="button" id="clearSingle">清空输出</button></div>
+              <div class="target-actions" id="singleTargets"></div>
+              <div class="output-stack" id="singleResults"><div class="empty-state">选择目标样本并开始拟合。</div></div>
+            </div>
+
+            <div id="fitAll" hidden>
+              <details class="adv"><summary>高级选项（一般不用动）</summary>
+              <div class="option-grid">
+                <div class="control"><label for="multiCycles">计算轮次</label><select id="multiCycles"><option value="0.25">0.25×</option><option value="1" selected>1×</option><option value="4">4×</option></select></div>
+                <div class="control"><label for="multiFast">快速模式</label><select id="multiFast"><option value="no">否</option><option value="yes">是</option></select></div>
+                <div class="control"><label for="multiAdc">距离附加列 ADC</label><select id="multiAdc"><option value="0">关闭</option><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1">1×</option></select></div>
+                <div class="control"><label for="multiRecalc">ADC 后重算</label><select id="multiRecalc"><option value="yes">是</option><option value="no">否</option></select></div>
+                <div class="control"><label for="multiZeros">显示零值</label><select id="multiZeros"><option value="no">否</option><option value="yes">是</option></select></div>
+                <div class="control"><label for="multiAggregate">按冒号前名称合并</label><select id="multiAggregate"><option value="yes">是</option><option value="no">否</option></select></div>
+              </div>
+              </details>
+              <div class="toolbar"><button class="btn primary" type="button" id="runMulti">批量拟合</button><button class="btn ghost" type="button" id="copyMultiCsv">复制 CSV</button><button class="btn ghost" type="button" id="copyMultiTsv">复制 TSV</button><button class="btn danger" type="button" id="clearMulti">清空输出</button></div>
+              <div id="multiResults"><div class="empty-state" style="margin-top:22px">至少需要一个参考群体和一个目标样本。</div></div>
+            </div>
+
+          </div>
         </div>
       </div>
 
@@ -1127,16 +1148,46 @@
   // ---- 拟合用参考人群（手动挑） ----
   state.fitRefs = state.fitRefs || [];
 
-  function renderFitChips() {
+  function renderFitRefs() {
     const box = document.getElementById("fitChips");
     const cnt = document.getElementById("fitRefCount");
+    const visible = document.getElementById("fitRefVisible");
     if (cnt) cnt.textContent = state.fitRefs.length;
     if (!box) return;
-    box.innerHTML = state.fitRefs.map((r, i) =>
-      `<span class="chip">${escapeHtml(r.name)}<button type="button" data-rmref="${i}" title="移除">×</button></span>`).join("");
-    box.querySelectorAll("[data-rmref]").forEach(btn => btn.addEventListener("click", () => {
-      state.fitRefs.splice(Number(btn.dataset.rmref), 1);
-      renderFitChips();
+    const q = (document.getElementById("fitRefSearch")?.value || "").trim().toLowerCase();
+    const rows = state.fitRefs.map((row, index) => ({ row, index })).filter(({ row }) => !q || row.name.toLowerCase().includes(q));
+    if (visible) visible.textContent = rows.length;
+    if (!rows.length) {
+      box.innerHTML = `<div class="empty-state" style="padding:20px">${state.fitRefs.length ? "没有匹配的参考人群" : "还没有选择参考人群"}</div>`;
+      return;
+    }
+    box.innerHTML = rows.map(({ row, index }) => `<article class="sample-item"><div><strong>${escapeHtml(row.name)}</strong><small>${row.values.slice(0, 4).map(value => Number(value).toFixed(6)).join(", ")} … 共 25 维</small></div><button class="sample-delete" type="button" data-delref="${index}">删除</button></article>`).join("");
+    box.querySelectorAll("[data-delref]").forEach(btn => btn.addEventListener("click", () => {
+      state.fitRefs.splice(Number(btn.dataset.delref), 1);
+      const fitRefSearch = document.getElementById("fitRefSearch");
+  if (fitRefSearch) fitRefSearch.addEventListener("input", () => renderFitRefs());
+
+  const fitFormatBtn = document.getElementById("fitFormatBtn");
+  if (fitFormatBtn) fitFormatBtn.addEventListener("click", () => {
+    const field = document.getElementById("fitInput");
+    const parsed = parseCoordinates(field.value);
+    const msg = document.getElementById("fitValidation");
+    if (!parsed.rows.length) { if (msg) { msg.className = "validation bad"; msg.textContent = parsed.issues[0] || "没有可整理的样本。"; } return; }
+    field.value = parsed.rows.map(rowToLine).join("\n");
+    field.dispatchEvent(new Event("input"));
+    if (msg) { msg.className = "validation ok"; msg.textContent = `已整理 ${parsed.rows.length} 个样本。`; }
+  });
+
+  const fitClearInput = document.getElementById("fitClearInput");
+  if (fitClearInput) fitClearInput.addEventListener("click", () => {
+    const field = document.getElementById("fitInput");
+    field.value = "";
+    field.dispatchEvent(new Event("input"));
+    const msg = document.getElementById("fitValidation");
+    if (msg) msg.textContent = "";
+  });
+
+  renderFitRefs();
     }));
   }
 
@@ -1176,7 +1227,7 @@
       if (!row) return;
       if (state.fitRefs.some(x => x.name === row.name)) return;
       state.fitRefs.push({ name: row.name, values: row.values });
-      renderFitChips();
+      renderFitRefs();
     }));
   }
 
@@ -1226,8 +1277,8 @@
   const fitSearch = document.getElementById("fitSearch");
   if (fitSearch) fitSearch.addEventListener("input", () => renderFitPicker(fitSearch.value));
   const fitClearRefs = document.getElementById("fitClearRefs");
-  if (fitClearRefs) fitClearRefs.addEventListener("click", () => { state.fitRefs = []; renderFitChips(); });
-  renderFitChips();
+  if (fitClearRefs) fitClearRefs.addEventListener("click", () => { state.fitRefs = []; renderFitRefs(); });
+  renderFitRefs();
 
   // 只用所选参考做拟合
   function fitWithSelectedRefs() {
