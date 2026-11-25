@@ -383,7 +383,7 @@
       .page-header::after { right: 10px; }
       .steps, .control-grid { grid-template-columns: 1fr; }
       .panel-head { flex-direction: column; }
-      textarea { min-height: 280px; }
+      textarea { min-height: 120px; }
       .result-card { overflow-x: auto; }
       .result-table { min-width: 620px; }
       .proportion-row { grid-template-columns: 105px 1fr 58px; gap: 8px; }
@@ -551,7 +551,7 @@
         <div class="panel-head"><div><h2>我的样本</h2><p>这里是「要分析的人」。26 个数字一行：先名称，再 25 个坐标。多个样本就多行。</p></div><div class="toolbar"><label class="btn file-button">导入文件<input type="file" id="targetFile" accept=".csv,.txt,text/csv,text/plain"></label><button class="btn ghost" type="button" data-format="target">整理格式</button><button class="btn danger" type="button" data-clear="target">清空</button></div></div>
         <textarea id="targetInput" spellcheck="false" placeholder="目标样本名称,第1维,第2维,...,第25维"></textarea>
         <div class="data-meta"><span class="meta-chip">有效样本 <strong id="targetCount">0</strong></span><span class="meta-chip">坐标维度 <strong id="targetDims">—</strong></span></div><div class="validation" id="targetValidation" aria-live="polite"></div>
-        <section class="sample-manager" aria-label="目标样本管理">
+        <details class="adv"><summary>从内置库里挑样本（可选）</summary><section class="sample-manager" aria-label="目标样本管理">
           <div class="sample-manager-head"><h3>搜索全球 G25 坐标库</h3><span id="targetLibrarySummary">正在载入…</span></div>
           <div class="library-search-row"><input class="text-input" id="targetLibrarySearch" placeholder="搜索 11,247 条数据；支持空格、?、! 组合筛选"><select id="targetLibrarySource"><option value="">全部数据源</option></select></div>
           <div class="validation" id="targetLibraryMessage" aria-live="polite"></div><div class="sample-list library-results" id="targetLibraryList"><div class="empty-state" style="padding:20px">坐标库载入后即可搜索</div></div>
@@ -566,6 +566,7 @@
         <div class="an-block">
           <div class="an-h"><span class="an-i">2</span><h3>用来比对的名单</h3><p id="libSummary">正在准备名单…</p></div>
           <div class="an-body">
+            <details class="adv"><summary>自定义参考名单（默认已用内置 3,227 条，不用动）</summary>
 
         <div class="panel-head"><div><h2>参考人群</h2><p>这些是「候选答案」——用来和你的样本比对。可以直接搜内置库加入，也可以粘贴自己的一行。</p></div><div class="toolbar"><label class="btn file-button">导入文件<input type="file" id="sourceFile" accept=".csv,.txt,text/csv,text/plain"></label><button class="btn ghost" type="button" data-format="source">整理格式</button><button class="btn danger" type="button" data-clear="source">清空</button></div></div>
         <textarea id="sourceInput" spellcheck="false" placeholder="参考群体名称,第1维,第2维,...,第25维"></textarea>
@@ -580,6 +581,7 @@
           <div class="search-row"><input class="text-input" id="sourceSearch" placeholder="搜索已选样本"><button class="btn danger" type="button" data-delete-filtered="source">删除搜索结果</button></div>
           <div class="sample-add-row"><input class="text-input" id="sourceAddRow" placeholder="粘贴一整行：名称 + 25 个坐标"><button class="btn" type="button" data-add-row="source">新增参考样本</button></div>
           <div class="validation" id="sourceManagerMessage" aria-live="polite"></div><div class="sample-list" id="sourceSampleList"><div class="empty-state" style="padding:20px">暂无参考样本</div>
+          </details>
           </div>
         </div>
 
@@ -610,7 +612,7 @@
     </section>
       </div>
 
-          </section>
+          </section></details>
       </div>
 
       <div class="tab-panel" id="panel-convert" role="tabpanel">
