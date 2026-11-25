@@ -737,7 +737,21 @@
       .brand-mark { width: 48px; height: 32px; font-size: 14px; }
     }
 
-  </style>
+  
+    /* 创作者访问码：仅本次页面有效，刷新后需重新输入 */
+    .owner-gate { margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .owner-gate[hidden] { display: none; }
+    .owner-gate label { font-size: 12px; color: #666; }
+    .owner-gate input { width: 104px; background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px; color: #e8f6ff; font-size: 13px; padding: 7px 10px; text-align: center;
+      letter-spacing: 3px; outline: none; }
+    .owner-gate input:focus { border-color: rgba(0, 191, 255, 0.5); }
+    .owner-gate button { background: rgba(0, 191, 255, 0.14); border: 1px solid rgba(0, 191, 255, 0.3);
+      color: #8fd8ff; border-radius: 6px; font-size: 13px; padding: 7px 14px; cursor: pointer; }
+    .owner-gate button:hover { background: rgba(0, 191, 255, 0.24); }
+    .owner-gate .owner-msg { font-size: 12px; color: #ff6b6b; }
+</style>
 </head>
 <body>
   <nav>
@@ -791,6 +805,12 @@
           <div><a href="muscle-potential.html" style="color:#00bfff;text-decoration:none;font-weight:800;">去增肌潜力计算器测试 &rarr;</a></div>
           <div><a href="height-prediction.html" style="color:#00bfff;text-decoration:none;font-weight:800;">去身高预测计算器测试 &rarr;</a></div>
         </div>
+      </div>
+      <div class="owner-gate" id="ownerGate" hidden>
+        <label for="ownerCode">创作者访问码</label>
+        <input type="password" id="ownerCode" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="访问码">
+        <button type="button" id="ownerUnlock">解锁</button>
+        <span class="owner-msg" id="ownerMsg"></span>
       </div>
     </div>
   </div>
@@ -1436,16 +1456,19 @@
         payButton.textContent = '前往 Stripe 安全支付 ' + displayPrice;
       }
       var payStrip = document.getElementById('payStrip');
+      var ownerGate = document.getElementById('ownerGate');
       var unlockedKey = localStorage.getItem('paidReportUnlockedKey');
       var currentKey = getReportUnlockKey(data);
-      if (unlockedKey !== currentKey) {
+      if (!ownerUnlocked && unlockedKey !== currentKey) {
         if (payStrip) payStrip.style.display = '';
+        if (ownerGate) ownerGate.hidden = false;
         localStorage.removeItem('paidReportUnlocked');
         box.innerHTML = renderLockedReport(data);
         return;
       }
 
       if (payStrip) payStrip.style.display = 'none';
+      if (ownerGate) ownerGate.hidden = true;
 
       if (data.reportType === 'fitness') {
         box.innerHTML = renderFitnessSpecificReport(data);
@@ -1464,6 +1487,40 @@
 
     applyPaymentReturn();
     renderGeneratedReport();
+
+    /* 创作者访问码 —— 只记在内存里，刷新即失效；源码中不含明文码 */
+    var OWNER_CODE_HASH = '78e370b587b145920213731b7c7c725e512b3b6577c51c800218a7c764c532ae';
+    var ownerUnlocked = false;
+
+    async function ownerDigest(text) {
+      var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+      return Array.prototype.map.call(new Uint8Array(buf), function (b) {
+        return ('0' + b.toString(16)).slice(-2);
+      }).join('');
+    }
+
+    (function bindOwnerGate() {
+      var input = document.getElementById('ownerCode');
+      var btn = document.getElementById('ownerUnlock');
+      var msg = document.getElementById('ownerMsg');
+      if (!btn) return;
+      btn.addEventListener('click', async function () {
+        var code = (input && input.value || '').trim();
+        if (!code) { if (msg) msg.textContent = '请输入访问码'; return; }
+        var ok = false;
+        try { ok = (await ownerDigest(code)) === OWNER_CODE_HASH; } catch (e) {}
+        if (ok) {
+          ownerUnlocked = true;
+          if (msg) msg.textContent = '';
+          if (input) input.value = '';
+          renderGeneratedReport();
+        } else {
+          if (msg) msg.textContent = '访问码不正确';
+          if (input) { input.value = ''; input.focus(); }
+        }
+      });
+      if (input) input.addEventListener('keydown', function (e) { if (e.key === 'Enter') btn.click(); });
+    })();
   </script>
   <script src="../assets/i18n.js"></script>
 </body>
