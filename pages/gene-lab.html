@@ -573,7 +573,8 @@
           #panel-convert .conv-hint { font-size:12.5px; color:#8f9ca9; line-height:1.7; margin-top:8px; }
           #panel-convert .conv-hint b { color:#cfe7e9; font-weight:600; }
         </style>
-        <div class="panel-head"><div><h2>成分换算（23魔方 / 微基因 → G25）</h2><p>填报告里的百分比，点「计算 G25」就得到你的 25 维坐标；再点「填入目标样本」直接去第 ② 步比距离。</p></div></div>
+        <div class="panel-head"><div><h2>成分换算（23魔方 / 微基因 → G25）</h2><p>填报告里的百分比，点「计算 G25」就得到你的 25 维坐标；再点「填入目标样本」直接去第 ② 步比距离。</p>
+          <p class="conv-hint" style="margin:2px 0 0">注：<span id="convertModelNote">—</span></p></div></div>
         
         <div class="conv-toolbar">
           <select id="convertModel" style="width:auto;min-width:190px">
@@ -582,7 +583,7 @@
           </select>
           <button class="btn ghost" type="button" id="convertDemo">填示例</button>
           <button class="btn ghost" type="button" id="convertClear">清空</button>
-          <span class="meta-chip" id="convertModelNote">—</span>
+          
         </div>
                 
 
