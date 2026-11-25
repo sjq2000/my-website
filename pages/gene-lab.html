@@ -512,36 +512,52 @@
 
     <section class="lab-shell" aria-label="Global25 中文分析工作区">
       <div class="tab-list" role="tablist" aria-label="工具页签">
-        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="data">① 导入数据</button>
-        <button class="tab-button active" type="button" role="tab" aria-selected="true" data-tab="analyze">② 分析</button>
-        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="convert">③ 成分换算</button>
-        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="single">④ 成分拆解</button>
+        <button class="tab-button active" type="button" role="tab" aria-selected="true" data-tab="convert">① 成分换算</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="analyze">② 距离分析</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="single">③ 成分拆解</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="data">④ 数据导入</button>
       </div>
 
-      <div class="tab-panel" id="panel-data" role="tabpanel">
-        <div class="panel-head"><div><h2>导入数据</h2><p>有 CSV/TXT 就打开（每行：名称 + 25 个数字）；没有就跳过，用下面几页里内置的全球坐标库。</p></div><button class="btn primary" type="button" id="loadDemo">载入 25 维演示数据</button></div>
-        <div class="library-banner"><div><strong id="libraryBannerCount">正在载入全球 G25 坐标库…</strong><div>参考群体和目标样本页均可搜索并一键加入。</div></div><span id="libraryBannerSources">3 套数据源</span></div>
-        <div class="data-workspace">
-          <div class="file-sidebar">
-            <label class="btn file-button" style="width:100%">打开文件<input type="file" id="dataFiles" accept=".csv,.txt,text/csv,text/plain" multiple></label>
-            <button class="btn danger" type="button" id="removeDataFile" style="width:100%;margin-top:8px">移除当前文件</button>
-            <div class="file-list" id="dataFileList"><div class="empty-state" style="padding:22px 10px">尚未打开文件</div></div>
-          </div>
-          <div class="data-preview">
-            <div class="search-row"><input class="text-input" id="dataFilter" placeholder="输入名称筛选；空格=并且，?=或者，!=排除"><button class="btn ghost" type="button" id="resetFilter">清除</button></div>
-            <textarea id="dataPreview" readonly spellcheck="false" placeholder="打开文件后，筛选结果会显示在这里。"></textarea>
-            <div class="toolbar" style="margin-top:10px">
-              <select id="dataAddMode" style="width:auto;min-width:130px"><option value="append">追加到</option><option value="replace">替换到</option></select>
-              <button class="btn" type="button" data-add-to="source">参考群体</button><button class="btn" type="button" data-add-to="target">目标样本</button>
-            </div>
-            <div class="data-meta"><span class="meta-chip">筛选结果 <strong id="filteredCount">0</strong></span><span class="meta-chip">要求 <strong>名称 + 25 个坐标</strong></span></div>
-          </div>
+      <div class="tab-panel active" id="panel-convert" role="tabpanel">
+        <style>
+          #panel-convert .conv-toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:14px; }
+          #panel-convert .conv-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(146px,1fr)); gap:10px; margin-top:14px; }
+          #panel-convert .conv-item { display:flex; flex-direction:column; gap:5px; }
+          #panel-convert .conv-item label { font-size:12px; color:#8f9ca9; letter-spacing:.3px; }
+          #panel-convert .conv-item input { padding:8px 10px; border-radius:8px; }
+          #panel-convert .conv-out { min-height:150px; margin-top:10px; }
+          #panel-convert .conv-hint { font-size:12.5px; color:#8f9ca9; line-height:1.7; margin-top:8px; }
+          #panel-convert .conv-hint b { color:#cfe7e9; font-weight:600; }
+        </style>
+        <div class="panel-head"><div><h2>成分换算（23魔方 / 微基因 → G25）</h2><p>把常染成分百分比按基向量线性组合成 25 维坐标，可直接送入「目标样本」跑距离或拟合。</p></div></div>
+        <div class="conv-toolbar">
+          <select id="convertModel" style="width:auto;min-width:190px">
+            <option value="mofang">23魔方 · 12 项</option>
+            <option value="wegene">微基因 · 15 项</option>
+          </select>
+          <button class="btn ghost" type="button" id="convertDemo">填示例</button>
+          <button class="btn ghost" type="button" id="convertClear">清空</button>
+          <span class="meta-chip" id="convertModelNote">—</span>
         </div>
-        <div class="data-guide"><div><code>abc def</code>：同时包含 abc 和 def</div><div><code>abc ? def</code>：包含 abc 或 def</div><div><code>abc !def</code>：包含 abc 且排除 def</div><div><code>,abc</code>：名称以 abc 开头；<code>abc,</code>：名称以 abc 结尾</div></div>
-        <div class="note" style="margin-top:18px">演示数据为 25 维虚构坐标，只用于确认流程和算法，不代表真实族群。Global25 的每一维是 PCA 坐标轴，不是 25 个独立“血统百分比”。</div>
+        <div class="conv-grid" id="convertFields"></div>
+        <div class="conv-toolbar">
+          <input class="text-input" id="convertName" style="max-width:240px" placeholder="样本名" value="我的成分">
+          <button class="btn primary" type="button" id="convertRun">计算 G25</button>
+          <button class="btn" type="button" id="convertCopy">复制坐标</button>
+          <button class="btn" type="button" id="convertToTarget">填入目标样本</button>
+          <span class="meta-chip">成分合计 <strong id="convertSum">0</strong></span>
+        </div>
+        <div class="validation" id="convertMessage" aria-live="polite"></div>
+        <textarea id="convertOutput" class="conv-out" readonly spellcheck="false" placeholder="计算后显示：样本名 + 25 个坐标"></textarea>
+        <div class="conv-hint">
+          <b>算法：</b>G25 ＝ Σ（成分ᵢ ÷ 成分合计）× 基向量ᵢ，与你 23魔方/微基因 页面上的原始百分比不需要先加到 100，会自动归一。<br>
+          <b>23魔方：</b>12 项基向量由 58 个汉族锚点的 ridge 反推解出，与「全国334市 G25 反推版」同源。<br>
+          <b>微基因：</b>只取 15 个东亚标杆，其余 27 项按 0 处理；与完整 42 项的换算结果平均相差 0.005，最近族群排序基本一致。<br>
+          <b>注意：</b>成分体系由汉族锚点拟合，少数民族样本（藏、维、蒙等）换算后偏差会偏大，结果仅供参考。
+        </div>
       </div>
 
-      <div class="tab-panel active" id="panel-analyze" role="tabpanel">
+      <div class="tab-panel" id="panel-analyze" role="tabpanel">
         <div class="panel-head"><div><h2>分析</h2><p>三件事都在这一页：① 放你要分析的人　② 选用来比对的名单　③ 看结果。名单默认用内置的全球现代人群，不用自己加。</p></div></div>
 
         <div class="an-block">
@@ -619,44 +635,6 @@
           </section></details>
       </div>
 
-      <div class="tab-panel" id="panel-convert" role="tabpanel">
-        <style>
-          #panel-convert .conv-toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:14px; }
-          #panel-convert .conv-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(146px,1fr)); gap:10px; margin-top:14px; }
-          #panel-convert .conv-item { display:flex; flex-direction:column; gap:5px; }
-          #panel-convert .conv-item label { font-size:12px; color:#8f9ca9; letter-spacing:.3px; }
-          #panel-convert .conv-item input { padding:8px 10px; border-radius:8px; }
-          #panel-convert .conv-out { min-height:150px; margin-top:10px; }
-          #panel-convert .conv-hint { font-size:12.5px; color:#8f9ca9; line-height:1.7; margin-top:8px; }
-          #panel-convert .conv-hint b { color:#cfe7e9; font-weight:600; }
-        </style>
-        <div class="panel-head"><div><h2>成分换算（23魔方 / 微基因 → G25）</h2><p>把常染成分百分比按基向量线性组合成 25 维坐标，可直接送入「目标样本」跑距离或拟合。</p></div></div>
-        <div class="conv-toolbar">
-          <select id="convertModel" style="width:auto;min-width:190px">
-            <option value="mofang">23魔方 · 12 项</option>
-            <option value="wegene">微基因 · 15 项</option>
-          </select>
-          <button class="btn ghost" type="button" id="convertDemo">填示例</button>
-          <button class="btn ghost" type="button" id="convertClear">清空</button>
-          <span class="meta-chip" id="convertModelNote">—</span>
-        </div>
-        <div class="conv-grid" id="convertFields"></div>
-        <div class="conv-toolbar">
-          <input class="text-input" id="convertName" style="max-width:240px" placeholder="样本名" value="我的成分">
-          <button class="btn primary" type="button" id="convertRun">计算 G25</button>
-          <button class="btn" type="button" id="convertCopy">复制坐标</button>
-          <button class="btn" type="button" id="convertToTarget">填入目标样本</button>
-          <span class="meta-chip">成分合计 <strong id="convertSum">0</strong></span>
-        </div>
-        <div class="validation" id="convertMessage" aria-live="polite"></div>
-        <textarea id="convertOutput" class="conv-out" readonly spellcheck="false" placeholder="计算后显示：样本名 + 25 个坐标"></textarea>
-        <div class="conv-hint">
-          <b>算法：</b>G25 ＝ Σ（成分ᵢ ÷ 成分合计）× 基向量ᵢ，与你 23魔方/微基因 页面上的原始百分比不需要先加到 100，会自动归一。<br>
-          <b>23魔方：</b>12 项基向量由 58 个汉族锚点的 ridge 反推解出，与「全国334市 G25 反推版」同源。<br>
-          <b>微基因：</b>只取 15 个东亚标杆，其余 27 项按 0 处理；与完整 42 项的换算结果平均相差 0.005，最近族群排序基本一致。<br>
-          <b>注意：</b>成分体系由汉族锚点拟合，少数民族样本（藏、维、蒙等）换算后偏差会偏大，结果仅供参考。
-        </div>
-      </div>
       <div class="tab-panel" id="panel-single" role="tabpanel">
         <div class="panel-head"><div><h2>成分拆解</h2><p>把样本拆成参考人群的加权组合，百分比加起来 100%。先看一个样本用左边，想一次看全部点「一次看全部」。</p></div></div>
         <div class="seg" role="tablist" style="margin:6px 0 18px">
@@ -698,6 +676,36 @@
       
         </div>
       </div>
+
+      <div class="tab-panel" id="panel-data" role="tabpanel">
+        <div class="panel-head"><div><h2>导入数据</h2><p>有 CSV/TXT 就打开（每行：名称 + 25 个数字）；没有就跳过，用下面几页里内置的全球坐标库。</p></div><button class="btn primary" type="button" id="loadDemo">载入 25 维演示数据</button></div>
+        <div class="library-banner"><div><strong id="libraryBannerCount">正在载入全球 G25 坐标库…</strong><div>参考群体和目标样本页均可搜索并一键加入。</div></div><span id="libraryBannerSources">3 套数据源</span></div>
+        <div class="data-workspace">
+          <div class="file-sidebar">
+            <label class="btn file-button" style="width:100%">打开文件<input type="file" id="dataFiles" accept=".csv,.txt,text/csv,text/plain" multiple></label>
+            <button class="btn danger" type="button" id="removeDataFile" style="width:100%;margin-top:8px">移除当前文件</button>
+            <div class="file-list" id="dataFileList"><div class="empty-state" style="padding:22px 10px">尚未打开文件</div></div>
+          </div>
+          <div class="data-preview">
+            <div class="search-row"><input class="text-input" id="dataFilter" placeholder="输入名称筛选；空格=并且，?=或者，!=排除"><button class="btn ghost" type="button" id="resetFilter">清除</button></div>
+            <textarea id="dataPreview" readonly spellcheck="false" placeholder="打开文件后，筛选结果会显示在这里。"></textarea>
+            <div class="toolbar" style="margin-top:10px">
+              <select id="dataAddMode" style="width:auto;min-width:130px"><option value="append">追加到</option><option value="replace">替换到</option></select>
+              <button class="btn" type="button" data-add-to="source">参考群体</button><button class="btn" type="button" data-add-to="target">目标样本</button>
+            </div>
+            <div class="data-meta"><span class="meta-chip">筛选结果 <strong id="filteredCount">0</strong></span><span class="meta-chip">要求 <strong>名称 + 25 个坐标</strong></span></div>
+          </div>
+        </div>
+        <div class="data-guide"><div><code>abc def</code>：同时包含 abc 和 def</div><div><code>abc ? def</code>：包含 abc 或 def</div><div><code>abc !def</code>：包含 abc 且排除 def</div><div><code>,abc</code>：名称以 abc 开头；<code>abc,</code>：名称以 abc 结尾</div></div>
+        <div class="note" style="margin-top:18px">演示数据为 25 维虚构坐标，只用于确认流程和算法，不代表真实族群。Global25 的每一维是 PCA 坐标轴，不是 25 个独立“血统百分比”。</div>
+      </div>
+
+      
+
+      
+
+      
+      
 
     </section>
 
@@ -855,7 +863,7 @@
     const existing = targetInput.value.trim();
     targetInput.value = existing ? `${existing}\n${line}` : line;
     refreshData("target");
-    switchTab("target");
+    switchTab("analyze");
   });
 
   buildConvertFields();
@@ -895,10 +903,11 @@
     function refreshData(kind) {
       const input = kind === "source" ? sourceInput : targetInput, parsed = parseCoordinates(input.value);
       state[kind] = parsed.rows; state[`${kind}Error`] = parsed.issues.join("；");
-      document.getElementById(`${kind}Count`).textContent = parsed.rows.length;
-      document.getElementById(`${kind}Dims`).textContent = parsed.rows.length ? `${DIMENSIONS} / ${DIMENSIONS}` : "—";
-      document.getElementById(`${kind}Badge`).textContent = parsed.rows.length;
-      const validation = document.getElementById(`${kind}Validation`);
+      const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+      setText(`${kind}Count`, parsed.rows.length);
+      setText(`${kind}Dims`, parsed.rows.length ? `${DIMENSIONS} / ${DIMENSIONS}` : "—");
+      setText(`${kind}Badge`, parsed.rows.length);
+      const validation = document.getElementById(`${kind}Validation`) || { classList: { add(){}, remove(){} }, set className(v){}, get className(){return ""}, textContent: "" };
       if (parsed.issues.length) { validation.className = "validation"; validation.textContent = parsed.issues.slice(0, 4).join("；") + (parsed.issues.length > 4 ? `；另有 ${parsed.issues.length - 4} 项` : ""); }
       else if (parsed.rows.length) { validation.className = "validation ok"; validation.textContent = `已识别 ${parsed.rows.length} 个完整的 25 维样本`; }
       else { validation.className = "validation"; validation.textContent = ""; }
