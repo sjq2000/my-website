@@ -716,9 +716,10 @@
     function escapeHtml(value) { return String(value).replace(/[&<>'\"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[c])); }
     function formatNumber(value, digits = 8) { return Number(value).toFixed(digits); }
     function splitLine(line) {
-      if (line.includes(",")) return line.split(",").map(cell => cell.trim().replace(/^['\"]|['\"]$/g, ""));
-      if (line.includes("\t")) return line.split("\t").map(cell => cell.trim());
-      return line.trim().split(/\s+/);
+      const cleaned = line.replace(/[，、；;]/g, ",").replace(/\u3000/g, " ");
+      if (cleaned.includes(",")) return cleaned.split(",").map(cell => cell.trim().replace(/^['\"]|['\"]$/g, ""));
+      if (cleaned.includes("\t")) return cleaned.split("\t").map(cell => cell.trim());
+      return cleaned.trim().split(/\s+/);
     }
     function rowToLine(row) { return [row.name, ...row.values.map(value => Number(value).toFixed(6))].join(","); }
     function parseCoordinates(text) {
