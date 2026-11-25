@@ -551,7 +551,11 @@
         <div class="panel-head"><div><h2>我的样本</h2><p>这里是「要分析的人」。26 个数字一行：先名称，再 25 个坐标。多个样本就多行。</p></div><div class="toolbar"><label class="btn file-button">导入文件<input type="file" id="targetFile" accept=".csv,.txt,text/csv,text/plain"></label><button class="btn ghost" type="button" data-format="target">整理格式</button><button class="btn danger" type="button" data-clear="target">清空</button></div></div>
         <textarea id="targetInput" spellcheck="false" placeholder="目标样本名称,第1维,第2维,...,第25维"></textarea>
         <div class="data-meta"><span class="meta-chip">有效样本 <strong id="targetCount">0</strong></span><span class="meta-chip">坐标维度 <strong id="targetDims">—</strong></span></div><div class="validation" id="targetValidation" aria-live="polite"></div>
-        <details class="adv"><summary>从内置库里挑样本（可选）</summary><section class="sample-manager" aria-label="目标样本管理">
+        <div class="toolbar" style="margin:14px 0 4px">
+              <button class="btn primary" type="button" id="quickRun" style="font-size:15px;padding:12px 26px">开始分析</button>
+              <span class="meta-chip" id="quickHint">粘好坐标后点这里</span>
+            </div>
+            <details class="adv"><summary>从内置库里挑样本（可选）</summary><section class="sample-manager" aria-label="目标样本管理">
           <div class="sample-manager-head"><h3>搜索全球 G25 坐标库</h3><span id="targetLibrarySummary">正在载入…</span></div>
           <div class="library-search-row"><input class="text-input" id="targetLibrarySearch" placeholder="搜索 11,247 条数据；支持空格、?、! 组合筛选"><select id="targetLibrarySource"><option value="">全部数据源</option></select></div>
           <div class="validation" id="targetLibraryMessage" aria-live="polite"></div><div class="sample-list library-results" id="targetLibraryList"><div class="empty-state" style="padding:20px">坐标库载入后即可搜索</div></div>
@@ -861,6 +865,23 @@
     document.getElementById("fitOne").hidden = all;
     document.getElementById("fitAll").hidden = !all;
   }));
+
+  const quickRun = document.getElementById("quickRun");
+  if (quickRun) quickRun.addEventListener("click", () => {
+    const hint = document.getElementById("quickHint");
+    const tgt = document.getElementById("targetCount").textContent;
+    const src = document.getElementById("sourceCount").textContent;
+    if (tgt === "0") { hint.textContent = "上面还没读到样本：一行要「名字 + 25 个数字」"; return; }
+    if (src === "0") { hint.textContent = "参考名单还没载入，等两秒再点"; return; }
+    hint.textContent = "计算中…";
+    document.getElementById("runDistanceMode").click();
+    setTimeout(() => {
+      const out = document.getElementById("distanceResults");
+      if (out) out.scrollIntoView({ behavior: "smooth", block: "start" });
+      const err = out && out.querySelector(".empty-state");
+      hint.textContent = err ? ("没算出来：" + err.innerText.slice(0, 40)) : "算好了，结果在下面";
+    }, 900);
+  });
 
   function switchTab(name) {
       document.querySelectorAll(".tab-button").forEach(button => { const active = button.dataset.tab === name; button.classList.toggle("active", active); button.setAttribute("aria-selected", String(active)); });
