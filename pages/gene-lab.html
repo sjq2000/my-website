@@ -703,7 +703,6 @@
               <button class="seg-btn active" type="button" data-fitview="one">单样本拟合</button>
               <button class="seg-btn" type="button" data-fitview="all">多样本拟合</button>
             </div>
-            <p class="mode-help" id="fitModeHelp" hidden>一次把所有样本都拆开，结果排成一张对照表。</p>
 
             <div class="panel-head"><div><h2>我的样本</h2><p>26 个数字一行：先名称，再 25 个坐标。</p></div><div class="toolbar"><button class="btn ghost" type="button" id="fitFromConvert">从成分换算带过来</button><button class="btn ghost" type="button" id="fitFormatBtn">整理格式</button><button class="btn danger" type="button" id="fitClearInput">清空</button></div></div>
             <textarea id="fitInput" spellcheck="false" placeholder="例如：我的成分,0.0228,-0.4459,…,共 25 个数字"></textarea>
@@ -1057,8 +1056,6 @@
     const all = btn.dataset.fitview === "all";
     document.getElementById("fitOne").hidden = all;
     document.getElementById("fitAll").hidden = !all;
-    const modeHelp = document.getElementById("fitModeHelp");
-    if (modeHelp) modeHelp.hidden = !all;
   }));
 
   // ===== 付费解锁 =====
