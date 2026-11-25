@@ -491,202 +491,125 @@
 
   <main>
     <header class="page-header">
-      <div class="eyebrow">SJQ G25 Workbench</div>
-      <h1>基因<span>坐标实验室</span></h1>
-      <p>中文 Global25 坐标工作台：数据导入、参考与目标数据、基因距离、双目标比较、单样本拟合和多样本拟合。</p>
-      <div class="status-row"><span class="status-pill"><span class="status-dot"></span>严格校验 25 维</span><span class="status-pill secondary">本地计算 · 数据不上传</span></div>
+      <div class="eyebrow">SJQ · 祖源速查</div>
+      <h1>你是<span>哪里人</span></h1>
+      <p>把 23魔方 / 微基因 报告里的血统百分比填进来，就能看到你的基因坐标、南北位置，以及和你最接近的 15 个人群。全程在浏览器本地计算，数据不上传。</p>
+      <div class="status-row"><span class="status-pill"><span class="status-dot"></span>不用凑满 100，自动归一</span><span class="status-pill secondary">本地计算 · 数据不上传</span></div>
     </header>
+    <section class="lab-shell simple" aria-label="祖源速查">
+      <style>
+        .simple { display:block; width:100%; max-width:none; padding: 26px 30px 30px; }
+        .simple .step { display: flex; gap: 16px; padding: 22px 0; border-bottom: 1px solid rgba(255,255,255,.07); }
+        .simple .step:last-of-type { border-bottom: 0; }
+        .simple .step-n { flex: 0 0 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+                          background: rgba(67,216,210,.14); color: #43d8d2; font-weight: 800; font-size: 15px; }
+        .simple .step-body { flex: 1; min-width: 0; }
+        .simple h2 { font-size: 19px; margin-bottom: 6px; color: #e8f2f5; }
+        .simple p.lead { color: #8f9ca9; font-size: 13.5px; line-height: 1.75; margin-bottom: 14px; }
+        .simple .choice-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .simple .choice { padding: 11px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,.14);
+                          background: rgba(255,255,255,.03); color: #cfe0e6; font-weight: 700; cursor: pointer; }
+        .simple .choice.active { border-color: #43d8d2; background: rgba(67,216,210,.12); color: #9ef0ec; }
+        .simple .conv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 9px; }
+        .simple .conv-item { display: flex; flex-direction: column; gap: 4px; }
+        .simple .conv-item label { font-size: 11.5px; color: #8f9ca9; }
+        .simple .conv-item input { padding: 7px 9px; border-radius: 8px; }
+        .simple .row-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; align-items: center; }
+        .simple .verdict { border: 1px solid rgba(67,216,210,.22); background: linear-gradient(135deg, rgba(67,216,210,.09), rgba(255,255,255,.02));
+                           border-radius: 14px; padding: 18px 20px; margin-bottom: 18px; }
+        .simple .verdict-label { font-size: 12px; letter-spacing: 2px; color: #8f9ca9; }
+        .simple .verdict-name { font-size: 28px; font-weight: 800; color: #9ef0ec; margin: 6px 0 4px; }
+        .simple .verdict-sub { font-size: 13px; color: #8f9ca9; }
+        .simple .axis { margin: 6px 0 22px; }
+        .simple .axis-title { font-size: 13.5px; color: #cfe0e6; font-weight: 700; margin-bottom: 4px; }
+        .simple .axis-title span { font-weight: 400; color: #7f8c99; margin-left: 8px; font-size: 12px; }
+        .simple .axis-bar { position: relative; height: 10px; border-radius: 5px; margin: 26px 0 10px;
+                            background: linear-gradient(90deg, #6f8fd6, #43d8d2 46%, #e5b25d 74%, #d4654f); opacity: .85; }
+        .simple .axis-mark { position: absolute; top: -7px; width: 3px; height: 24px; background: #fff; border-radius: 2px; box-shadow: 0 0 0 3px rgba(255,255,255,.14); }
+        .simple .axis-scale { display: flex; justify-content: space-between; font-size: 11.5px; color: #7f8c99; }
+        .simple .axis-value { font-size: 13px; color: #cfe0e6; margin-top: 8px; }
+        .simple h3 { font-size: 15px; color: #cfe0e6; margin: 18px 0 10px; }
+        .simple .near-list { list-style: none; display: grid; gap: 7px; }
+        .simple .near-list li { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 9px;
+                                background: rgba(255,255,255,.03); font-size: 13.5px; }
+        .simple .near-list .rk { width: 22px; color: #5f6d7a; font-variant-numeric: tabular-nums; }
+        .simple .near-list .nm { flex: 1; color: #dfe9ee; }
+        .simple .near-list .ds { color: #43d8d2; font-variant-numeric: tabular-nums; font-size: 12.5px; }
+        .simple .near-list li:first-child { background: rgba(67,216,210,.1); }
+        .simple .more summary { cursor: pointer; color: #9ef0ec; font-size: 13.5px; margin: 16px 0 10px; }
+        .simple .hint { font-size: 12.5px; color: #7f8c99; line-height: 1.75; margin-top: 14px; }
+        .simple .msg { margin-top: 10px; font-size: 13px; color: #43d8d2; min-height: 20px; }
+      </style>
 
-    <section class="lab-shell" aria-label="Global25 中文分析工作区">
-      <div class="tab-list" role="tablist" aria-label="工具页签">
-        <button class="tab-button active" type="button" role="tab" aria-selected="true" data-tab="data">数据导入</button>
-        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="source">参考群体 <span id="sourceBadge">0</span></button>
-        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="target">目标样本 <span id="targetBadge">0</span></button>
-        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="convert">成分换算</button>
-        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="distance">基因距离</button>
-        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="single">单样本拟合</button>
-        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="multi">多样本拟合</button>
-      </div>
-
-      <div class="tab-panel active" id="panel-data" role="tabpanel">
-        <div class="panel-head"><div><h2>数据导入与筛选</h2><p>可同时打开多个 CSV/TXT 文件，筛选样本后追加或替换到参考群体与目标样本。</p></div><button class="btn primary" type="button" id="loadDemo">载入 25 维演示数据</button></div>
-        <div class="library-banner"><div><strong id="libraryBannerCount">正在载入全球 G25 坐标库…</strong><div>参考群体和目标样本页均可搜索并一键加入。</div></div><span id="libraryBannerSources">3 套数据源</span></div>
-        <div class="data-workspace">
-          <div class="file-sidebar">
-            <label class="btn file-button" style="width:100%">打开文件<input type="file" id="dataFiles" accept=".csv,.txt,text/csv,text/plain" multiple></label>
-            <button class="btn danger" type="button" id="removeDataFile" style="width:100%;margin-top:8px">移除当前文件</button>
-            <div class="file-list" id="dataFileList"><div class="empty-state" style="padding:22px 10px">尚未打开文件</div></div>
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-body">
+          <h2>你的数据来自哪家公司？</h2>
+          <p class="lead">两家报告里都有一页「祖源成分 / 血统比例」，把那里的百分比抄过来就行。没有的项留空。</p>
+          <div class="choice-row">
+            <button class="choice active" type="button" data-model="mofang">23魔方 · 12 项</button>
+            <button class="choice" type="button" data-model="wegene">微基因 · 15 项</button>
           </div>
-          <div class="data-preview">
-            <div class="search-row"><input class="text-input" id="dataFilter" placeholder="输入名称筛选；空格=并且，?=或者，!=排除"><button class="btn ghost" type="button" id="resetFilter">清除</button></div>
-            <textarea id="dataPreview" readonly spellcheck="false" placeholder="打开文件后，筛选结果会显示在这里。"></textarea>
-            <div class="toolbar" style="margin-top:10px">
-              <select id="dataAddMode" style="width:auto;min-width:130px"><option value="append">追加到</option><option value="replace">替换到</option></select>
-              <button class="btn" type="button" data-add-to="source">参考群体</button><button class="btn" type="button" data-add-to="target">目标样本</button>
-            </div>
-            <div class="data-meta"><span class="meta-chip">筛选结果 <strong id="filteredCount">0</strong></span><span class="meta-chip">要求 <strong>名称 + 25 个坐标</strong></span></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-body">
+          <h2>填百分比</h2>
+          <p class="lead">不用凑到 100，按报告上的数字填；差一点系统会自动归一。</p>
+          <div class="conv-grid" id="fields"></div>
+          <div class="row-actions">
+            <button class="btn ghost" type="button" id="demoBtn">用示例试试</button>
+            <button class="btn ghost" type="button" id="clearBtn">清空</button>
+            <button class="btn primary" type="button" id="calcBtn">看结果</button>
+            <span class="meta-chip">合计 <strong id="sumChip">0</strong></span>
           </div>
         </div>
-        <div class="data-guide"><div><code>abc def</code>：同时包含 abc 和 def</div><div><code>abc ? def</code>：包含 abc 或 def</div><div><code>abc !def</code>：包含 abc 且排除 def</div><div><code>,abc</code>：名称以 abc 开头；<code>abc,</code>：名称以 abc 结尾</div></div>
-        <div class="note" style="margin-top:18px">演示数据为 25 维虚构坐标，只用于确认流程和算法，不代表真实族群。Global25 的每一维是 PCA 坐标轴，不是 25 个独立“血统百分比”。</div>
       </div>
 
-      <div class="tab-panel" id="panel-source" role="tabpanel">
-        <div class="panel-head"><div><h2>参考群体（SOURCE）</h2><p>每行必须是名称加 25 个数值坐标，无表头。</p></div><div class="toolbar"><label class="btn file-button">导入文件<input type="file" id="sourceFile" accept=".csv,.txt,text/csv,text/plain"></label><button class="btn ghost" type="button" data-format="source">整理格式</button><button class="btn danger" type="button" data-clear="source">清空</button></div></div>
-        <textarea id="sourceInput" spellcheck="false" placeholder="参考群体名称,第1维,第2维,...,第25维"></textarea>
-        <div class="data-meta"><span class="meta-chip">有效样本 <strong id="sourceCount">0</strong></span><span class="meta-chip">坐标维度 <strong id="sourceDims">—</strong></span></div><div class="validation" id="sourceValidation" aria-live="polite"></div>
-        <section class="sample-manager" aria-label="参考群体样本管理">
-          <div class="sample-manager-head"><h3>搜索全球 G25 坐标库</h3><span id="sourceLibrarySummary">正在载入…</span></div>
-          <div class="library-search-row has-action"><input class="text-input" id="sourceLibrarySearch" placeholder="搜索 11,247 条数据；支持空格、?、! 组合筛选"><select id="sourceLibrarySource"><option value="">全部数据源</option></select><button class="btn primary" type="button" id="sourceAddAll" disabled>一键全选加入</button></div>
-          <p class="mode-help">不输入关键词时加入当前数据源的全部记录；输入关键词时加入全部搜索结果。同名记录会自动加来源后缀。</p>
-          <div class="validation" id="sourceLibraryMessage" aria-live="polite"></div><div class="sample-list library-results" id="sourceLibraryList"><div class="empty-state" style="padding:20px">坐标库载入后即可搜索</div></div>
-          <div class="library-divider"></div>
-          <div class="sample-manager-head"><h3>管理已选参考样本</h3><span>当前显示 <strong id="sourceVisibleCount">0</strong> 条</span></div>
-          <div class="search-row"><input class="text-input" id="sourceSearch" placeholder="搜索已选样本"><button class="btn danger" type="button" data-delete-filtered="source">删除搜索结果</button></div>
-          <div class="sample-add-row"><input class="text-input" id="sourceAddRow" placeholder="粘贴一整行：名称 + 25 个坐标"><button class="btn" type="button" data-add-row="source">新增参考样本</button></div>
-          <div class="validation" id="sourceManagerMessage" aria-live="polite"></div><div class="sample-list" id="sourceSampleList"><div class="empty-state" style="padding:20px">暂无参考样本</div></div>
-        </section>
-      </div>
-
-      <div class="tab-panel" id="panel-target" role="tabpanel">
-        <div class="panel-head"><div><h2>目标样本（TARGET）</h2><p>可放入一个或多个 25 维样本。</p></div><div class="toolbar"><label class="btn file-button">导入文件<input type="file" id="targetFile" accept=".csv,.txt,text/csv,text/plain"></label><button class="btn ghost" type="button" data-format="target">整理格式</button><button class="btn danger" type="button" data-clear="target">清空</button></div></div>
-        <textarea id="targetInput" spellcheck="false" placeholder="目标样本名称,第1维,第2维,...,第25维"></textarea>
-        <div class="data-meta"><span class="meta-chip">有效样本 <strong id="targetCount">0</strong></span><span class="meta-chip">坐标维度 <strong id="targetDims">—</strong></span></div><div class="validation" id="targetValidation" aria-live="polite"></div>
-        <section class="sample-manager" aria-label="目标样本管理">
-          <div class="sample-manager-head"><h3>搜索全球 G25 坐标库</h3><span id="targetLibrarySummary">正在载入…</span></div>
-          <div class="library-search-row"><input class="text-input" id="targetLibrarySearch" placeholder="搜索 11,247 条数据；支持空格、?、! 组合筛选"><select id="targetLibrarySource"><option value="">全部数据源</option></select></div>
-          <div class="validation" id="targetLibraryMessage" aria-live="polite"></div><div class="sample-list library-results" id="targetLibraryList"><div class="empty-state" style="padding:20px">坐标库载入后即可搜索</div></div>
-          <div class="library-divider"></div>
-          <div class="sample-manager-head"><h3>管理已选目标样本</h3><span>当前显示 <strong id="targetVisibleCount">0</strong> 条</span></div>
-          <div class="search-row"><input class="text-input" id="targetSearch" placeholder="搜索已选样本"><button class="btn danger" type="button" data-delete-filtered="target">删除搜索结果</button></div>
-          <div class="sample-add-row"><input class="text-input" id="targetAddRow" placeholder="粘贴一整行：名称 + 25 个坐标"><button class="btn" type="button" data-add-row="target">新增目标样本</button></div>
-          <div class="validation" id="targetManagerMessage" aria-live="polite"></div><div class="sample-list" id="targetSampleList"><div class="empty-state" style="padding:20px">暂无目标样本</div></div>
-        </section>
-      </div>
-
-      <div class="tab-panel" id="panel-convert" role="tabpanel">
-        <style>
-          #panel-convert .conv-toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:14px; }
-          #panel-convert .conv-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(146px,1fr)); gap:10px; margin-top:14px; }
-          #panel-convert .conv-item { display:flex; flex-direction:column; gap:5px; }
-          #panel-convert .conv-item label { font-size:12px; color:#8f9ca9; letter-spacing:.3px; }
-          #panel-convert .conv-item input { padding:8px 10px; border-radius:8px; }
-          #panel-convert .conv-out { min-height:150px; margin-top:10px; }
-          #panel-convert .conv-hint { font-size:12.5px; color:#8f9ca9; line-height:1.7; margin-top:8px; }
-          #panel-convert .conv-hint b { color:#cfe7e9; font-weight:600; }
-        </style>
-        <div class="panel-head"><div><h2>成分换算（23魔方 / 微基因 → G25）</h2><p>把常染成分百分比按基向量线性组合成 25 维坐标，可直接送入「目标样本」跑距离或拟合。</p></div></div>
-        <div class="conv-toolbar">
-          <select id="convertModel" style="width:auto;min-width:190px">
-            <option value="mofang">23魔方 · 12 项</option>
-            <option value="wegene">微基因 · 15 项</option>
-          </select>
-          <button class="btn ghost" type="button" id="convertDemo">填示例</button>
-          <button class="btn ghost" type="button" id="convertClear">清空</button>
-          <span class="meta-chip" id="convertModelNote">—</span>
+      <div class="step" id="resultStep" hidden>
+        <div class="step-n">3</div>
+        <div class="step-body">
+          <h2>结果</h2>
+          <div class="verdict">
+            <div class="verdict-label">你最像</div>
+            <div class="verdict-name" id="topName">—</div>
+            <div class="verdict-sub" id="topSub"></div>
+          </div>
+          <div class="axis">
+            <div class="axis-title">南北位置<span>左＝更北（西伯利亚）　右＝更南（东南亚）</span></div>
+            <div class="axis-bar"><span class="axis-mark" id="axisMark" style="left:50%"></span></div>
+            <div class="axis-scale"><span>鄂温克 0</span><span>马来 100</span></div>
+            <div class="axis-value" id="axisValue"></div>
+          </div>
+          <h3>最接近的 15 个人群</h3>
+          <ol class="near-list" id="nearList"></ol>
+          <details class="more">
+            <summary>最接近的 5 个古代样本</summary>
+            <ol class="near-list" id="ancientList"></ol>
+          </details>
+          <div class="row-actions">
+            <button class="btn" type="button" id="copyBtn">复制我的 G25 坐标</button>
+            <a class="btn ghost" href="gene-lab-pro.html">专业模式（拟合 / 自定义参考群体）</a>
+          </div>
+          <div class="msg" id="msg"></div>
+          <div class="hint">
+            距离数值越小越像，0.01 以内基本算同一类人群。<br>
+            结果只说明「基因坐标上像谁」，不等于民族或籍贯，也不构成医学结论。
+          </div>
         </div>
-        <div class="conv-grid" id="convertFields"></div>
-        <div class="conv-toolbar">
-          <input class="text-input" id="convertName" style="max-width:240px" placeholder="样本名" value="我的成分">
-          <button class="btn primary" type="button" id="convertRun">计算 G25</button>
-          <button class="btn" type="button" id="convertCopy">复制坐标</button>
-          <button class="btn" type="button" id="convertToTarget">填入目标样本</button>
-          <span class="meta-chip">成分合计 <strong id="convertSum">0</strong></span>
-        </div>
-        <div class="validation" id="convertMessage" aria-live="polite"></div>
-        <textarea id="convertOutput" class="conv-out" readonly spellcheck="false" placeholder="计算后显示：样本名 + 25 个坐标"></textarea>
-        <div class="conv-hint">
-          <b>算法：</b>G25 ＝ Σ（成分ᵢ ÷ 成分合计）× 基向量ᵢ，与你 23魔方/微基因 页面上的原始百分比不需要先加到 100，会自动归一。<br>
-          <b>23魔方：</b>12 项基向量由 58 个汉族锚点的 ridge 反推解出，与「全国334市 G25 反推版」同源。<br>
-          <b>微基因：</b>只取 15 个东亚标杆，其余 27 项按 0 处理；与完整 42 项的换算结果平均相差 0.005，最近族群排序基本一致。<br>
-          <b>注意：</b>成分体系由汉族锚点拟合，少数民族样本（藏、维、蒙等）换算后偏差会偏大，结果仅供参考。
-        </div>
-      </div>
-      <div class="tab-panel" id="panel-distance" role="tabpanel">
-        <div class="panel-head"><div><h2>基因距离（DISTANCE）</h2><p>计算单目标的 G25 欧氏距离，或比较两个目标相对每个参考群体的差值、比值与 D3。</p></div></div>
-        <div class="option-grid">
-          <div class="control"><label for="distanceMode">模式</label><select id="distanceMode"><option value="single">单目标距离</option><option value="difference">差值 AC − BC</option><option value="ratio">比值 AC ÷ BC</option><option value="d3">D3 (AC − BC) ÷ (AC + BC)</option></select></div>
-          <div class="control"><label for="distanceTop">最大输出数量</label><input class="number-input" id="distanceTop" type="number" min="1" value="25"></div>
-          <div class="control"><label for="distanceGradient">颜色渐变</label><select id="distanceGradient"><option value="yes">开启</option><option value="no">关闭</option></select></div>
-          <div class="control"><label for="distanceScale">距离显示</label><select id="distanceScale"><option value="1">原始距离</option><option value="100" selected>距离 × 100</option></select></div>
-          <div class="control"><label for="compareA">目标 A</label><select id="compareA"></select></div><div class="control"><label for="compareB">目标 B</label><select id="compareB"></select></div>
-          <div class="control"><label for="gradientFrom">渐变起点</label><input class="number-input" id="gradientFrom" type="number" step="0.01" min="0" value="0"></div>
-          <div class="control"><label for="gradientTo">渐变终点</label><input class="number-input" id="gradientTo" type="number" step="0.01" min="0" value="0.2"></div>
-        </div>
-        <div class="toolbar"><button class="btn primary" type="button" id="runDistanceMode">运行当前模式</button><button class="btn" type="button" id="runAllDistance">运行全部单目标</button><button class="btn ghost" type="button" id="copyDistance">复制结果</button><button class="btn danger" type="button" id="clearDistance">清空输出</button></div>
-        <div class="target-actions" id="distanceTargets"></div><p class="mode-help" id="distanceModeHelp">单目标模式：点击目标按钮或“运行全部单目标”。</p>
-        <div class="output-stack" id="distanceResults"><div class="empty-state">请先准备参考群体与目标样本。</div></div>
-      </div>
-
-      <div class="tab-panel" id="panel-single" role="tabpanel">
-        <div class="panel-head"><div><h2>单样本拟合（SINGLE）</h2><p>为一个目标寻找参考群体的非负加权组合。</p></div></div>
-        <div class="option-grid">
-          <div class="control"><label for="singleTarget">目标样本</label><select id="singleTarget"></select></div>
-          <div class="control"><label for="singleCycles">计算轮次</label><select id="singleCycles"><option value="0.25">0.25×</option><option value="1" selected>1×</option><option value="4">4×</option></select></div>
-          <div class="control"><label for="singleReduce">限制成分数</label><select id="singleReduce"><option value="0">不限制</option><option value="2">2P</option><option value="3">3P</option><option value="4">4P</option><option value="5">5P</option><option value="6">6P</option></select></div>
-          <div class="control"><label for="singleAdc">距离附加列 ADC</label><select id="singleAdc"><option value="0">关闭</option><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1">1×</option></select></div>
-          <div class="control"><label for="singleRecalc">ADC 后重算</label><select id="singleRecalc"><option value="yes">是</option><option value="no">否</option></select></div>
-          <div class="control"><label for="singleZeros">显示零值</label><select id="singleZeros"><option value="no">否</option><option value="yes">是</option></select></div>
-          <div class="control"><label for="singleAggregate">按冒号前名称合并</label><select id="singleAggregate"><option value="yes">是</option><option value="no">否</option></select></div>
-          <div class="control"><label for="singleBars">条形图</label><select id="singleBars"><option value="1">模式 1</option><option value="2">模式 2</option><option value="0">关闭</option></select></div>
-        </div>
-        <div class="toolbar"><button class="btn primary" type="button" id="runSingle">运行当前目标</button><button class="btn" type="button" id="runAllSingle">运行全部目标</button><button class="btn ghost" type="button" id="copySingle">复制结果</button><button class="btn danger" type="button" id="clearSingle">清空输出</button></div>
-        <div class="target-actions" id="singleTargets"></div><div class="output-stack" id="singleResults"><div class="empty-state">选择目标样本并开始拟合。</div></div>
-      </div>
-
-      <div class="tab-panel" id="panel-multi" role="tabpanel">
-        <div class="panel-head"><div><h2>多样本拟合（MULTI）</h2><p>批量拟合所有目标，并生成参考成分 × 目标样本对照表。</p></div></div>
-        <div class="option-grid">
-          <div class="control"><label for="multiCycles">计算轮次</label><select id="multiCycles"><option value="0.25">0.25×</option><option value="1" selected>1×</option><option value="4">4×</option></select></div>
-          <div class="control"><label for="multiFast">快速模式</label><select id="multiFast"><option value="no">否</option><option value="yes">是</option></select></div>
-          <div class="control"><label for="multiAdc">距离附加列 ADC</label><select id="multiAdc"><option value="0">关闭</option><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1">1×</option></select></div>
-          <div class="control"><label for="multiRecalc">ADC 后重算</label><select id="multiRecalc"><option value="yes">是</option><option value="no">否</option></select></div>
-          <div class="control"><label for="multiZeros">显示零值</label><select id="multiZeros"><option value="no">否</option><option value="yes">是</option></select></div>
-          <div class="control"><label for="multiAggregate">按冒号前名称合并</label><select id="multiAggregate"><option value="yes">是</option><option value="no">否</option></select></div>
-        </div>
-        <div class="toolbar"><button class="btn primary" type="button" id="runMulti">运行批量分析</button><button class="btn ghost" type="button" id="copyMultiCsv">复制 CSV</button><button class="btn ghost" type="button" id="copyMultiTsv">复制 TSV</button><button class="btn danger" type="button" id="clearMulti">清空输出</button></div>
-        <div id="multiResults"><div class="empty-state" style="margin-top:22px">至少需要一个参考群体和一个目标样本。</div></div>
       </div>
     </section>
 
-    <aside class="science-note"><h3>25 个坐标是什么</h3><p>Global25 的 25 个数值是样本在 25 条主成分轴上的位置。单个维度没有固定的“某族血统”含义；结果只能结合相同缩放方式和同一参考面板解释。距离是坐标空间的相似度，拟合比例是数学近似，不等于族源证明、亲缘鉴定或医学诊断。</p></aside>
+    <aside class="science-note"><h3>这些结果是什么</h3><p>Global25 的 25 个数值是样本在 25 条主成分轴上的位置，单个维度没有「某族血统」的含义。这里的换算只是把你报告里的成分按固定权重合成坐标，结果只能和同一套坐标体系比较，不等于民族鉴定、亲缘鉴定或医学结论。</p></aside>
   </main>
-  <footer>© 2025 【SJQ】身体数据实验室 · G25 Workbench 在浏览器本地运行</footer>
+  <footer>© 2025 【SJQ】身体数据实验室 · 祖源速查 在浏览器本地运行</footer>
+<script>
+  const ACCESS_SESSION_KEY = "sjq-lab-access";
+  let libraryLoadStarted = false;
 
-  <script>
-    const DIMENSIONS = 25;
-    const state = { source: [], target: [], sourceError: "", targetError: "", files: [], activeFile: -1, filteredLines: [], library: { loading: true, rows: [], sources: [], total: 0 }, distanceBlocks: [], distanceText: [], singleBlocks: [], singleText: [], multiCsv: "", multiTsv: "" };
-    const ACCESS_SESSION_KEY = "sjq-g25-access";
-    let libraryLoadStarted = false;
-    const sourceInput = document.getElementById("sourceInput");
-    const targetInput = document.getElementById("targetInput");
-
-    function escapeHtml(value) { return String(value).replace(/[&<>'\"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[c])); }
-    function formatNumber(value, digits = 8) { return Number(value).toFixed(digits); }
-    function splitLine(line) {
-      if (line.includes(",")) return line.split(",").map(cell => cell.trim().replace(/^['\"]|['\"]$/g, ""));
-      if (line.includes("\t")) return line.split("\t").map(cell => cell.trim());
-      return line.trim().split(/\s+/);
-    }
-    function rowToLine(row) { return [row.name, ...row.values.map(value => Number(value).toFixed(6))].join(","); }
-    function parseCoordinates(text) {
-      const rows = [], issues = [], names = new Set();
-      text.split(/\r?\n/).forEach((raw, index) => {
-        const line = raw.trim();
-        if (!line || line.startsWith("#") || line.startsWith(",")) return;
-        const cells = splitLine(line), name = String(cells.shift() || "").trim(), values = cells.map(Number);
-        if (!name || values.some(value => !Number.isFinite(value))) {
-          const header = index === 0 && values.every(value => !Number.isFinite(value));
-          if (!header) issues.push(`第 ${index + 1} 行包含无效名称或数值`);
-          return;
-        }
-        if (values.length !== DIMENSIONS) { issues.push(`第 ${index + 1} 行有 ${values.length} 个坐标，必须是 ${DIMENSIONS} 个`); return; }
-        if (names.has(name)) issues.push(`样本名“${name}”重复`);
-        names.add(name); rows.push({ name, values, line: [name, ...values].join(","), lineIndex: index });
-      });
-      return { rows, issues, dims: rows.length ? DIMENSIONS : 0 };
-    }
-  // ===== 成分 → G25 换算 =====
+  // ===== 成分 → G25 基向量 =====
   const COMPONENT_MODELS = {
     mofang: { label: "23魔方 · 12 项", note: "12 个基向量，成分和自动归一", items: [
     ["北汉",[0.023487,-0.448447,0.010820,-0.063287,0.046163,0.018371,0.004782,0.001798,-0.012280,0.004908,-0.081508,-0.010178,0.011447,-0.007216,-0.008534,-0.001013,0.001702,-0.000016,-0.002897,-0.008495,0.012009,0.006010,0.009725,0.000656,0.000515]],
@@ -721,406 +644,230 @@
   ] }
   };
 
-  const convertModelSelect = document.getElementById("convertModel");
-  const convertFields = document.getElementById("convertFields");
-  const convertOutput = document.getElementById("convertOutput");
-  const convertMessage = document.getElementById("convertMessage");
+  const PROV = {Shandong:"山东",Henan:"河南",Hebei:"河北",Shanxi:"山西",Shaanxi:"陕西",Gansu:"甘肃",Qinghai:"青海",
+    Liaoning:"辽宁",Jilin:"吉林",Heilongjiang:"黑龙江",Inner_Mongolia:"内蒙古",Beijing:"北京",Tianjin:"天津",
+    Shanghai:"上海",Chongqing:"重庆",Jiangsu:"江苏",Zhejiang:"浙江",Anhui:"安徽",Fujian:"福建",Jiangxi:"江西",
+    Hubei:"湖北",Hunan:"湖南",Guangdong:"广东",Guangxi:"广西",Sichuan:"四川",Guizhou:"贵州",Yunnan:"云南",
+    Xinjiang:"新疆",Ningxia:"宁夏",Tibet:"西藏",Hainan:"海南",Taiwan:"台湾",Hongkong:"香港",Macau:"澳门"};
+  const ETH = {Han:"汉族",Manchu:"满族",Mongol:"蒙古族",Korean:"朝鲜族",Japanese:"日本人",Vietnamese:"越南人",
+    Kinh:"京族",Tibetan:"藏族",Baima:"藏族",Uyghur:"维吾尔族",Kazakh:"哈萨克族",Kyrgyz:"柯尔克孜族",
+    Zhuang:"壮族",Dai:"傣族",Miao:"苗族",Hmong:"苗族",Yao:"瑶族",Hui:"回族",She:"畲族",Tujia:"土家族",
+    Yi:"彝族",Bai:"白族",Naxi:"纳西族",Lahu:"拉祜族",Hani:"哈尼族",Lisu:"傈僳族",Qiang:"羌族",Dong:"侗族",
+    Bouyei:"布依族",Sui:"水族",Gelao:"仡佬族",Xibe:"锡伯族",Daur:"达斡尔族",Oroqen:"鄂伦春族",Hezhen:"赫哲族",
+    Evenk:"鄂温克族",Yakut:"雅库特人",Buryat:"布里亚特人",Nivkh:"尼夫赫人",Malay:"马来人",Onge:"安达曼人",
+    Thai:"泰国人",Cambodian:"柬埔寨人",Burmese:"缅甸人",Nepali:"尼泊尔人",Bengali:"孟加拉人",Sindhi:"信德人",
+    Punjabi:"旁遮普人",Tamil:"泰米尔人",Telugu:"泰卢固人",Gujarati:"古吉拉特人",Marathi:"马拉地人",
+    Pashtun:"普什图人",Persian:"波斯人",Mongolian:"蒙古国蒙古人"};
 
-  function currentConvertModel() { return COMPONENT_MODELS[convertModelSelect.value]; }
-
-  function buildConvertFields() {
-    const model = currentConvertModel();
-    convertFields.innerHTML = model.items.map(([label], index) =>
-      `<div class="conv-item"><label>${escapeHtml(label)}</label>` +
-      `<input class="text-input" type="number" min="0" step="0.01" inputmode="decimal" data-conv-index="${index}" placeholder="0"></div>`
-    ).join("");
-    document.getElementById("convertModelNote").textContent = model.note;
-    document.getElementById("convertSum").textContent = "0";
-    convertOutput.value = "";
-    convertMessage.textContent = "";
-    convertMessage.className = "validation";
-  }
-
-  function readConvertValues() {
-    const model = currentConvertModel();
-    return [...convertFields.querySelectorAll("[data-conv-index]")].map(input => {
-      const value = parseFloat(input.value);
-      return Number.isFinite(value) && value > 0 ? value : 0;
-    }).slice(0, model.items.length);
-  }
-
-  function computeConvert() {
-    const model = currentConvertModel();
-    const values = readConvertValues();
-    const sum = values.reduce((a, b) => a + b, 0);
-    document.getElementById("convertSum").textContent = sum.toFixed(2);
-    if (!(sum > 0)) {
-      convertMessage.className = "validation";
-      convertMessage.textContent = "请至少填写一个大于 0 的成分。";
-      convertOutput.value = "";
-      return null;
+  function prettyName(raw) {
+    const name = String(raw).replace(/\(n=[\d,]+\)$/, "").replace(/_o\d*$/, "");
+    const parts = name.split("_");
+    const first = parts[0];
+    const ethName = ETH[first];
+    const provName = PROV[first];
+    if (first === "Han") {
+      const prov = PROV[parts[1]] || parts[1] || "";
+      return prov ? `汉族 · ${prov}` : "汉族";
     }
-    const g25 = new Array(25).fill(0);
-    values.forEach((value, index) => {
-      if (!value) return;
-      const vector = model.items[index][1];
-      const weight = value / sum;
-      for (let dim = 0; dim < 25; dim += 1) g25[dim] += weight * vector[dim];
-    });
-    const rawName = (document.getElementById("convertName").value || "成分样本").trim();
-    const name = rawName.replace(/[\s,，]+/g, "_") || "成分样本";
-    const line = [name, ...g25.map(x => x.toFixed(6))].join(",");
-    convertOutput.value = line;
-    convertMessage.className = "validation ok";
-    convertMessage.textContent = `已换算：成分和 ${sum.toFixed(2)}，归一化后加权 25 维。`;
-    return line;
+    if (ethName) {
+      const prov = parts.slice(1).map(x => PROV[x]).filter(Boolean)[0];
+      return prov ? `${ethName} · ${prov}` : ethName;
+    }
+    if (provName) return `${provName}人`;
+    return name.replace(/_/g, " ");
   }
 
-  convertModelSelect.addEventListener("change", buildConvertFields);
-  document.getElementById("convertClear").addEventListener("click", buildConvertFields);
-  document.getElementById("convertDemo").addEventListener("click", () => {
-    const demo = convertModelSelect.value === "wegene"
-      ? { "北方汉族": 52, "南方汉族": 22, "蒙古语族群": 9, "通古斯": 4, "藏族": 3, "纳西/彝族": 2.5, "苗瑶": 2, "畲族": 1, "高山族群": 0.8, "傣族": 0.8, "拉祜族": 0.3, "维吾尔族": 0.5, "韩国人": 0.6, "日本人": 0.3, "雅库特": 0.2 }
-      : { "北汉": 62, "南汉": 24, "藏缅": 3.5, "傣": 1.2, "苗瑶": 2.4, "朝鲜": 2.2, "蒙通": 2.6, "拉祜": 0.4, "维吾尔": 0.5, "日本": 0.2, "雅库特": 0.2, "布里亚特": 0.1 };
-    const model = currentConvertModel();
-    model.items.forEach(([label], index) => {
-      const input = convertFields.querySelector(`[data-conv-index="${index}"]`);
+  function prettyAncient(raw) {
+    const name = String(raw).replace(/\(n=[\d,]+\)$/, "");
+    const parts = name.split("_");
+    if (parts[0] === "China") {
+      const prov = PROV[parts[1]] || parts[1];
+      const DYN = {Longshan:"龙山",Yangshao:"仰韶",Neolithic:"新石器",Bronze:"青铜",Iron:"铁器",
+        Zhou:"周",Han:"汉",Ming:"明",Qing:"清",Tang:"唐",Song:"宋",Yuan:"元",Jin:"金",
+        Eastern:"东",Western:"西",Northern:"北",Southern:"南",Warring:"战国",Spring:"春秋",
+        Autumn:"",States:"",and:"",Period:"",Dynasty:"",Modern:"近现代",Medieval:"中世纪",HP:"",IA:"",LBA:"",LBIA:"",LN:"",N:""};
+      let dyn = "";
+      for (const p of parts.slice(2)) {
+        if (/^(LN|LBA|LBIA|IA|EN|MN|CA|BA|EBA|MBA|LIA|HP|EP|MP|LP)$/.test(p)) continue;
+        const cn = DYN[p];
+        if (cn !== undefined) dyn += cn;
+        else if (!dyn) continue;
+        else break;
+      }
+      return `${prov} · ${dyn || "古代"}`;
+    }
+    const ethName = ETH[parts[0]];
+    if (ethName) return `${ethName} · 古代`;
+    return name.replace(/_/g, " ");
+  }
+
+  const state = { model: "mofang", library: null, lastG25: null, axisEnds: null };
+
+  const fieldsEl = document.getElementById("fields");
+  const resultStep = document.getElementById("resultStep");
+
+  function buildFields() {
+    const model = COMPONENT_MODELS[state.model];
+    fieldsEl.innerHTML = model.items.map(([label], i) =>
+      `<div class="conv-item"><label>${label}</label><input class="text-input" type="number" min="0" step="0.01" inputmode="decimal" data-i="${i}" placeholder="0"></div>`
+    ).join("");
+    document.getElementById("sumChip").textContent = "0";
+    resultStep.hidden = true;
+  }
+
+  document.querySelectorAll(".choice").forEach(btn => btn.addEventListener("click", () => {
+    document.querySelectorAll(".choice").forEach(b => b.classList.toggle("active", b === btn));
+    state.model = btn.dataset.model;
+    buildFields();
+  }));
+
+  document.getElementById("clearBtn").addEventListener("click", buildFields);
+
+  document.getElementById("demoBtn").addEventListener("click", () => {
+    const demo = state.model === "wegene"
+      ? {"北方汉族":52,"南方汉族":22,"蒙古语族群":9,"通古斯":4,"藏族":3,"纳西/彝族":2.5,"苗瑶":2,"畲族":1,"高山族群":0.8,"傣族":0.8,"拉祜族":0.3,"维吾尔族":0.5,"韩国人":0.6,"日本人":0.3,"雅库特":0.2}
+      : {"北汉":62,"南汉":24,"藏缅":3.5,"傣":1.2,"苗瑶":2.4,"朝鲜":2.2,"蒙通":2.6,"拉祜":0.4,"维吾尔":0.5,"日本":0.2,"雅库特":0.2,"布里亚特":0.1};
+    const model = COMPONENT_MODELS[state.model];
+    model.items.forEach(([label], i) => {
+      const input = fieldsEl.querySelector(`[data-i="${i}"]`);
       if (input) input.value = demo[label] !== undefined ? demo[label] : "";
     });
-    computeConvert();
-  });
-  document.getElementById("convertRun").addEventListener("click", computeConvert);
-  document.getElementById("convertCopy").addEventListener("click", async () => {
-    const line = convertOutput.value || computeConvert();
-    if (!line) return;
-    try { await navigator.clipboard.writeText(line); convertMessage.className = "validation ok"; convertMessage.textContent = "已复制到剪贴板。"; }
-    catch { convertOutput.select(); convertMessage.className = "validation"; convertMessage.textContent = "浏览器不允许自动复制，已选中文本，请手动复制。"; }
-  });
-  document.getElementById("convertToTarget").addEventListener("click", () => {
-    const line = convertOutput.value || computeConvert();
-    if (!line) return;
-    const existing = targetInput.value.trim();
-    targetInput.value = existing ? `${existing}\n${line}` : line;
-    refreshData("target");
-    switchTab("target");
+    run();
   });
 
-  buildConvertFields();
+  function computeG25() {
+    const model = COMPONENT_MODELS[state.model];
+    const inputs = [...fieldsEl.querySelectorAll("[data-i]")];
+    const values = inputs.map(el => { const v = parseFloat(el.value); return Number.isFinite(v) && v > 0 ? v : 0; });
+    const sum = values.reduce((a, b) => a + b, 0);
+    document.getElementById("sumChip").textContent = sum.toFixed(2);
+    if (!(sum > 0)) return null;
+    const g = new Array(25).fill(0);
+    values.forEach((v, i) => { if (!v) return; const vec = model.items[i][1], w = v / sum;
+      for (let k = 0; k < 25; k += 1) g[k] += w * vec[k]; });
+    return g;
+  }
 
-    function switchTab(name) {
-      document.querySelectorAll(".tab-button").forEach(button => { const active = button.dataset.tab === name; button.classList.toggle("active", active); button.setAttribute("aria-selected", String(active)); });
-      document.querySelectorAll(".tab-panel").forEach(panel => panel.classList.toggle("active", panel.id === `panel-${name}`));
-    }
-    document.querySelectorAll(".tab-button").forEach(button => button.addEventListener("click", () => switchTab(button.dataset.tab)));
-    const menuToggle = document.querySelector(".menu-toggle");
-    menuToggle.addEventListener("click", () => { const open = document.querySelector(".nav-links").classList.toggle("open"); menuToggle.setAttribute("aria-expanded", String(open)); });
+  function dist(a, b) { let s = 0; for (let i = 0; i < 25; i += 1) { const d = a[i] - b[i]; s += d * d; } return Math.sqrt(s); }
 
-    function refreshData(kind) {
-      const input = kind === "source" ? sourceInput : targetInput, parsed = parseCoordinates(input.value);
-      state[kind] = parsed.rows; state[`${kind}Error`] = parsed.issues.join("；");
-      document.getElementById(`${kind}Count`).textContent = parsed.rows.length;
-      document.getElementById(`${kind}Dims`).textContent = parsed.rows.length ? `${DIMENSIONS} / ${DIMENSIONS}` : "—";
-      document.getElementById(`${kind}Badge`).textContent = parsed.rows.length;
-      const validation = document.getElementById(`${kind}Validation`);
-      if (parsed.issues.length) { validation.className = "validation"; validation.textContent = parsed.issues.slice(0, 4).join("；") + (parsed.issues.length > 4 ? `；另有 ${parsed.issues.length - 4} 项` : ""); }
-      else if (parsed.rows.length) { validation.className = "validation ok"; validation.textContent = `已识别 ${parsed.rows.length} 个完整的 25 维样本`; }
-      else { validation.className = "validation"; validation.textContent = ""; }
-      renderSampleManager(kind);
-      refreshTargetControls();
+  function nearest(g, rows, limit, dedupe) {
+    const scored = rows.map(row => ({ name: row.name, label: prettyName(row.name), d: dist(g, row.values) }));
+    scored.sort((a, b) => a.d - b.d);
+    if (!dedupe) return scored.slice(0, limit);
+    const seen = new Set(), out = [];
+    for (const row of scored) {
+      if (seen.has(row.label)) continue;
+      seen.add(row.label); out.push(row);
+      if (out.length >= limit) break;
     }
-    sourceInput.addEventListener("input", () => refreshData("source")); targetInput.addEventListener("input", () => refreshData("target"));
-    function requireData() {
-      if (!state.source.length) return "请先加入至少一个有效的 25 维参考群体。";
-      if (!state.target.length) return "请先加入至少一个有效的 25 维目标样本。";
-      if (state.sourceError || state.targetError) return "数据仍有格式问题，请先修正红色提示。";
-      return "";
-    }
-    function euclidean(a, b) { let sum = 0; for (let i = 0; i < a.length; i++) { const d = a[i] - b[i]; sum += d * d; } return Math.sqrt(sum); }
+    return out;
+  }
 
-    document.querySelectorAll("[data-clear]").forEach(button => button.addEventListener("click", () => { const kind = button.dataset.clear; (kind === "source" ? sourceInput : targetInput).value = ""; refreshData(kind); }));
-    document.querySelectorAll("[data-format]").forEach(button => button.addEventListener("click", () => { const kind = button.dataset.format, input = kind === "source" ? sourceInput : targetInput, parsed = parseCoordinates(input.value); if (parsed.rows.length) input.value = parsed.rows.map(rowToLine).join("\n"); refreshData(kind); }));
-    function bindSimpleFile(id, kind) { document.getElementById(id).addEventListener("change", async event => { const file = event.target.files[0]; if (!file) return; (kind === "source" ? sourceInput : targetInput).value = await file.text(); refreshData(kind); event.target.value = ""; }); }
-    bindSimpleFile("sourceFile", "source"); bindSimpleFile("targetFile", "target");
+  function axisPosition(g) {
+    const ends = state.axisEnds;
+    if (!ends) return null;
+    const dv = ends.dv, dd = ends.dd;
+    let t = 0;
+    for (let i = 0; i < 25; i += 1) t += (g[i] - ends.evenk[i]) * dv[i];
+    return Math.max(0, Math.min(100, t / dd * 100));
+  }
 
-    function managerMessage(kind, text, ok = false) {
-      const element = document.getElementById(`${kind}ManagerMessage`); element.className = ok ? "validation ok" : "validation"; element.textContent = text;
+  function renderList(el, rows) {
+    el.innerHTML = rows.map((row, i) => `<li><span class="rk">${i + 1}</span><span class="nm">${row.label || prettyName(row.name)}</span><span class="ds">${row.d.toFixed(4)}</span></li>`).join("");
+  }
+
+  function run() {
+    const g = computeG25();
+    const msg = document.getElementById("msg");
+    if (!g) { resultStep.hidden = false; msg.textContent = "请至少填一个大于 0 的成分。"; return; }
+    if (!state.library) { resultStep.hidden = false; msg.textContent = "坐标库还在载入，请稍等两秒再点一次。"; return; }
+    state.lastG25 = g;
+    msg.textContent = "";
+    const modern = nearest(g, state.library.modern, 15, true);
+    const ancient = nearest(g, state.library.ancient, 5, true).map(r => ({ ...r, label: prettyAncient(r.name) }));
+    const axis = axisPosition(g);
+
+    document.getElementById("topName").textContent = modern[0].label;
+    document.getElementById("topSub").textContent = `距离 ${modern[0].d.toFixed(4)}　·　第二名 ${modern[1].label}（${modern[1].d.toFixed(4)}）`;
+    renderList(document.getElementById("nearList"), modern);
+    renderList(document.getElementById("ancientList"), ancient);
+
+    if (axis !== null) {
+      document.getElementById("axisMark").style.left = Math.max(2, Math.min(98, axis)) + "%";
+      document.getElementById("axisValue").textContent = `你的南北坐标 ${axis.toFixed(2)}（0 最北 · 100 最南；中国汉族多在 62–88 之间）`;
     }
-    function libraryMessage(kind, text, ok = false) {
-      const element = document.getElementById(`${kind}LibraryMessage`); element.className = ok ? "validation ok" : "validation"; element.textContent = text;
-    }
-    function populateLibrarySourceOptions(kind) {
-      const select = document.getElementById(`${kind}LibrarySource`), previous = select.value;
-      select.innerHTML = `<option value="">全部数据源（${state.library.total.toLocaleString("zh-CN")}）</option>` + state.library.sources.map(source => `<option value="${escapeHtml(source.id)}">${escapeHtml(source.label)}（${source.count.toLocaleString("zh-CN")}）</option>`).join("");
-      if ([...select.options].some(option => option.value === previous)) select.value = previous;
-    }
-    function renderLibraryResults(kind) {
-      const search = document.getElementById(`${kind}LibrarySearch`), sourceSelect = document.getElementById(`${kind}LibrarySource`), list = document.getElementById(`${kind}LibraryList`), summary = document.getElementById(`${kind}LibrarySummary`);
-      const addAllButton = kind === "source" ? document.getElementById("sourceAddAll") : null;
-      if (state.library.loading) { summary.textContent = "正在载入…"; if (addAllButton) addAllButton.disabled = true; return; }
-      if (!state.library.rows.length) { summary.textContent = "载入失败"; if (addAllButton) addAllButton.disabled = true; list.innerHTML = '<div class="empty-state" style="padding:20px">坐标库暂时无法载入</div>'; return; }
-      const query = search.value.trim(), sourceId = sourceSelect.value;
-      const matches = state.library.rows.filter(row => (!sourceId || row.sourceId === sourceId) && matchesFilter(row.name, query)), visible = matches.slice(0, 200);
-      if (addAllButton) { addAllButton.disabled = !matches.length; addAllButton.textContent = `一键全选加入（${matches.length.toLocaleString("zh-CN")}）`; }
-      if (!query) { summary.textContent = `共 ${matches.length.toLocaleString("zh-CN")} 条`; list.innerHTML = '<div class="empty-state" style="padding:20px">输入名称可搜索；也可以一键加入当前数据源的全部记录</div>'; return; }
-      summary.textContent = matches.length > 200 ? `找到 ${matches.length.toLocaleString("zh-CN")} 条，显示前 200 条` : `找到 ${matches.length.toLocaleString("zh-CN")} 条`;
-      if (!visible.length) { list.innerHTML = '<div class="empty-state" style="padding:20px">没有匹配的数据</div>'; return; }
-      list.innerHTML = visible.map(row => `<article class="sample-item"><div><strong>${escapeHtml(row.name)}</strong><small>${row.values.slice(0,4).map(value => Number(value).toFixed(6)).join(", ")} … 共 25 维</small><span class="source-chip">${escapeHtml(row.sourceLabel)}</span></div><button class="sample-add" type="button" data-library-add="${row.index}">添加</button></article>`).join("");
-      list.querySelectorAll("[data-library-add]").forEach(button => button.addEventListener("click", () => addLibrarySample(kind, Number(button.dataset.libraryAdd))));
-    }
-    function addLibrarySample(kind, index) {
-      const libraryRow = state.library.rows[index];
-      if (!libraryRow) { libraryMessage(kind, "没有找到该坐标记录。"); return; }
-      if (state[kind].some(row => row.name === libraryRow.name)) { libraryMessage(kind, `“${libraryRow.name}”已经在已选样本中。`); return; }
-      const input = kind === "source" ? sourceInput : targetInput, line = rowToLine(libraryRow);
-      input.value = input.value.trim() ? `${input.value.trim()}\n${line}` : line;
-      refreshData(kind); libraryMessage(kind, `已从“${libraryRow.sourceLabel}”添加“${libraryRow.name}”。`, true);
-    }
-    async function addAllLibraryMatches() {
-      const button = document.getElementById("sourceAddAll"), query = document.getElementById("sourceLibrarySearch").value.trim(), sourceId = document.getElementById("sourceLibrarySource").value;
-      const matches = state.library.rows.filter(row => (!sourceId || row.sourceId === sourceId) && matchesFilter(row.name, query));
-      if (!matches.length) { libraryMessage("source", "当前没有可加入的记录。"); return; }
-      const originalLabel = button.textContent; button.disabled = true; button.textContent = "正在加入…"; libraryMessage("source", `正在处理 ${matches.length.toLocaleString("zh-CN")} 条记录…`);
-      await new Promise(resolve => requestAnimationFrame(resolve));
-      const nameCounts = new Map(); matches.forEach(row => nameCounts.set(row.name, (nameCounts.get(row.name) || 0) + 1));
-      const usedNames = new Set(state.source.map(row => row.name)), lines = []; let skipped = 0, renamed = 0;
-      matches.forEach(row => {
-        const sourceTag = row.sourceLabel.split("·").pop().trim();
-        let name = nameCounts.get(row.name) > 1 ? `${row.name} [${sourceTag}]` : row.name;
-        if (usedNames.has(name)) { skipped++; return; }
-        usedNames.add(name); if (name !== row.name) renamed++;
-        lines.push(rowToLine({name, values: row.values}));
-      });
-      if (lines.length) sourceInput.value = sourceInput.value.trim() ? `${sourceInput.value.trim()}\n${lines.join("\n")}` : lines.join("\n");
-      refreshData("source");
-      const details = [`已加入 ${lines.length.toLocaleString("zh-CN")} 条`];
-      if (renamed) details.push(`${renamed.toLocaleString("zh-CN")} 条同名记录已加来源后缀`);
-      if (skipped) details.push(`跳过 ${skipped.toLocaleString("zh-CN")} 条已存在记录`);
-      libraryMessage("source", details.join("；") + "。", true);
-      button.disabled = false; button.textContent = originalLabel;
-      renderLibraryResults("source");
-    }
-    async function loadG25Library() {
-      try {
-        const response = await fetch("../assets/data/g25-library.json");
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const payload = await response.json(), rows = [];
-        payload.sources.forEach(source => source.rows.forEach(row => rows.push({ index: rows.length, name: row[0], values: row.slice(1), sourceId: source.id, sourceLabel: source.label })));
-        state.library = { loading: false, rows, sources: payload.sources.map(({id,label,count}) => ({id,label,count})), total: payload.total };
-        document.getElementById("libraryBannerCount").textContent = `内置全球 G25 坐标库：${payload.total.toLocaleString("zh-CN")} 条`;
-        document.getElementById("libraryBannerSources").textContent = payload.sources.map(source => `${source.label} ${source.count.toLocaleString("zh-CN")}`).join(" · ");
-        ["source","target"].forEach(kind => { populateLibrarySourceOptions(kind); renderLibraryResults(kind); });
-      } catch (error) {
-        state.library = { loading: false, rows: [], sources: [], total: 0 };
-        document.getElementById("libraryBannerCount").textContent = "全球 G25 坐标库载入失败";
-        ["source","target"].forEach(kind => renderLibraryResults(kind));
+    resultStep.hidden = false;
+    resultStep.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  document.getElementById("calcBtn").addEventListener("click", run);
+
+  document.getElementById("copyBtn").addEventListener("click", async () => {
+    if (!state.lastG25) return;
+    const line = "我的成分," + state.lastG25.map(x => x.toFixed(6)).join(",");
+    const msg = document.getElementById("msg");
+    try { await navigator.clipboard.writeText(line); msg.textContent = "已复制，可粘贴到专业模式或 Vahaduo。"; }
+    catch { msg.textContent = "浏览器不允许自动复制，请手动选取。"; }
+  });
+
+  // ===== 坐标库 =====
+  async function loadLibrary() {
+    try {
+      const res = await fetch("../assets/data/g25-library.json");
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const payload = await res.json();
+      const rowsOf = id => {
+        const src = payload.sources.find(s => s.id === id);
+        return src ? src.rows.map(r => ({ name: r[0], values: r.slice(1) })) : [];
+      };
+      const modern = rowsOf("modern_m2026");
+      const ancient = rowsOf("ancient");
+      const evenk = modern.find(r => r.name.startsWith("Evenk_(n=19)"));
+      const malay = modern.find(r => r.name.startsWith("Malay_Singapore"));
+      if (evenk && malay) {
+        const dv = malay.values.map((v, i) => v - evenk.values[i]);
+        state.axisEnds = { evenk: evenk.values, dv, dd: dv.reduce((a, b) => a + b * b, 0) };
       }
+      state.library = { modern, ancient };
+    } catch (e) {
+      state.library = null;
     }
-    function removeSampleLines(kind, lineIndexes) {
-      const input = kind === "source" ? sourceInput : targetInput, remove = new Set(lineIndexes), lines = input.value.split(/\r?\n/);
-      input.value = lines.filter((_, index) => !remove.has(index)).join("\n"); refreshData(kind);
-    }
-    function renderSampleManager(kind) {
-      const search = document.getElementById(`${kind}Search`), list = document.getElementById(`${kind}SampleList`), counter = document.getElementById(`${kind}VisibleCount`);
-      if (!search || !list || !counter) return;
-      const query = search.value, matches = state[kind].filter(row => matchesFilter(row.name, query)), visible = matches.slice(0, 250);
-      counter.textContent = matches.length + (matches.length > 250 ? "（仅展示前 250 条）" : "");
-      if (!visible.length) { list.innerHTML = `<div class="empty-state" style="padding:20px">${state[kind].length ? "没有匹配的样本" : "暂无样本"}</div>`; return; }
-      list.innerHTML = visible.map(row => `<article class="sample-item"><div><strong>${escapeHtml(row.name)}</strong><small>${row.values.slice(0,4).map(value => Number(value).toFixed(6)).join(", ")} … 共 25 维</small></div><button class="sample-delete" type="button" data-delete-line="${row.lineIndex}">删除</button></article>`).join("");
-      list.querySelectorAll("[data-delete-line]").forEach(button => button.addEventListener("click", () => { removeSampleLines(kind, [Number(button.dataset.deleteLine)]); managerMessage(kind, "已删除 1 个样本。", true); }));
-    }
-    ["source","target"].forEach(kind => {
-      document.getElementById(`${kind}LibrarySearch`).addEventListener("input", () => { libraryMessage(kind, ""); renderLibraryResults(kind); });
-      document.getElementById(`${kind}LibrarySource`).addEventListener("change", () => { libraryMessage(kind, ""); renderLibraryResults(kind); });
-      document.getElementById(`${kind}Search`).addEventListener("input", () => renderSampleManager(kind));
-      document.querySelector(`[data-add-row="${kind}"]`).addEventListener("click", () => {
-        const field = document.getElementById(`${kind}AddRow`), parsed = parseCoordinates(field.value.trim());
-        if (parsed.issues.length || parsed.rows.length !== 1) { managerMessage(kind, parsed.issues[0] || "请粘贴一整行名称和 25 个坐标。"); return; }
-        if (state[kind].some(row => row.name === parsed.rows[0].name)) { managerMessage(kind, `样本名“${parsed.rows[0].name}”已经存在。`); return; }
-        const input = kind === "source" ? sourceInput : targetInput; input.value = input.value.trim() ? `${input.value.trim()}\n${rowToLine(parsed.rows[0])}` : rowToLine(parsed.rows[0]); field.value = ""; refreshData(kind); managerMessage(kind, `已新增“${parsed.rows[0].name}”。`, true);
-      });
-      document.getElementById(`${kind}AddRow`).addEventListener("keydown", event => { if (event.key === "Enter") { event.preventDefault(); document.querySelector(`[data-add-row="${kind}"]`).click(); } });
-      document.querySelector(`[data-delete-filtered="${kind}"]`).addEventListener("click", () => {
-        const query = document.getElementById(`${kind}Search`).value.trim();
-        if (!query) { managerMessage(kind, "请先输入搜索条件，避免误删全部样本。"); return; }
-        const matches = state[kind].filter(row => matchesFilter(row.name, query));
-        if (!matches.length) { managerMessage(kind, "没有可删除的匹配样本。"); return; }
-        removeSampleLines(kind, matches.map(row => row.lineIndex)); managerMessage(kind, `已删除 ${matches.length} 个搜索结果。`, true);
-      });
-    });
-    document.getElementById("sourceAddAll").addEventListener("click", addAllLibraryMatches);
+  }
 
-    function unlockLab() {
-      document.documentElement.classList.remove("access-locked");
-      document.getElementById("accessGate").setAttribute("aria-hidden", "true");
-      if (!libraryLoadStarted) { libraryLoadStarted = true; loadG25Library(); }
-    }
-    const accessForm = document.getElementById("accessForm"), accessInput = document.getElementById("accessCode"), accessMessage = document.getElementById("accessMessage"), accessCard = document.getElementById("accessCard");
-    try { if (sessionStorage.getItem(ACCESS_SESSION_KEY) === "verified") unlockLab(); else accessInput.focus(); } catch (error) { accessInput.focus(); }
+  function unlockLab() {
+    document.documentElement.classList.remove("access-locked");
+    const gate = document.getElementById("accessGate");
+    if (gate) gate.setAttribute("aria-hidden", "true");
+    if (!libraryLoadStarted) { libraryLoadStarted = true; loadLibrary(); }
+  }
+
+  const accessForm = document.getElementById("accessForm");
+  const accessInput = document.getElementById("accessCode");
+  const accessMessage = document.getElementById("accessMessage");
+  const accessCard = document.getElementById("accessCard");
+  try { if (sessionStorage.getItem(ACCESS_SESSION_KEY) === "verified") unlockLab(); else accessInput && accessInput.focus(); }
+  catch (e) { accessInput && accessInput.focus(); }
+  if (accessForm) {
     accessInput.addEventListener("input", () => { accessInput.value = accessInput.value.replace(/\D/g, ""); accessMessage.textContent = ""; });
     accessForm.addEventListener("submit", event => {
       event.preventDefault();
       if (accessInput.value === "1985") {
-        try { sessionStorage.setItem(ACCESS_SESSION_KEY, "verified"); } catch (error) {}
+        try { sessionStorage.setItem(ACCESS_SESSION_KEY, "verified"); } catch (e) {}
         accessMessage.textContent = ""; unlockLab();
       } else {
         accessMessage.textContent = "验证码不正确，请重新输入。"; accessInput.value = ""; accessInput.focus();
         accessCard.classList.remove("denied"); void accessCard.offsetWidth; accessCard.classList.add("denied");
       }
     });
+  }
+  const menuToggle = document.querySelector(".menu-toggle");
+  if (menuToggle) menuToggle.addEventListener("click", () => {
+    const open = document.querySelector(".nav-links").classList.toggle("open");
+    menuToggle.setAttribute("aria-expanded", String(open));
+  });
 
-    function makeDemoVector(seed) { return Array.from({length:DIMENSIONS}, (_, i) => Number((Math.sin((i + 1) * (seed + 0.71)) * 0.062 + Math.cos((i + 2) * (seed * 0.37 + 0.43)) * 0.031 + seed * 0.0015).toFixed(6))); }
-    function mixVectors(vectors, weights) { return Array.from({length:DIMENSIONS}, (_, i) => Number(vectors.reduce((sum, vector, index) => sum + vector[i] * weights[index], 0).toFixed(6))); }
-    function loadDemoData() {
-      const vectors = [makeDemoVector(1), makeDemoVector(2), makeDemoVector(3), makeDemoVector(4), makeDemoVector(5)];
-      const sources = vectors.map((values, i) => ({name:`演示参考${String.fromCharCode(65 + i)}`, values}));
-      const targets = [
-        {name:"演示目标_45A_35B_20C", values:mixVectors(vectors.slice(0,3), [0.45,0.35,0.20])},
-        {name:"演示目标_25A_50D_25E", values:mixVectors([vectors[0],vectors[3],vectors[4]], [0.25,0.50,0.25])}
-      ];
-      sourceInput.value = sources.map(rowToLine).join("\n"); targetInput.value = targets.map(rowToLine).join("\n"); refreshData("source"); refreshData("target");
-      state.files = [
-        {name:"25维演示参考", rows:sources, lines:sources.map(rowToLine)},
-        {name:"25维演示目标", rows:targets, lines:targets.map(rowToLine)}
-      ]; state.activeFile = 0; renderFileList(); filterActiveFile();
-    }
-    document.getElementById("loadDemo").addEventListener("click", loadDemoData);
-
-    document.getElementById("dataFiles").addEventListener("change", async event => {
-      for (const file of event.target.files) {
-        const text = await file.text(), parsed = parseCoordinates(text);
-        state.files.push({ name:file.name.replace(/\.(csv|txt)$/i, "").replace(/_/g, " "), rows:parsed.rows, lines:parsed.rows.map(rowToLine) });
-      }
-      if (state.activeFile < 0 && state.files.length) state.activeFile = 0;
-      renderFileList(); filterActiveFile(); event.target.value = "";
-    });
-    function renderFileList() {
-      const list = document.getElementById("dataFileList");
-      if (!state.files.length) { list.innerHTML = '<div class="empty-state" style="padding:22px 10px">尚未打开文件</div>'; return; }
-      list.innerHTML = state.files.map((file, index) => `<button class="file-card ${index === state.activeFile ? "active" : ""}" type="button" data-file-index="${index}"><strong>${escapeHtml(file.name)}</strong><span>${file.rows.length} 个有效样本</span></button>`).join("");
-      list.querySelectorAll("[data-file-index]").forEach(button => button.addEventListener("click", () => { state.activeFile = Number(button.dataset.fileIndex); renderFileList(); filterActiveFile(); }));
-    }
-    function tokenMatches(name, token) {
-      let negate = token.startsWith("!"); if (negate) token = token.slice(1);
-      const starts = token.startsWith(","), ends = token.endsWith(","); token = token.replace(/^,|,$/g, "");
-      const lower = name.toLowerCase(), needle = token.toLowerCase();
-      let match = starts && ends ? lower === needle : starts ? lower.startsWith(needle) : ends ? lower.endsWith(needle) : lower.includes(needle);
-      return negate ? !match : match;
-    }
-    function matchesFilter(name, query) {
-      const groups = query.trim().replace(/\s*\?\s*/g, "?").split("?").map(group => group.trim().split(/\s+/).filter(Boolean)).filter(group => group.length);
-      if (!groups.length) return true;
-      return groups.some(group => group.every(token => tokenMatches(name, token)));
-    }
-    function filterActiveFile() {
-      const file = state.files[state.activeFile], query = document.getElementById("dataFilter").value;
-      state.filteredLines = file ? file.rows.filter(row => matchesFilter(row.name, query)).map(rowToLine) : [];
-      document.getElementById("dataPreview").value = state.filteredLines.join("\n"); document.getElementById("filteredCount").textContent = state.filteredLines.length;
-    }
-    document.getElementById("dataFilter").addEventListener("input", filterActiveFile);
-    document.getElementById("resetFilter").addEventListener("click", () => { document.getElementById("dataFilter").value = ""; filterActiveFile(); });
-    document.getElementById("removeDataFile").addEventListener("click", () => { if (state.activeFile < 0) return; state.files.splice(state.activeFile, 1); state.activeFile = state.files.length ? Math.min(state.activeFile, state.files.length - 1) : -1; renderFileList(); filterActiveFile(); });
-    document.querySelectorAll("[data-add-to]").forEach(button => button.addEventListener("click", () => {
-      if (!state.filteredLines.length) return;
-      const kind = button.dataset.addTo, input = kind === "source" ? sourceInput : targetInput, mode = document.getElementById("dataAddMode").value;
-      input.value = mode === "replace" || !input.value.trim() ? state.filteredLines.join("\n") : `${input.value.trim()}\n${state.filteredLines.join("\n")}`;
-      refreshData(kind); switchTab(kind);
-    }));
-
-    function setSelectOptions(id, previous = "") {
-      const select = document.getElementById(id); select.innerHTML = state.target.length ? state.target.map((row,index) => `<option value="${index}">${escapeHtml(row.name)}</option>`).join("") : '<option value="">请先加入目标样本</option>';
-      if (previous !== "" && state.target[Number(previous)]) select.value = previous; else if (state.target.length) select.selectedIndex = 0;
-    }
-    function refreshTargetControls() {
-      ["singleTarget","compareA","compareB"].forEach(id => setSelectOptions(id, document.getElementById(id)?.value || ""));
-      if (state.target.length > 1) document.getElementById("compareB").selectedIndex = Math.min(1, state.target.length - 1);
-      const buttons = state.target.map((row,index) => `<button class="target-run" type="button" data-target-index="${index}">${escapeHtml(row.name)}</button>`).join("");
-      document.getElementById("distanceTargets").innerHTML = buttons; document.getElementById("singleTargets").innerHTML = buttons;
-      document.querySelectorAll("#distanceTargets [data-target-index]").forEach(button => button.addEventListener("click", () => runSingleDistance(Number(button.dataset.targetIndex))));
-      document.querySelectorAll("#singleTargets [data-target-index]").forEach(button => button.addEventListener("click", () => runSingleFit(Number(button.dataset.targetIndex))));
-    }
-
-    function gradientStyle(value, min, max) {
-      if (document.getElementById("distanceGradient").value !== "yes") return "";
-      const pct = max === min ? 0.5 : Math.max(0, Math.min(1, (value - min) / (max - min))), hue = 155 - pct * 115;
-      return `background-color:hsla(${hue},70%,42%,.22);color:hsl(${hue},80%,78%)`;
-    }
-    function distanceTable(rows, valueLabel, scale = 1) {
-      if (!rows.length) return '<div class="empty-state">没有可显示的结果。</div>';
-      const values = rows.map(row => row.value), min = Math.min(...values), max = Math.max(...values);
-      return `<table class="result-table"><thead><tr><th>排名</th><th>参考群体</th><th>${escapeHtml(valueLabel)}</th></tr></thead><tbody>${rows.map((row,index) => `<tr><td>${index + 1}</td><td>${escapeHtml(row.name)}</td><td style="${gradientStyle(row.value,min,max)}">${formatNumber(row.value * scale, 8)}</td></tr>`).join("")}</tbody></table>`;
-    }
-    function pushDistanceBlock(html, text) { if (state.distanceBlocks.length === 0) document.getElementById("distanceResults").innerHTML = ""; state.distanceBlocks.unshift(html); state.distanceText.unshift(text); document.getElementById("distanceResults").innerHTML = state.distanceBlocks.join(""); }
-    function runSingleDistance(index) {
-      const error = requireData(); if (error) { document.getElementById("distanceResults").innerHTML = `<div class="empty-state">${escapeHtml(error)}</div>`; return; }
-      const target = state.target[index], limit = Math.max(1, Number(document.getElementById("distanceTop").value) || 25), scale = Number(document.getElementById("distanceScale").value);
-      const ranked = state.source.map(source => ({name:source.name,value:euclidean(target.values,source.values)})).filter(row => row.name !== target.name).sort((a,b) => a.value - b.value).slice(0,limit);
-      const html = `<article class="result-card"><div class="result-head"><h3>到 ${escapeHtml(target.name)} 的距离</h3><span>25 维 · ${ranked.length} 条</span></div>${distanceTable(ranked, scale === 100 ? "距离 × 100" : "欧氏距离", scale)}</article>`;
-      const text = [`目标：${target.name}`,...ranked.map((row,i)=>`${i+1}. ${row.name}\t${formatNumber(row.value*scale,8)}`)].join("\n"); pushDistanceBlock(html,text);
-    }
-    function runComparison() {
-      const error = requireData(); if (error) { document.getElementById("distanceResults").innerHTML = `<div class="empty-state">${escapeHtml(error)}</div>`; return; }
-      const a = state.target[Number(document.getElementById("compareA").value)], b = state.target[Number(document.getElementById("compareB").value)], mode = document.getElementById("distanceMode").value;
-      if (!a || !b || a === b) { document.getElementById("distanceModeHelp").textContent = "比较模式需要两个不同的目标样本。"; return; }
-      const formulas = {difference:{label:"差值 AC − BC",center:0,fn:(ac,bc)=>ac-bc},ratio:{label:"比值 AC ÷ BC",center:1,fn:(ac,bc)=>bc===0?NaN:ac/bc},d3:{label:"D3",center:0,fn:(ac,bc)=>(ac+bc)===0?NaN:(ac-bc)/(ac+bc)}}, config = formulas[mode], limit = Math.max(1,Number(document.getElementById("distanceTop").value)||25);
-      const all = state.source.map(source => { const ac=euclidean(a.values,source.values),bc=euclidean(b.values,source.values); return {name:source.name,value:config.fn(ac,bc)}; }).filter(row=>Number.isFinite(row.value)).sort((x,y)=>x.value-y.value);
-      const low = all.filter(row=>row.value<config.center).slice(0,limit), high = all.filter(row=>row.value>config.center).slice(-limit).reverse();
-      const html = `<article class="result-card"><div class="result-head"><h3>${escapeHtml(config.label)}</h3><span>A：${escapeHtml(a.name)} · B：${escapeHtml(b.name)}</span></div><div class="comparison-grid"><div class="comparison-block"><h4>更接近 A / 数值较低</h4>${distanceTable(low,config.label,1)}</div><div class="comparison-block"><h4>更接近 B / 数值较高</h4>${distanceTable(high,config.label,1)}</div></div></article>`;
-      const text = [`${config.label}\nA: ${a.name}\nB: ${b.name}`,"较低：",...low.map(row=>`${row.name}\t${formatNumber(row.value,8)}`),"较高：",...high.map(row=>`${row.name}\t${formatNumber(row.value,8)}`)].join("\n"); pushDistanceBlock(html,text);
-    }
-    document.getElementById("distanceMode").addEventListener("change", event => { document.getElementById("distanceModeHelp").textContent = event.target.value === "single" ? "单目标模式：选择目标 A 后运行，或点击任意目标按钮。" : "比较模式：选择不同的目标 A 与 B 后运行。"; });
-    document.getElementById("runDistanceMode").addEventListener("click", () => document.getElementById("distanceMode").value === "single" ? runSingleDistance(Number(document.getElementById("compareA").value)) : runComparison());
-    document.getElementById("runAllDistance").addEventListener("click", () => { const error=requireData(); if(error){document.getElementById("distanceResults").innerHTML=`<div class="empty-state">${escapeHtml(error)}</div>`;return;} state.target.forEach((_,i)=>runSingleDistance(i)); });
-    document.getElementById("clearDistance").addEventListener("click",()=>{state.distanceBlocks=[];state.distanceText=[];document.getElementById("distanceResults").innerHTML='<div class="empty-state">输出已清空。</div>';});
-
-    function projectSimplex(vector) { const sorted=[...vector].sort((a,b)=>b-a); let sum=0,rho=0; for(let i=0;i<sorted.length;i++){sum+=sorted[i];if(sorted[i]-(sum-1)/(i+1)>0)rho=i+1;} const theta=(sorted.slice(0,rho).reduce((s,v)=>s+v,0)-1)/Math.max(rho,1); return vector.map(v=>Math.max(v-theta,0)); }
-    function spectralStep(sourceVectors) { const dims=sourceVectors[0].length; let v=Array(dims).fill(1/Math.sqrt(dims)); for(let k=0;k<16;k++){const p=sourceVectors.map(row=>row.reduce((s,x,i)=>s+x*v[i],0)),n=Array(dims).fill(0);sourceVectors.forEach((row,r)=>row.forEach((x,c)=>n[c]+=x*p[r]));const norm=Math.sqrt(n.reduce((s,x)=>s+x*x,0))||1;v=n.map(x=>x/norm);} const p=sourceVectors.map(row=>row.reduce((s,x,i)=>s+x*v[i],0)),lambda=p.reduce((s,x)=>s+x*x,0);return 1/Math.max(2*lambda,1e-10); }
-    function fitVectors(targetValues, sourceVectors, iterations) {
-      const count=sourceVectors.length,dims=targetValues.length;if(count===1)return{weights:[1]};let weights=Array(count).fill(1/count),accelerated=[...weights],momentum=1,step=spectralStep(sourceVectors)*.92;
-      for(let k=0;k<iterations;k++){const prediction=Array(dims).fill(0);sourceVectors.forEach((row,r)=>row.forEach((x,c)=>prediction[c]+=accelerated[r]*x));const residual=prediction.map((x,c)=>x-targetValues[c]),gradient=sourceVectors.map(row=>2*row.reduce((s,x,c)=>s+x*residual[c],0)),next=projectSimplex(accelerated.map((w,i)=>w-step*gradient[i])),nextM=(1+Math.sqrt(1+4*momentum*momentum))/2;accelerated=next.map((w,i)=>w+((momentum-1)/nextM)*(w-weights[i]));weights=next;momentum=nextM;} return{weights};
-    }
-    function fitOptions(prefix) { return { cycles:Number(document.getElementById(`${prefix}Cycles`).value), reduce:prefix==="single"?Number(document.getElementById("singleReduce").value):0, adc:Number(document.getElementById(`${prefix}Adc`).value), recalc:document.getElementById(`${prefix}Recalc`).value==="yes", aggregate:document.getElementById(`${prefix}Aggregate`).value==="yes", zeros:document.getElementById(`${prefix}Zeros`).value==="yes", fast:prefix==="multi"&&document.getElementById("multiFast").value==="yes" }; }
-    function fitTarget(target, options) {
-      const start=performance.now(),iterations=options.fast?450:options.cycles===.25?800:options.cycles===4?4200:1900,refs=[...state.source];
-      let vectors=refs.map(ref=>options.adc?ref.values.concat(euclidean(ref.values,target.values)*options.adc):[...ref.values]),targetVector=options.adc?target.values.concat(0):[...target.values],result=fitVectors(targetVector,vectors,iterations),selected=refs.map((ref,i)=>({ref,weight:result.weights[i]}));
-      if(options.reduce>0&&selected.length>options.reduce){selected.sort((a,b)=>b.weight-a.weight);selected=selected.slice(0,options.reduce);vectors=selected.map(item=>options.adc?item.ref.values.concat(euclidean(item.ref.values,target.values)*options.adc):[...item.ref.values]);result=fitVectors(targetVector,vectors,iterations);selected=selected.map((item,i)=>({ref:item.ref,weight:result.weights[i]}));}
-      if(options.adc&&options.recalc){vectors=selected.map(item=>item.ref.values);result=fitVectors(target.values,vectors,Math.max(600,Math.floor(iterations/2)));selected=selected.map((item,i)=>({ref:item.ref,weight:result.weights[i]}));}
-      const weights=state.source.map(ref=>{const found=selected.find(item=>item.ref===ref);return found?found.weight:0;}),prediction=Array(DIMENSIONS).fill(0);state.source.forEach((ref,r)=>ref.values.forEach((x,c)=>prediction[c]+=weights[r]*x));
-      return {weights,distance:euclidean(prediction,target.values),elapsed:(performance.now()-start)/1000,iterations};
-    }
-    function componentsFor(result,options) {
-      const map=new Map();state.source.forEach((ref,i)=>{const name=options.aggregate?ref.name.split(":")[0]:ref.name;map.set(name,(map.get(name)||0)+result.weights[i]);});
-      let items=[...map].map(([name,weight])=>({name,weight})).sort((a,b)=>b.weight-a.weight);if(!options.zeros)items=items.filter(item=>item.weight>=.0005);return items;
-    }
-    function renderSingleCard(target,result,options) {
-      const items=componentsFor(result,options),barMode=Number(document.getElementById("singleBars").value),rows=items.map(item=>{const pct=item.weight*100,bar=barMode===1?`<div class="bar-mode-1"><i style="width:${Math.min(100,pct)}%"></i></div>`:"",style=barMode===2?`style="background:linear-gradient(90deg,rgba(67,216,210,.22) ${pct}%,transparent ${pct}%)"`:"";return `<div class="proportion-row" ${style}><span class="proportion-name" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</span><span>${bar}</span><span class="proportion-value">${pct.toFixed(1)}%</span></div>`;}).join("");
-      return {html:`<article class="result-card"><div class="result-head"><h3>${escapeHtml(target.name)}</h3><span>来源 ${state.source.length} · 迭代 ${result.iterations} · ${result.elapsed.toFixed(2)} 秒</span></div><div class="fit-summary"><div class="fit-score"><div><strong>${(result.distance*100).toFixed(4)}%</strong><span>${formatNumber(result.distance,8)} · 拟合距离</span></div></div><div class="proportion-list">${rows||'<div class="empty-state">没有非零成分</div>'}</div></div></article>`,text:[`目标：${target.name}`,`距离：${(result.distance*100).toFixed(4)}% / ${formatNumber(result.distance,8)}`,...items.map(item=>`${(item.weight*100).toFixed(1)}\t${item.name}`)].join("\n")};
-    }
-    async function runSingleFit(index) {
-      const error=requireData();if(error){document.getElementById("singleResults").innerHTML=`<div class="empty-state">${escapeHtml(error)}</div>`;return;}const target=state.target[index],options=fitOptions("single"),container=document.getElementById("singleResults");container.innerHTML='<div class="empty-state">正在本地计算…</div>';await new Promise(resolve=>requestAnimationFrame(resolve));const rendered=renderSingleCard(target,fitTarget(target,options),options);state.singleBlocks.unshift(rendered.html);state.singleText.unshift(rendered.text);container.innerHTML=state.singleBlocks.join("");
-    }
-    document.getElementById("runSingle").addEventListener("click",()=>runSingleFit(Number(document.getElementById("singleTarget").value)));
-    document.getElementById("runAllSingle").addEventListener("click",async()=>{const error=requireData();if(error){document.getElementById("singleResults").innerHTML=`<div class="empty-state">${escapeHtml(error)}</div>`;return;}for(let i=0;i<state.target.length;i++)await runSingleFit(i);});
-    document.getElementById("clearSingle").addEventListener("click",()=>{state.singleBlocks=[];state.singleText=[];document.getElementById("singleResults").innerHTML='<div class="empty-state">输出已清空。</div>';});
-
-    document.getElementById("runMulti").addEventListener("click",async()=>{
-      const error=requireData(),container=document.getElementById("multiResults");if(error){container.innerHTML=`<div class="empty-state" style="margin-top:22px">${escapeHtml(error)}</div>`;return;}const options=fitOptions("multi");container.innerHTML='<div class="empty-state" style="margin-top:22px">正在批量计算…</div>';await new Promise(resolve=>requestAnimationFrame(resolve));
-      const results=state.target.map(target=>({target,result:fitTarget(target,options)})),groupNames=options.aggregate?[...new Set(state.source.map(ref=>ref.name.split(":")[0]))]:state.source.map(ref=>ref.name),matrix=new Map(groupNames.map(name=>[name,Array(state.target.length).fill(0)]));
-      results.forEach((entry,t)=>state.source.forEach((ref,s)=>{const name=options.aggregate?ref.name.split(":")[0]:ref.name;matrix.get(name)[t]+=entry.result.weights[s];}));
-      let rows=[...matrix].map(([name,values])=>({name,values,average:values.reduce((s,v)=>s+v,0)/values.length})).sort((a,b)=>b.average-a.average);if(!options.zeros)rows=rows.filter(row=>row.values.some(v=>v>=.0005));
-      const color=value=>value===0?"rgba(255,255,255,.025)":`hsla(${205-value*80},${40+value*50}%,${25+value*35}%,.72)`,header=state.target.map((target,i)=>`<th>${escapeHtml(target.name)}<br><small>距 ${(results[i].result.distance*100).toFixed(3)}%</small></th>`).join(""),body=rows.map(row=>`<tr><td>${escapeHtml(row.name)}</td>${row.values.map(v=>`<td style="background:${color(v)}">${(v*100).toFixed(1)}</td>`).join("")}<td style="background:${color(row.average)}">${(row.average*100).toFixed(1)}</td></tr>`).join("");
-      container.innerHTML=`<div class="multi-wrap"><table class="multi-table"><thead><tr><th>参考成分</th>${header}<th>平均</th></tr></thead><tbody>${body}</tbody></table></div>`;
-      const csvRows=[["参考成分",...state.target.map(t=>t.name),"平均"],...rows.map(row=>[row.name,...row.values.map(v=>(v*100).toFixed(1)),(row.average*100).toFixed(1)])];state.multiCsv=csvRows.map(row=>row.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(",")).join("\n");state.multiTsv=csvRows.map(row=>row.join("\t")).join("\n");
-    });
-    document.getElementById("clearMulti").addEventListener("click",()=>{state.multiCsv="";state.multiTsv="";document.getElementById("multiResults").innerHTML='<div class="empty-state" style="margin-top:22px">输出已清空。</div>';});
-
-    async function copyText(text,button,label="复制结果") { if(!text){button.textContent="暂无结果";setTimeout(()=>button.textContent=label,1000);return;}try{await navigator.clipboard.writeText(text);}catch(_){const helper=document.createElement("textarea");helper.value=text;document.body.appendChild(helper);helper.select();document.execCommand("copy");helper.remove();}button.textContent="已复制";setTimeout(()=>button.textContent=label,1000); }
-    document.getElementById("copyDistance").addEventListener("click",event=>copyText(state.distanceText.join("\n\n"),event.currentTarget));
-    document.getElementById("copySingle").addEventListener("click",event=>copyText(state.singleText.join("\n\n"),event.currentTarget));
-    document.getElementById("copyMultiCsv").addEventListener("click",event=>copyText(state.multiCsv,event.currentTarget,"复制 CSV"));
-    document.getElementById("copyMultiTsv").addEventListener("click",event=>copyText(state.multiTsv,event.currentTarget,"复制 TSV"));
-
-    refreshData("source"); refreshData("target"); renderFileList(); filterActiveFile();
-  </script>
+  buildFields();
+</script>
   <script src="../assets/i18n.js"></script>
 </body>
 </html>
