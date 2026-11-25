@@ -718,6 +718,16 @@
         </div>
         <div id="fitPicker" hidden style="margin-top:10px">
           <input class="text-input" id="fitSearch" placeholder="搜名字，如 Han_ 或 Manchu">
+          <div class="filterbar" style="margin-top:8px">
+            <label>地理<select id="fitFacetContinent"></select></label>
+            <label>国家<select id="fitFacetCountry"></select></label>
+            <label>时间<select id="fitFacetPeriod">
+              <option value="modern" selected>现代</option>
+              <option value="ancient">古代</option>
+              <option value="all">全部</option>
+            </select></label>
+            <span class="meta-chip" id="fitFacetCount">—</span>
+          </div>
           <div class="fit-picker-list" id="fitPickerList"></div>
         </div>
         <div id="fitOne">
@@ -1134,29 +1144,84 @@
     const list = document.getElementById("fitPickerList");
     if (!list) return;
     const q = (query || "").trim().toLowerCase();
-    const rows = (state.library ? state.library.rows : [])
-      .filter(r => r.sourceId === "modern_m2026")
-      .filter(r => !q || r.name.toLowerCase().includes(q))
-      .slice(0, 60);
-    list.innerHTML = rows.map(r =>
+    const contSel = document.getElementById("fitFacetContinent");
+    const ctySel = document.getElementById("fitFacetCountry");
+    const perSel = document.getElementById("fitFacetPeriod");
+    const cont = contSel ? contSel.value : "";
+    const cty = ctySel ? ctySel.value : "";
+    const per = perSel ? perSel.value : "modern";
+    const seen = new Set();
+    const rows = (state.library ? state.library.rows : []).filter(r => {
+      const f = r.facet || facetOf(r);
+      if (per !== "all") {
+        if (per === "modern" && f.period !== "现代") return false;
+        if (per === "ancient" && f.period === "现代") return false;
+      }
+      if (cont && f.continent !== cont) return false;
+      if (cty && (f.continent + "|" + f.country) !== cty) return false;
+      if (q && !r.name.toLowerCase().includes(q)) return false;
+      if (seen.has(r.name)) return false;
+      seen.add(r.name);
+      return true;
+    });
+    const count = document.getElementById("fitFacetCount");
+    if (count) count.textContent = rows.length.toLocaleString("zh-CN") + " 条";
+    const shown = rows.slice(0, 60);
+    list.innerHTML = shown.map((r, i) =>
       `<div class="fit-picker-row"><span title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</span>
-        <button type="button" data-addref="${escapeHtml(r.name)}">加入</button></div>`).join("")
+        <button type="button" data-fitidx="${i}">加入</button></div>`).join("")
       || `<div class="fit-picker-row"><span>没有匹配的名字</span></div>`;
-    list.querySelectorAll("[data-addref]").forEach(btn => btn.addEventListener("click", () => {
-      const name = btn.dataset.addref;
-      if (state.fitRefs.some(x => x.name === name)) return;
-      const row = state.library.rows.find(r => r.name === name);
+    list.querySelectorAll("[data-fitidx]").forEach(btn => btn.addEventListener("click", () => {
+      const row = shown[Number(btn.dataset.fitidx)];
       if (!row) return;
+      if (state.fitRefs.some(x => x.name === row.name)) return;
       state.fitRefs.push({ name: row.name, values: row.values });
       renderFitChips();
     }));
   }
 
+  // 拟合选择器的筛选条：与「距离分析」共用同一套 facet
+  function buildFitFacets() {
+    const map = window.__facetCountries;
+    const contSel = document.getElementById("fitFacetContinent");
+    if (!contSel || !map) return;
+    if (contSel.options.length > 1) { refreshFitCountryOptions(); return; }
+    const conts = new Map();
+    for (const [k, v] of map) {
+      const c = k.split("|")[0];
+      conts.set(c, (conts.get(c) || 0) + v);
+    }
+    contSel.innerHTML = '<option value="">全部大洲</option>' +
+      [...conts.entries()].sort((a, b) => b[1] - a[1]).map(([k, v]) => `<option value="${k}">${k}（${v}）</option>`).join("");
+    refreshFitCountryOptions();
+  }
+
+  function refreshFitCountryOptions() {
+    const contSel = document.getElementById("fitFacetContinent");
+    const ctySel = document.getElementById("fitFacetCountry");
+    if (!ctySel || !window.__facetCountries) return;
+    const cont = contSel ? contSel.value : "";
+    const entries = [...window.__facetCountries.entries()]
+      .filter(([k]) => !cont || k.startsWith(cont + "|"))
+      .sort((a, b) => b[1] - a[1]);
+    ctySel.innerHTML = '<option value="">全部国家</option>' +
+      entries.map(([k, v]) => { const c = k.split("|")[1]; return `<option value="${k}">${c}（${v}）</option>`; }).join("");
+  }
+
+  ["fitFacetContinent", "fitFacetCountry", "fitFacetPeriod"].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("change", () => {
+      if (id === "fitFacetContinent") refreshFitCountryOptions();
+      renderFitPicker(document.getElementById("fitSearch")?.value || "");
+    });
+  });
+
   const fitAddOpen = document.getElementById("fitAddOpen");
   if (fitAddOpen) fitAddOpen.addEventListener("click", () => {
     const picker = document.getElementById("fitPicker");
     picker.hidden = !picker.hidden;
-    if (!picker.hidden) { renderFitPicker(document.getElementById("fitSearch").value); document.getElementById("fitSearch").focus(); }
+    if (!picker.hidden) { buildFitFacets(); renderFitPicker(document.getElementById("fitSearch").value); document.getElementById("fitSearch").focus(); }
   });
   const fitSearch = document.getElementById("fitSearch");
   if (fitSearch) fitSearch.addEventListener("input", () => renderFitPicker(fitSearch.value));
