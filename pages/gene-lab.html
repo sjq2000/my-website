@@ -471,6 +471,17 @@
   .filterbar select { padding: 7px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,.14);
                       background: rgba(255,255,255,.04); color: #dfe9ee; font-size: 13px; }
   #fitInput { min-height: 86px; margin: 4px 0 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+  .chip { display: inline-flex; align-items: center; gap: 7px; padding: 6px 10px; border-radius: 999px;
+          background: rgba(67,216,210,.1); border: 1px solid rgba(67,216,210,.32); color: #cfe0e6; font-size: 12.5px; }
+  .chip button { border: 0; background: transparent; color: #7f8c99; cursor: pointer; font-size: 14px; line-height: 1; }
+  .chip button:hover { color: #ff8a7a; }
+  .fit-picker-list { max-height: 260px; overflow: auto; margin-top: 8px; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; }
+  .fit-picker-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 12px;
+                    border-bottom: 1px solid rgba(255,255,255,.05); font-size: 12.5px; color: #cfe0e6; }
+  .fit-picker-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .fit-picker-row button { padding: 3px 10px; border-radius: 7px; border: 1px solid rgba(67,216,210,.4);
+                           background: rgba(67,216,210,.1); color: #9ef0ec; cursor: pointer; font-size: 12px; }
   .sub-h { font-size: 15px; font-weight: 800; color: #e8f2f5; margin: 22px 0 4px; }
   .sub-note { font-size: 13px; color: #8f9ca9; line-height: 1.7; margin: 0 0 8px; }
   .pager { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 12px; }
@@ -664,7 +675,12 @@
 
       <div class="tab-panel" id="panel-single" role="tabpanel">
         <div class="panel-head"><div><h2>成分拟合</h2><p>把样本拆成参考人群的加权组合，百分比加起来 100%。先看一个样本，想批量看就切「多样本拟合」。</p></div></div>
-        <div class="sub-h">① 要分析的人</div>
+        <div class="sub-h">① 要分析的人（单样本 / 多样本）</div>
+        <div class="seg" role="tablist" style="margin:6px 0 14px">
+          <button class="seg-btn active" type="button" data-fitview="one">单样本拟合</button>
+          <button class="seg-btn" type="button" data-fitview="all">多样本拟合</button>
+        </div>
+
         <p class="sub-note">一行就够：名字 + 25 个坐标（和②距离分析用的是同一份数据，两边同步）。</p>
         <textarea id="fitInput" spellcheck="false" placeholder="例如：我的成分,0.0228,-0.4459,…,共 25 个数字"></textarea>
         <div class="row-actions" style="margin:8px 0 4px">
@@ -672,10 +688,6 @@
           <span class="meta-chip">已识别 <strong id="fitCount">0</strong> 个样本</span>
         </div>
         <p class="sub-note">在下面粘一行「名字 + 25 个坐标」，或用②里已有的样本；切「多样本拟合」会把所有样本都算一遍。</p>
-        <div class="seg" role="tablist" style="margin:6px 0 14px">
-          <button class="seg-btn active" type="button" data-fitview="one">单样本拟合</button>
-          <button class="seg-btn" type="button" data-fitview="all">多样本拟合</button>
-        </div>
         <div id="fitOne">
         <details class="adv"><summary>高级选项（一般不用动）</summary>
         <div class="option-grid">
@@ -690,7 +702,17 @@
         </div>
         </details>
         <div class="sub-h">② 用来拟合的样本</div>
-        <p class="sub-note" id="fitSrcNote">当前名单：—（沿用 ② 距离分析 里筛选好的名单）</p>
+        <p class="sub-note" id="fitSrcNote">点「＋ 添加参考人群」从库里挑，一般 5～15 个就够；不选则用 ② 距离分析 的整张名单（3,000+ 条，结果容易碎）。</p>
+        <div class="chips" id="fitChips"></div>
+        <div class="toolbar" style="margin-top:8px">
+          <button class="btn ghost" type="button" id="fitAddOpen">＋ 添加参考人群</button>
+          <button class="btn ghost" type="button" id="fitClearRefs">清空参考</button>
+          <span class="meta-chip">已选 <strong id="fitRefCount">0</strong> 个</span>
+        </div>
+        <div id="fitPicker" hidden style="margin-top:10px">
+          <input class="text-input" id="fitSearch" placeholder="搜名字，如 Han_ 或 Manchu">
+          <div class="fit-picker-list" id="fitPickerList"></div>
+        </div>
         <div class="toolbar"><button class="btn primary" type="button" id="runSingle">拟合这个样本</button><button class="btn" type="button" id="runAllSingle" style="display:none">全部一起拆</button><button class="btn ghost" type="button" id="copySingle" style="display:none">复制结果</button><button class="btn danger" type="button" id="clearSingle">清空输出</button></div>
         <div class="sub-h">③ 结果</div>
         <div class="target-actions" id="singleTargets"></div><div class="output-stack" id="singleResults"><div class="empty-state">选择目标样本并开始拟合。</div></div>
@@ -940,6 +962,81 @@
       applyFacet();
     });
   });
+
+  // ---- 拟合用参考人群（手动挑） ----
+  state.fitRefs = state.fitRefs || [];
+
+  function renderFitChips() {
+    const box = document.getElementById("fitChips");
+    const cnt = document.getElementById("fitRefCount");
+    if (cnt) cnt.textContent = state.fitRefs.length;
+    if (!box) return;
+    box.innerHTML = state.fitRefs.map((r, i) =>
+      `<span class="chip">${escapeHtml(r.name)}<button type="button" data-rmref="${i}" title="移除">×</button></span>`).join("");
+    box.querySelectorAll("[data-rmref]").forEach(btn => btn.addEventListener("click", () => {
+      state.fitRefs.splice(Number(btn.dataset.rmref), 1);
+      renderFitChips();
+    }));
+  }
+
+  function renderFitPicker(query) {
+    const list = document.getElementById("fitPickerList");
+    if (!list) return;
+    const q = (query || "").trim().toLowerCase();
+    const rows = (state.library ? state.library.rows : [])
+      .filter(r => r.sourceId === "modern_m2026")
+      .filter(r => !q || r.name.toLowerCase().includes(q))
+      .slice(0, 60);
+    list.innerHTML = rows.map(r =>
+      `<div class="fit-picker-row"><span title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</span>
+        <button type="button" data-addref="${escapeHtml(r.name)}">加入</button></div>`).join("")
+      || `<div class="fit-picker-row"><span>没有匹配的名字</span></div>`;
+    list.querySelectorAll("[data-addref]").forEach(btn => btn.addEventListener("click", () => {
+      const name = btn.dataset.addref;
+      if (state.fitRefs.some(x => x.name === name)) return;
+      const row = state.library.rows.find(r => r.name === name);
+      if (!row) return;
+      state.fitRefs.push({ name: row.name, values: row.values });
+      renderFitChips();
+    }));
+  }
+
+  const fitAddOpen = document.getElementById("fitAddOpen");
+  if (fitAddOpen) fitAddOpen.addEventListener("click", () => {
+    const picker = document.getElementById("fitPicker");
+    picker.hidden = !picker.hidden;
+    if (!picker.hidden) { renderFitPicker(document.getElementById("fitSearch").value); document.getElementById("fitSearch").focus(); }
+  });
+  const fitSearch = document.getElementById("fitSearch");
+  if (fitSearch) fitSearch.addEventListener("input", () => renderFitPicker(fitSearch.value));
+  const fitClearRefs = document.getElementById("fitClearRefs");
+  if (fitClearRefs) fitClearRefs.addEventListener("click", () => { state.fitRefs = []; renderFitChips(); });
+  renderFitChips();
+
+  // 只用所选参考做拟合
+  function fitWithSelectedRefs() {
+    const refs = state.fitRefs;
+    const target = state.target[0];
+    if (!target) { document.getElementById("singleResults").innerHTML = '<div class="empty-state">先在①里放一个样本。</div>'; return; }
+    if (refs.length < 2) { document.getElementById("singleResults").innerHTML = '<div class="empty-state">请在②里至少选 2 个参考人群。</div>'; return; }
+    const vectors = refs.map(r => r.values);
+    const res = fitVectors(target.values, vectors, 2200);
+    const items = refs.map((r, i) => ({ name: r.name, w: res.weights[i] })).filter(x => x.w > 0.0005).sort((a, b) => b.w - a.w);
+    let pred = new Array(25).fill(0);
+    refs.forEach((r, i) => { for (let k = 0; k < 25; k++) pred[k] += res.weights[i] * r.values[k]; });
+    let s2 = 0; for (let k = 0; k < 25; k++) { const d = pred[k] - target.values[k]; s2 += d * d; }
+    const dist = Math.sqrt(s2);
+    const rows = items.map(x => {
+      const pct = x.w * 100;
+      return `<div class="proportion-row"><span class="proportion-name">${escapeHtml(x.name)}</span>
+        <span><div class="bar-mode-1"><i style="width:${Math.min(100, pct)}%"></i></div></span>
+        <span class="proportion-value">${pct.toFixed(1)}%</span></div>`;
+    }).join("");
+    document.getElementById("singleResults").innerHTML =
+      `<article class="result-card"><div class="result-head"><h3>${escapeHtml(target.name)}</h3>
+        <span>参考 ${refs.length} 个 · ${(dist * 100).toFixed(4)}% 拟合距离</span></div>
+        <div class="proportion-list">${rows || '<div class="empty-state">没有非零成分</div>'}</div></article>`;
+  }
 
   const fitInput = document.getElementById("fitInput");
   if (fitInput) {
@@ -1538,7 +1635,10 @@
     async function runSingleFit(index) {
       const error=requireData();if(error){document.getElementById("singleResults").innerHTML=`<div class="empty-state">${escapeHtml(error)}</div>`;return;}const target=state.target[index],options=fitOptions("single"),container=document.getElementById("singleResults");container.innerHTML='<div class="empty-state">正在本地计算…</div>';await new Promise(resolve=>requestAnimationFrame(resolve));const rendered=renderSingleCard(target,fitTarget(target,options),options);state.singleBlocks.unshift(rendered.html);state.singleText.unshift(rendered.text);container.innerHTML=state.singleBlocks.join("");
     }
-    document.getElementById("runSingle").addEventListener("click",()=>runSingleFit(Number(document.getElementById("singleTarget").value)));
+    document.getElementById("runSingle").addEventListener("click",()=>{
+      if (state.fitRefs && state.fitRefs.length >= 2) { fitWithSelectedRefs(); return; }
+      runSingleFit(Number(document.getElementById("singleTarget").value));
+    });
     document.getElementById("runAllSingle").addEventListener("click",async()=>{const error=requireData();if(error){document.getElementById("singleResults").innerHTML=`<div class="empty-state">${escapeHtml(error)}</div>`;return;}for(let i=0;i<state.target.length;i++)await runSingleFit(i);});
     document.getElementById("clearSingle").addEventListener("click",()=>{state.singleBlocks=[];state.singleText=[];document.getElementById("singleResults").innerHTML='<div class="empty-state">输出已清空。</div>';});
 
