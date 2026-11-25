@@ -470,6 +470,22 @@
   .filterbar label { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #8f9ca9; white-space: nowrap; }
   .filterbar select { padding: 7px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,.14);
                       background: rgba(255,255,255,.04); color: #dfe9ee; font-size: 13px; }
+  .paywall { border: 1px solid rgba(240,217,168,.28); background: rgba(240,217,168,.05); border-radius: 14px; padding: 16px 18px; margin: 0 0 16px; }
+  .paywall-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  .paywall-title { font-size: 15px; font-weight: 800; color: #f0d9a8; }
+  .paywall-sub { font-size: 12.5px; color: #8f9ca9; margin-top: 4px; }
+  .paywall-credit { font-size: 13px; color: #9ef0ec; background: rgba(67,216,210,.1); border: 1px solid rgba(67,216,210,.3); border-radius: 999px; padding: 5px 12px; }
+  .price-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 14px; }
+  .price-card { position: relative; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; padding: 14px; background: rgba(255,255,255,.03); }
+  .price-card.best { border-color: rgba(240,217,168,.55); background: rgba(240,217,168,.08); }
+  .pc-badge { position: absolute; top: -10px; right: 10px; font-size: 11px; padding: 2px 8px; border-radius: 999px; background: #f0d9a8; color: #1b2027; font-weight: 800; }
+  .pc-name { font-size: 13px; color: #cfe0e6; }
+  .pc-price { font-size: 26px; font-weight: 800; color: #f0d9a8; margin: 6px 0 10px; font-variant-numeric: tabular-nums; }
+  .pc-was { font-size: 13px; color: #7f8c99; font-weight: 400; margin-left: 6px; }
+  .pc-btn { display: block; text-align: center; width: 100%; }
+  .pc-note { font-size: 11.5px; color: #8f9ca9; margin-top: 8px; line-height: 1.6; }
+  .paywall-foot { font-size: 12px; color: #8f9ca9; margin-top: 12px; line-height: 1.8; }
+  .linklike { border: 0; background: none; color: #9ef0ec; cursor: pointer; font-size: 12px; text-decoration: underline; padding: 0; }
   #fitInput { min-height: 86px; margin: 4px 0 0; }
   .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
   .chip { display: inline-flex; align-items: center; gap: 7px; padding: 6px 10px; border-radius: 999px;
@@ -569,6 +585,40 @@
           <button class="btn ghost" type="button" id="convertClear">清空</button>
           <span class="meta-chip" id="convertModelNote">—</span>
         </div>
+                <div class="paywall" id="paywall">
+          <div class="paywall-head">
+            <div>
+              <div class="paywall-title">G25 成分换算 · 单次解锁</div>
+              <div class="paywall-sub">23魔方 或 微基因 二选一，换算一次出 25 维坐标。</div>
+            </div>
+            <div class="paywall-credit" id="creditChip">剩余 0 次</div>
+          </div>
+          <div class="price-row">
+            <div class="price-card">
+              <div class="pc-name">单次换算</div>
+              <div class="pc-price">¥29</div>
+              <a class="btn primary pc-btn" id="payOne" target="_blank" rel="noopener">去支付 ¥29</a>
+            </div>
+            <div class="price-card">
+              <div class="pc-name">已买过另一种</div>
+              <div class="pc-price">¥6 <s class="pc-was">¥29</s></div>
+              <a class="btn pc-btn" id="payAddon" target="_blank" rel="noopener">去支付 ¥6</a>
+              <div class="pc-note" id="addonNote">仅限已购买过 23魔方 或 微基因 换算的用户</div>
+            </div>
+            <div class="price-card best">
+              <div class="pc-badge">一次买两种 · 省 ¥23</div>
+              <div class="pc-name">双套餐（23魔方 + 微基因）</div>
+              <div class="pc-price">¥35 <s class="pc-was">¥58</s></div>
+              <a class="btn primary pc-btn" id="payBundle" target="_blank" rel="noopener">去支付 ¥35</a>
+              <div class="pc-note">分两次单买要 ¥58，一起买便宜 ¥23</div>
+            </div>
+          </div>
+          <div class="paywall-foot">
+            支付完成后会自动跳回本页并解锁。<br>
+            换设备或清过缓存的老用户，点这里 <button class="linklike" type="button" id="showAddon">拿 ¥6 加购价</button>。
+          </div>
+        </div>
+
         <div class="conv-grid" id="convertFields"></div>
         <div class="conv-toolbar">
           <input class="text-input" id="convertName" style="max-width:240px" placeholder="样本名" value="我的成分">
@@ -912,7 +962,15 @@
     });
     computeConvert();
   });
-  document.getElementById("convertRun").addEventListener("click", computeConvert);
+  document.getElementById("convertRun").addEventListener("click", () => {
+    if (getCredits() <= 0) {
+      const m = document.getElementById("convertMessage");
+      if (m) { m.className = "validation"; m.textContent = "还没解锁：用上面的 Stripe 链接付款后会自动解锁 1 次换算。"; }
+      return;
+    }
+    const line = computeConvert();
+    if (line) { setCredits(getCredits() - 1); markBought(); }
+  });
   document.getElementById("convertCopy").addEventListener("click", async () => {
     const line = convertOutput.value || computeConvert();
     if (!line) return;
@@ -936,6 +994,61 @@
     document.getElementById("fitOne").hidden = all;
     document.getElementById("fitAll").hidden = !all;
   }));
+
+  // ===== 付费解锁 =====
+  const PRICES = {
+    one:    { cny: 29, url: "https://buy.stripe.com/REPLACE_29" },
+    addon:  { cny: 6,  url: "https://buy.stripe.com/REPLACE_6" },
+    bundle: { cny: 35, url: "https://buy.stripe.com/REPLACE_35" }
+  };
+  const CREDIT_KEY = "sjq-g25-credits";
+  const BOUGHT_KEY = "sjq-g25-bought";
+
+  function getCredits() { try { return Math.max(0, Number(localStorage.getItem(CREDIT_KEY) || 0)); } catch (e) { return 0; } }
+  function setCredits(n) { try { localStorage.setItem(CREDIT_KEY, String(Math.max(0, n))); } catch (e) {} renderPaywall(); }
+  function hasBought() { try { return localStorage.getItem(BOUGHT_KEY) === "1"; } catch (e) { return false; } }
+  function markBought() { try { localStorage.setItem(BOUGHT_KEY, "1"); } catch (e) {} }
+
+  function renderPaywall() {
+    const left = getCredits();
+    const chip = document.getElementById("creditChip");
+    if (chip) chip.textContent = left > 0 ? `剩余 ${left} 次换算` : "剩余 0 次 · 需解锁";
+    const addon = document.getElementById("payAddon");
+    if (addon) {
+      addon.href = hasBought() ? PRICES.addon.url : "#";
+      addon.classList.toggle("disabled", !hasBought());
+      const note = document.getElementById("addonNote");
+      if (note) note.textContent = hasBought() ? "已检测到你的购买记录，可直接用 ¥6" : "仅限已购买过 23魔方 或 微基因 换算的用户";
+    }
+    ["payOne","payAddon","payBundle"].forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const key = ["one","addon","bundle"][i];
+      el.href = PRICES[key].url;
+    });
+  }
+
+  // 支付回跳：?paid=29 / 6 / 35
+  (function handlePaid() {
+    const m = location.search.match(/[?&]paid=(\d+)/);
+    if (!m) return;
+    const amount = Number(m[1]);
+    const add = amount >= 35 ? 2 : 1;
+    setCredits(getCredits() + add);
+    markBought();
+    const clean = location.pathname + location.search.replace(/([?&])paid=\d+&?/, "$1").replace(/[?&]$/, "");
+    history.replaceState(null, "", clean);
+    setTimeout(() => {
+      const m = document.getElementById("convertMessage");
+      if (m) { m.className = "validation ok"; m.textContent = `支付已确认，本次解锁 ${add} 次换算`; }
+    }, 300);
+  })();
+
+  document.getElementById("showAddon")?.addEventListener("click", () => {
+    try { localStorage.setItem(BOUGHT_KEY, "1"); } catch (e) {}
+    renderPaywall();
+  });
+  renderPaywall();
 
   const quickRun = document.getElementById("quickRun");
   if (quickRun) quickRun.addEventListener("click", () => {
