@@ -233,9 +233,6 @@
     }
     .tab-button:hover { color: var(--text); background: rgba(67,216,210,.04); }
     .tab-button.active { color: #061315; background: var(--cyan); }
-    .tab-button.subtle { color: #6d7a86; font-weight: 600; font-size: 13px; padding: 17px 14px; }
-    .tab-button.subtle.active { color: #061315; background: var(--cyan); }
-    .tab-button.subtle::before { content: ""; }
 
     .tab-panel { display: none; padding: 28px; }
     .tab-panel.active { display: block; }
@@ -562,7 +559,7 @@
         <button class="tab-button active" type="button" role="tab" aria-selected="true" data-tab="convert">① 成分换算</button>
         <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="analyze">② 距离分析</button>
         <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="single">③ 成分拟合</button>
-        <button class="tab-button subtle" type="button" role="tab" aria-selected="false" data-tab="data" title="高级：批量导入 CSV/TXT">④ 导入</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="data">④ 数据导入</button>
       </div>
 
       <div class="tab-panel active" id="panel-convert" role="tabpanel">
@@ -792,7 +789,7 @@
       </div>
 
       <div class="tab-panel" id="panel-data" role="tabpanel">
-        <div class="panel-head"><div><h2>导入数据</h2><p>有 CSV/TXT 就打开（每行：名称 + 25 个数字）；没有就跳过，用内置全球坐标库。这里加进来的数据，② 距离分析 和 ③ 成分拟合 都能直接用。</p></div><button class="btn primary" type="button" id="loadDemo">载入 25 维演示数据</button></div>
+        <div class="panel-head"><div><h2>导入数据</h2><p>有 CSV/TXT 就打开（每行：名称 + 25 个数字）；没有就跳过，用下面几页里内置的全球坐标库。</p></div><button class="btn primary" type="button" id="loadDemo">载入 25 维演示数据</button></div>
         <div class="library-banner"><div><strong id="libraryBannerCount">正在载入全球 G25 坐标库…</strong><div>参考群体和目标样本页均可搜索并一键加入。</div></div><span id="libraryBannerSources">3 套数据源</span></div>
         <div class="data-workspace">
           <div class="file-sidebar">
@@ -806,7 +803,6 @@
             <div class="toolbar" style="margin-top:10px">
               <select id="dataAddMode" style="width:auto;min-width:130px"><option value="append">追加到</option><option value="replace">替换到</option></select>
               <button class="btn" type="button" data-add-to="source">参考群体</button><button class="btn" type="button" data-add-to="target">目标样本</button>
-              <span class="mode-help" style="margin:0">追加后会跳到 ② 距离分析</span>
             </div>
             <div class="data-meta"><span class="meta-chip">筛选结果 <strong id="filteredCount">0</strong></span><span class="meta-chip">要求 <strong>名称 + 25 个坐标</strong></span></div>
           </div>
