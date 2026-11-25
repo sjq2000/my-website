@@ -470,6 +470,14 @@
   .filterbar label { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #8f9ca9; white-space: nowrap; }
   .filterbar select { padding: 7px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,.14);
                       background: rgba(255,255,255,.04); color: #dfe9ee; font-size: 13px; }
+  .sub-h { font-size: 15px; font-weight: 800; color: #e8f2f5; margin: 22px 0 4px; }
+  .sub-note { font-size: 13px; color: #8f9ca9; line-height: 1.7; margin: 0 0 8px; }
+  .pager { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 12px; }
+  .pg-btn { padding: 5px 11px; border-radius: 7px; border: 1px solid rgba(255,255,255,.14);
+            background: rgba(255,255,255,.04); color: #cfe0e6; font-size: 13px; cursor: pointer; }
+  .pg-btn.on { background: rgba(67,216,210,.18); color: #9ef0ec; border-color: rgba(67,216,210,.5); }
+  .pg-btn:disabled { opacity: .35; cursor: default; }
+  .pg-info { font-size: 12px; color: #7f8c99; margin-left: 8px; }
   .seg { display: inline-flex; gap: 8px; background: rgba(255,255,255,.04); padding: 4px; border-radius: 10px; }
   .seg-btn { padding: 8px 16px; border-radius: 8px; border: 0; background: transparent; color: #9aa8b4; font-weight: 700; cursor: pointer; font-size: 13.5px; }
   .seg-btn.active { background: rgba(67,216,210,.14); color: #9ef0ec; }
@@ -516,7 +524,7 @@
     <header class="page-header">
       <div class="eyebrow">SJQ G25 Workbench</div>
       <h1>基因<span>坐标实验室</span></h1>
-      <p>四个页签：① 成分换算 → ② 距离分析 → ③ 成分拆解 → ④ 数据导入。普通用户只用前两个就能出结果，高级选项默认折叠。</p>
+      <p>四个页签：① 成分换算 → ② 距离分析 → ③ 成分拟合 → ④ 数据导入。普通用户只用前两个就能出结果，高级选项默认折叠。</p>
       <div class="status-row"><span class="status-pill"><span class="status-dot"></span>每行 25 个数字 · 自动校验</span><span class="status-pill secondary">本地计算 · 数据不上传</span></div>
     </header>
 
@@ -524,7 +532,7 @@
       <div class="tab-list" role="tablist" aria-label="工具页签">
         <button class="tab-button active" type="button" role="tab" aria-selected="true" data-tab="convert">① 成分换算</button>
         <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="analyze">② 距离分析</button>
-        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="single">③ 成分拆解</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="single">③ 成分拟合</button>
         <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="data">④ 数据导入</button>
       </div>
 
@@ -638,7 +646,8 @@
           <div class="control"><label for="gradientTo">渐变终点</label><input class="number-input" id="gradientTo" type="number" step="0.01" min="0" value="0.2"></div>
         </div>
         </details>
-        <div class="toolbar"><button class="btn primary" type="button" id="runDistanceMode">算 / 对比</button><button class="btn" type="button" id="runAllDistance" style="display:none">全部一起算</button><button class="btn ghost" type="button" id="copyDistance" style="display:none">复制结果</button><button class="btn danger" type="button" id="clearDistance">清空输出</button></div>
+        <div class="toolbar"><button class="btn primary" type="button" id="runDistanceMode">算 / 对比</button>
+        <button class="btn ghost" type="button" id="toggleCN">切中文名</button><button class="btn" type="button" id="runAllDistance" style="display:none">全部一起算</button><button class="btn ghost" type="button" id="copyDistance" style="display:none">复制结果</button><button class="btn danger" type="button" id="clearDistance">清空输出</button></div>
         <div class="target-actions" id="distanceTargets"></div><p class="mode-help" id="distanceModeHelp">一个人：点上方按钮，或「全部一起算」。</p>
         <div class="output-stack" id="distanceResults"><div class="empty-state">请先准备参考群体与目标样本。</div></div>
       
@@ -653,8 +662,10 @@
       </div>
 
       <div class="tab-panel" id="panel-single" role="tabpanel">
-        <div class="panel-head"><div><h2>成分拆解</h2><p>把样本拆成参考人群的加权组合，百分比加起来 100%。先看一个样本用左边，想一次看全部点「一次看全部」。</p></div></div>
-        <div class="seg" role="tablist" style="margin:6px 0 18px">
+        <div class="panel-head"><div><h2>成分拟合</h2><p>把样本拆成参考人群的加权组合，百分比加起来 100%。先看一个样本，想一次看全部点「一次看全部」。</p></div></div>
+        <div class="sub-h">① 要分析的人</div>
+        <p class="sub-note">点名字切换要看谁；「一次看全部」会依次算完所有样本。</p>
+        <div class="seg" role="tablist" style="margin:6px 0 14px">
           <button class="seg-btn active" type="button" data-fitview="one">看一个样本</button>
           <button class="seg-btn" type="button" data-fitview="all">一次看全部</button>
         </div>
@@ -671,7 +682,10 @@
           <div class="control"><label for="singleBars">条形图</label><select id="singleBars"><option value="1">模式 1</option><option value="2">模式 2</option><option value="0">关闭</option></select></div>
         </div>
         </details>
-        <div class="toolbar"><button class="btn primary" type="button" id="runSingle">拆解这个样本</button><button class="btn" type="button" id="runAllSingle" style="display:none">全部一起拆</button><button class="btn ghost" type="button" id="copySingle" style="display:none">复制结果</button><button class="btn danger" type="button" id="clearSingle">清空输出</button></div>
+        <div class="sub-h">② 用来拟合的样本</div>
+        <p class="sub-note" id="fitSrcNote">当前名单：—（沿用 ② 距离分析 里筛选好的名单）</p>
+        <div class="toolbar"><button class="btn primary" type="button" id="runSingle">拟合这个样本</button><button class="btn" type="button" id="runAllSingle" style="display:none">全部一起拆</button><button class="btn ghost" type="button" id="copySingle" style="display:none">复制结果</button><button class="btn danger" type="button" id="clearSingle">清空输出</button></div>
+        <div class="sub-h">③ 结果</div>
         <div class="target-actions" id="singleTargets"></div><div class="output-stack" id="singleResults"><div class="empty-state">选择目标样本并开始拟合。</div></div>
       
         </div>
@@ -688,7 +702,7 @@
           <div class="control"><label for="multiAggregate">按冒号前名称合并</label><select id="multiAggregate"><option value="yes">是</option><option value="no">否</option></select></div>
         </div>
         </details>
-        <div class="toolbar"><button class="btn primary" type="button" id="runMulti">批量拆解</button><button class="btn ghost" type="button" id="copyMultiCsv">复制 CSV</button><button class="btn ghost" type="button" id="copyMultiTsv">复制 TSV</button><button class="btn danger" type="button" id="clearMulti">清空输出</button></div>
+        <div class="toolbar"><button class="btn primary" type="button" id="runMulti">批量拟合</button><button class="btn ghost" type="button" id="copyMultiCsv">复制 CSV</button><button class="btn ghost" type="button" id="copyMultiTsv">复制 TSV</button><button class="btn danger" type="button" id="clearMulti">清空输出</button></div>
         <div id="multiResults"><div class="empty-state" style="margin-top:22px">至少需要一个参考群体和一个目标样本。</div></div>
       
         </div>
@@ -941,6 +955,8 @@
       else { validation.className = "validation"; validation.textContent = ""; }
       renderSampleManager(kind);
       refreshTargetControls();
+      const note = document.getElementById("fitSrcNote");
+      if (note && kind === "source") note.textContent = `当前名单：${parsed.rows.length.toLocaleString("zh-CN")} 条（沿用 ② 距离分析 里筛选好的名单，要改去那边调筛选）`;
     }
     sourceInput.addEventListener("input", () => refreshData("source")); targetInput.addEventListener("input", () => refreshData("target"));
     function requireData() {
@@ -1356,16 +1372,74 @@
       Punjabi:"旁遮普人",Tamil:"泰米尔人",Telugu:"泰卢固人",Gujarati:"古吉拉特人",Marathi:"马拉地人",
       Pashtun:"普什图人",Persian:"波斯人",Balochi:"俾路支人",Brahui:"布拉灰人",Kalash:"卡拉什人",Burusho:"布鲁绍人"};
     const ANCIENT_CN = {China:"中国",Xinjiang:"新疆",Tibet:"西藏",Mongolia:"蒙古",Russia:"俄罗斯",Ukraine:"乌克兰",Kazakhstan:"哈萨克斯坦",USA:"美国",Iran:"伊朗",Turkey:"土耳其",Israel:"以色列",Egypt:"埃及",Germany:"德国",France:"法国",Italy:"意大利",Spain:"西班牙",Greece:"希腊",Hungary:"匈牙利",Poland:"波兰",Czechia:"捷克",Sweden:"瑞典",Denmark:"丹麦",England:"英格兰",Britain:"英国",Ireland:"爱尔兰",Norway:"挪威",Finland:"芬兰",Croatia:"克罗地亚",Serbia:"塞尔维亚",Bulgaria:"保加利亚",Romania:"罗马尼亚",Armenia:"亚美尼亚",Georgia:"格鲁吉亚",Argentina:"阿根廷",Brazil:"巴西",Peru:"秘鲁",Mexico:"墨西哥",Canada:"加拿大",Australia:"澳大利亚",Japan:"日本",Korea:"韩国",Vietnam:"越南",Thailand:"泰国",Cambodia:"柬埔寨",India:"印度",Pakistan:"巴基斯坦",Afghanistan:"阿富汗",Nepal:"尼泊尔",Myanmar:"缅甸",Lebanon:"黎巴嫩",Jordan:"约旦",Iraq:"伊拉克",Syria:"叙利亚"};
-    function displayName(raw) {
-      return String(raw);
+    let showChinese = false;
+    function cnName(raw) {
+      const base = String(raw).replace(/\(n=[\d,]+\)$/, "").replace(/_o\d*$/, "").replace(/\([^)]*\)/g, "").replace(/_+$/, "");
+      const parts = base.split("_").filter(Boolean);
+      const first = parts[0] || "";
+      if (first === "Han") { const prov = PROV_CN[parts[1]] || parts[1] || ""; return prov ? `汉族 · ${prov}` : "汉族"; }
+      const eth = ETH_CN[first];
+      if (eth) return eth;
+      if (PROV_CN[first]) {
+        const second = ETH_CN[parts[1]];
+        if (second) return `${second}（${PROV_CN[first]}）`;
+        return PROV_CN[first];
+      }
+      const anc = ANCIENT_CN[first];
+      if (anc) return anc;
+      return parts.join(" ");
     }
+    function displayName(raw) {
+      return showChinese ? cnName(raw) : String(raw);
+    }
+
+    const PAGE_SIZE = 20;
+    const pageStore = new Map();
+    let pageSeq = 0;
 
     function distanceTable(rows, valueLabel, scale = 1) {
       if (!rows.length) return '<div class="empty-state">没有可显示的结果。</div>';
-      const values = rows.map(row => row.value), min = Math.min(...values), max = Math.max(...values);
-      const seen = new Set(), uniq = rows.filter(row => { const k = displayName(row.name); if (seen.has(k)) return false; seen.add(k); return true; });
-      return `<table class="result-table"><thead><tr><th>排名</th><th>参考群体</th><th>${escapeHtml(valueLabel)}</th></tr></thead><tbody>${uniq.map((row,index) => `<tr><td>${index + 1}</td><td>${escapeHtml(displayName(row.name))}</td><td style="${gradientStyle(row.value,min,max)}">${formatNumber(row.value * scale, 8)}</td></tr>`).join("")}</tbody></table>`;
+      const seen = new Set();
+      const uniq = rows.filter(row => { const k = row.name; if (seen.has(k)) return false; seen.add(k); return true; });
+      const key = "pg" + (pageSeq++);
+      pageStore.set(key, { rows: uniq, valueLabel, scale });
+      return renderDistancePage(key, 0);
     }
+
+    function renderDistancePage(key, page) {
+      const entry = pageStore.get(key);
+      if (!entry) return "";
+      const { rows, valueLabel, scale } = entry;
+      const total = rows.length, pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      const cur = Math.max(0, Math.min(page, pages - 1));
+      const slice = rows.slice(cur * PAGE_SIZE, cur * PAGE_SIZE + PAGE_SIZE);
+      const values = slice.map(r => r.value), min = Math.min(...values), max = Math.max(...values);
+      const body = slice.map((row, i) => {
+        const idx = cur * PAGE_SIZE + i + 1;
+        const name = showChinese ? cnName(row.name) : row.name;
+        const title = escapeHtml(row.name);
+        return `<tr><td>${idx}</td><td title="${title}">${escapeHtml(name)}</td><td style="${gradientStyle(row.value,min,max)}">${formatNumber(row.value * scale, 8)}</td></tr>`;
+      }).join("");
+      const pager = pages > 1 ? `<div class="pager" data-pager="${key}">
+          <button class="pg-btn" type="button" data-pg="${Math.max(0,cur-1)}" ${cur===0?"disabled":""}>上一页</button>
+          ${Array.from({length: pages}, (_, i) => i).filter(i => Math.abs(i-cur) < 3 || i === 0 || i === pages-1)
+            .map(i => `<button class="pg-btn ${i===cur?"on":""}" type="button" data-pg="${i}">${i+1}</button>`).join("")}
+          <button class="pg-btn" type="button" data-pg="${Math.min(pages-1,cur+1)}" ${cur===pages-1?"disabled":""}>下一页</button>
+          <span class="pg-info">第 ${cur+1}/${pages} 页 · 共 ${total} 条</span>
+        </div>` : `<div class="pg-info">共 ${total} 条</div>`;
+      return `<div class="dist-block" data-block="${key}"><table class="result-table"><thead><tr><th>排名</th><th>参考群体</th><th>${escapeHtml(valueLabel)}</th></tr></thead><tbody>${body}</tbody></table>${pager}</div>`;
+    }
+
+    document.addEventListener("click", ev => {
+      const btn = ev.target.closest("[data-pg]");
+      if (!btn) return;
+      const pager = btn.closest("[data-pager]");
+      if (!pager) return;
+      const key = pager.dataset.pager;
+      const block = document.querySelector(`[data-block="${key}"]`);
+      if (block) block.outerHTML = renderDistancePage(key, Number(btn.dataset.pg));
+    });
+
     function pushDistanceBlock(html, text) { if (state.distanceBlocks.length === 0) document.getElementById("distanceResults").innerHTML = ""; state.distanceBlocks.unshift(html); state.distanceText.unshift(text); document.getElementById("distanceResults").innerHTML = state.distanceBlocks.join(""); }
     function runSingleDistance(index) {
       const error = requireData(); if (error) { document.getElementById("distanceResults").innerHTML = `<div class="empty-state">${escapeHtml(error)}</div>`; return; }
@@ -1385,6 +1459,17 @@
       const text = [`${config.label}\nA: ${a.name}\nB: ${b.name}`,"较低：",...low.map(row=>`${row.name}\t${formatNumber(row.value,8)}`),"较高：",...high.map(row=>`${row.name}\t${formatNumber(row.value,8)}`)].join("\n"); pushDistanceBlock(html,text);
     }
     document.getElementById("distanceMode").addEventListener("change", event => { document.getElementById("distanceModeHelp").textContent = event.target.value === "single" ? "单目标模式：选择目标 A 后运行，或点击任意目标按钮。" : "比较模式：选择不同的目标 A 与 B 后运行。"; });
+    const toggleCN = document.getElementById("toggleCN");
+    if (toggleCN) toggleCN.addEventListener("click", () => {
+      showChinese = !showChinese;
+      toggleCN.textContent = showChinese ? "切英文名" : "切中文名";
+      document.querySelectorAll("[data-block]").forEach(block => {
+        const key = block.dataset.block;
+        const entry = pageStore.get(key);
+        if (entry) block.outerHTML = renderDistancePage(key, 0);
+      });
+    });
+
     document.getElementById("runDistanceMode").addEventListener("click", () => document.getElementById("distanceMode").value === "single" ? runSingleDistance(Number(document.getElementById("compareA").value)) : runComparison());
     document.getElementById("runAllDistance").addEventListener("click", () => { const error=requireData(); if(error){document.getElementById("distanceResults").innerHTML=`<div class="empty-state">${escapeHtml(error)}</div>`;return;} state.target.forEach((_,i)=>runSingleDistance(i)); });
     document.getElementById("clearDistance").addEventListener("click",()=>{state.distanceBlocks=[];state.distanceText=[];document.getElementById("distanceResults").innerHTML='<div class="empty-state">输出已清空。</div>';});
