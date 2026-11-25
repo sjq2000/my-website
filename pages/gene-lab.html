@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" class="access-locked">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -532,20 +532,6 @@
 </style>
 </head>
 <body>
-  <section class="access-gate" id="accessGate" role="dialog" aria-modal="true" aria-labelledby="accessTitle">
-    <div class="access-card" id="accessCard">
-      <div class="access-brand"><span class="brand-mark">SJQ</span><span>身体数据实验室</span></div>
-      <h1 id="accessTitle">基因坐标<span>实验室</span></h1>
-      <p>此页面需要访问验证码。请输入验证码后进入 G25 分析工作区。</p>
-      <form class="access-form" id="accessForm">
-        <label for="accessCode">访问验证码</label>
-        <input class="access-input" id="accessCode" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" aria-describedby="accessMessage" required>
-        <button class="access-submit" type="submit">进入实验室</button>
-      </form>
-      <div class="access-message" id="accessMessage" aria-live="polite"></div>
-      <div class="access-note">验证码通过后，本标签页会保持解锁。</div>
-    </div>
-  </section>
   <nav>
     <a href="../index.html" class="nav-brand"><span class="brand-mark">SJQ</span><span class="brand-text">身体数据实验室</span></a>
     <button class="menu-toggle" type="button" aria-label="打开导航" aria-expanded="false">☰</button>
@@ -847,7 +833,6 @@
   <script>
     const DIMENSIONS = 25;
     const state = { source: [], target: [], sourceError: "", targetError: "", files: [], activeFile: -1, filteredLines: [], library: { loading: true, rows: [], sources: [], total: 0 }, distanceBlocks: [], distanceText: [], singleBlocks: [], singleText: [], multiCsv: "", multiTsv: "" };
-    const ACCESS_SESSION_KEY = "sjq-g25-access";
     let libraryLoadStarted = false;
     const sourceInput = document.getElementById("sourceInput");
     const targetInput = document.getElementById("targetInput");
@@ -1550,22 +1535,9 @@
 
     function unlockLab() {
       document.documentElement.classList.remove("access-locked");
-      document.getElementById("accessGate").setAttribute("aria-hidden", "true");
       if (!libraryLoadStarted) { libraryLoadStarted = true; loadG25Library(); }
     }
-    const accessForm = document.getElementById("accessForm"), accessInput = document.getElementById("accessCode"), accessMessage = document.getElementById("accessMessage"), accessCard = document.getElementById("accessCard");
-    try { if (sessionStorage.getItem(ACCESS_SESSION_KEY) === "verified") unlockLab(); else accessInput.focus(); } catch (error) { accessInput.focus(); }
-    accessInput.addEventListener("input", () => { accessInput.value = accessInput.value.replace(/\D/g, ""); accessMessage.textContent = ""; });
-    accessForm.addEventListener("submit", event => {
-      event.preventDefault();
-      if (accessInput.value === "1985") {
-        try { sessionStorage.setItem(ACCESS_SESSION_KEY, "verified"); } catch (error) {}
-        accessMessage.textContent = ""; unlockLab();
-      } else {
-        accessMessage.textContent = "验证码不正确，请重新输入。"; accessInput.value = ""; accessInput.focus();
-        accessCard.classList.remove("denied"); void accessCard.offsetWidth; accessCard.classList.add("denied");
-      }
-    });
+    unlockLab();
 
     function makeDemoVector(seed) { return Array.from({length:DIMENSIONS}, (_, i) => Number((Math.sin((i + 1) * (seed + 0.71)) * 0.062 + Math.cos((i + 2) * (seed * 0.37 + 0.43)) * 0.031 + seed * 0.0015).toFixed(6))); }
     function mixVectors(vectors, weights) { return Array.from({length:DIMENSIONS}, (_, i) => Number(vectors.reduce((sum, vector, index) => sum + vector[i] * weights[index], 0).toFixed(6))); }
