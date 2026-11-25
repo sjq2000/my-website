@@ -21,6 +21,8 @@ Events:
 
 Action events are deduplicated per page load and product. For rates, use distinct users in the same period and matching product cohort, not event counts divided by page views. Repeated visits and multiple devices mean a GA user is not necessarily a unique person.
 
+`report_checkout_click` is registered as a GA4 key event using the existing code event, with no default monetary value. It measures checkout intent only; the default `purchase` key event remains unused until verified payment integration is implemented.
+
 ## Metrics and limits
 
 - Checkout-intent rate: distinct users clicking the Stripe button / distinct users visiting the corresponding calculator during the same period. Use a funnel exploration to enforce entry and step order.
