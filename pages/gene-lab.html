@@ -545,7 +545,18 @@
         .simple .mixbar .tk i { display:block; height:100%; background:linear-gradient(90deg,#43d8d2,#6f8fd6); }
         .simple .mixbar .vl { width:56px; text-align:right; color:#9ef0ec; font-variant-numeric:tabular-nums; }
         .simple textarea { min-height:96px; }
+        .simple .cards.two { display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start; }
+        .simple .cardcol { min-width:0; }
+        .simple .cards.two .verdict-name { font-size:22px; }
+        .simple .cards.two .near-list li { font-size:12.5px; }
+        .simple .scatter { width:100%; height:auto; display:block; margin:6px 0 4px; }
+        .simple .cmpstrip { display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:12px 16px; margin-bottom:16px;
+                            border:1px solid rgba(240,217,168,.28); border-radius:12px; background:rgba(240,217,168,.06); font-size:13.5px; color:#cfe0e6; }
+        .simple .cmpstrip b { color:#f0d9a8; font-variant-numeric:tabular-nums; }
+        .simple .cmpstrip .vs { color:#7f8c99; font-size:12px; }
+        .simple .cmpstrip .who { margin-left:auto; color:#9ef0ec; }
         @media (max-width: 620px) {
+          .simple .cards.two { grid-template-columns:1fr; }
           .simple { padding: 20px 16px 24px; }
           .simple .lead { margin-left: 0; }
           .simple .choice-row { margin-left: 0; }
@@ -578,7 +589,16 @@
           <div class="row-actions">
             <button class="btn ghost" type="button" id="demoBtn">用示例试试</button>
             <button class="btn ghost" type="button" id="clearBtn">清空</button>
+            <button class="btn ghost" type="button" id="addB">＋ 加一个对比样本</button>
             <span class="meta-chip">合计 <strong id="sumChip">0</strong></span>
+          </div>
+          <div id="slotB" hidden style="margin-top:16px;padding-top:14px;border-top:1px dashed rgba(255,255,255,.12)">
+            <div class="row-actions" style="margin-top:0">
+              <span class="meta-chip">第二个样本</span>
+              <button class="btn ghost" type="button" id="demoB">填示例</button>
+              <button class="btn ghost" type="button" id="removeB">移除</button>
+            </div>
+            <div class="conv-grid" id="fieldsB"></div>
           </div>
         </div>
         <div class="panel" id="panelCoord" hidden>
@@ -720,11 +740,12 @@
   const fieldsEl = $("fields");
 
   // ---------- 输入 ----------
-  function buildFields() {
+  function buildFields(slot) {
+    const target = slot === "B" ? $("fieldsB") : fieldsEl;
     const model = COMPONENT_MODELS[state.model];
-    fieldsEl.innerHTML = model.items.map(([label], i) =>
-      `<div class="conv-item"><label>${label}</label><input class="text-input" type="number" min="0" step="0.01" inputmode="decimal" data-i="${i}" placeholder="0"></div>`).join("");
-    $("sumChip").textContent = "0";
+    target.innerHTML = model.items.map(([label], i) =>
+      `<div class="conv-item"><label>${label}</label><input class="text-input" type="number" min="0" step="0.01" inputmode="decimal" data-${slot === "B" ? "ib" : "i"}="${i}" placeholder="0"></div>`).join("");
+    if (slot !== "B") $("sumChip").textContent = "0";
   }
 
   document.querySelectorAll("[data-mode]").forEach(btn => btn.addEventListener("click", () => {
@@ -736,10 +757,29 @@
 
   document.querySelectorAll("[data-model]").forEach(btn => btn.addEventListener("click", () => {
     document.querySelectorAll("[data-model]").forEach(b => b.classList.toggle("active", b === btn));
-    state.model = btn.dataset.model; buildFields();
+    state.model = btn.dataset.model; buildFields(); buildFields("B");
   }));
 
-  $("clearBtn").addEventListener("click", buildFields);
+  $("clearBtn").addEventListener("click", () => { buildFields(); buildFields("B"); });
+  $("addB").addEventListener("click", () => {
+    $("slotB").hidden = false;
+    if (!$("fieldsB").children.length) buildFields("B");
+    $("addB").hidden = true;
+  });
+  $("removeB").addEventListener("click", () => {
+    $("slotB").hidden = true; $("addB").hidden = false; buildFields("B");
+  });
+  $("demoB").addEventListener("click", () => {
+    const demo = state.model === "wegene"
+      ? {"北方汉族":38,"南方汉族":33,"蒙古语族群":6,"通古斯":1.5,"藏族":2.5,"纳西/彝族":3,"苗瑶":4,"畲族":2,"高山族群":1,"傣族":2,"拉祜族":0.5,"维吾尔族":0.2,"韩国人":0.4,"日本人":0.2,"雅库特":0.1}
+      : {"北汉":44,"南汉":38,"藏缅":4.5,"傣":3.2,"苗瑶":3.4,"朝鲜":1.2,"蒙通":1.6,"拉祜":0.8,"维吾尔":0.3,"日本":0.2,"雅库特":0.1,"布里亚特":0.1};
+    if (!$("fieldsB").children.length) buildFields("B");
+    COMPONENT_MODELS[state.model].items.forEach(([label], i) => {
+      const input = document.querySelector(`#fieldsB [data-ib="${i}"]`);
+      if (input) input.value = demo[label] !== undefined ? demo[label] : "";
+    });
+    analyse();
+  });
 
   $("demoBtn").addEventListener("click", () => {
     const demo = state.model === "wegene"
@@ -752,11 +792,12 @@
     analyse();
   });
 
-  function componentsToG25() {
+  function componentsToG25(slot) {
     const model = COMPONENT_MODELS[state.model];
-    const values = [...fieldsEl.querySelectorAll("[data-i]")].map(el => { const v = parseFloat(el.value); return Number.isFinite(v) && v > 0 ? v : 0; });
+    const sel = slot === "B" ? "#fieldsB [data-ib]" : "[data-i]";
+    const values = [...document.querySelectorAll(sel)].map(el => { const v = parseFloat(el.value); return Number.isFinite(v) && v > 0 ? v : 0; });
     const sum = values.reduce((a, b) => a + b, 0);
-    $("sumChip").textContent = sum.toFixed(2);
+    if (slot !== "B") $("sumChip").textContent = sum.toFixed(2);
     if (!(sum > 0)) return null;
     const g = new Array(25).fill(0);
     values.forEach((v, i) => { if (!v) return; const vec = model.items[i][1], w = v / sum; for (let k = 0; k < 25; k++) g[k] += w * vec[k]; });
@@ -780,7 +821,7 @@
   function dist(a, b) { let s = 0; for (let i = 0; i < 25; i++) { const d = a[i] - b[i]; s += d * d; } return Math.sqrt(s); }
 
   function nearest(g, rows, limit, labelFn) {
-    const scored = rows.map(r => ({ name: r.name, label: (labelFn || prettyName)(r.name), d: dist(g, r.values) }));
+    const scored = rows.map(r => ({ name: r.name, label: (labelFn || prettyName)(r.name), d: dist(g, r.values), v: r.values }));
     scored.sort((a, b) => a.d - b.d);
     const seen = new Set(), out = [];
     for (const row of scored) { if (seen.has(row.label)) continue; seen.add(row.label); out.push(row); if (out.length >= limit) break; }
@@ -891,9 +932,45 @@
         <div class="axis-bar"><span class="axis-mark" style="left:${Math.max(2, Math.min(98, axis))}%"></span></div>
         <div class="axis-scale"><span>鄂温克 0</span><span>马来 100</span></div>
         <div class="axis-value">你的南北坐标 ${axis.toFixed(2)}（中国汉族多在 62–88）</div>`}
+      <h3>位置示意<span style="font-weight:400;color:#7f8c99;font-size:12px">（横＝第一主成分，竖＝第二主成分，点越近越像）</span></h3>
+      ${scatterSvg(g, modern)}
       <h3>最接近的 15 个人群</h3>
       <ol class="near-list">${rows}</ol>
       <details class="more"><summary>最接近的 5 个古代样本</summary><ol class="near-list">${ancRows}</ol></details>`;
+  }
+
+  function scatterSvg(g, neighbors) {
+    const pts = [{ x: g[0], y: g[1], me: true, label: "你" }]
+      .concat(neighbors.slice(0, 20).map(n => ({ x: n.v[0], y: n.v[1], label: n.label })));
+    const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+    let x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const px = (x1 - x0) * 0.12 || 0.01, py = (y1 - y0) * 0.12 || 0.01;
+    x0 -= px; x1 += px; y0 -= py; y1 += py;
+    const W = 520, H = 300, PAD = 18;
+    const sx = v => PAD + (v - x0) / (x1 - x0) * (W - PAD * 2);
+    const sy = v => H - PAD - (v - y0) / (y1 - y0) * (H - PAD * 2);
+    const dots = pts.map((p, i) => {
+      const isMe = !!p.me;
+      const showLabel = isMe || i <= 5;
+      return `<circle cx="${sx(p.x).toFixed(1)}" cy="${sy(p.y).toFixed(1)}" r="${isMe ? 5.5 : 3.2}"
+                fill="${isMe ? "#f0d9a8" : "#43d8d2"}" opacity="${isMe ? 1 : 0.65}"></circle>`
+        + (showLabel ? `<text x="${(sx(p.x) + 7).toFixed(1)}" y="${(sy(p.y) + 4).toFixed(1)}"
+             font-size="11" fill="${isMe ? "#f0d9a8" : "#8f9ca9"}">${isMe ? "你" : p.label}</text>` : "");
+    }).join("");
+    return `<svg viewBox="0 0 ${W} ${H}" class="scatter" preserveAspectRatio="xMidYMid meet">
+      <rect x="${PAD}" y="${PAD}" width="${W - PAD * 2}" height="${H - PAD * 2}" fill="none" stroke="rgba(255,255,255,.08)"></rect>
+      ${dots}</svg>`;
+  }
+
+  function compareStrip(samples) {
+    const ax = samples.map(s => axisPosition(s.values));
+    if (ax.some(v => v === null)) return "";
+    const [a, b] = ax;
+    const diff = (b - a).toFixed(1);
+    const who = Math.abs(b - a) < 0.5 ? "两人位置几乎一样" : (b > a ? `B 更靠南 ${Math.abs(diff)} 个点` : `A 更靠南 ${Math.abs(diff)} 个点`);
+    return `<div class="cmpstrip"><span>南北对比</span>
+      <b>A ${a.toFixed(1)}</b><span class="vs">vs</span><b>B ${b.toFixed(1)}</b>
+      <span class="who">${who}</span></div>`;
   }
 
   function renderFit(items) {
@@ -912,13 +989,18 @@
       samples = parseCoordInput();
       if (!samples.length) { msg.textContent = "没读到有效坐标，每行要有 25 个数字。"; return; }
     } else {
-      const g = componentsToG25();
+      const g = componentsToG25("A");
       if (!g) { msg.textContent = "请至少填一个大于 0 的成分。"; return; }
-      samples = [{ name: "我的成分", values: g }];
+      samples = [{ name: "样本 A", values: g }];
+      if (!$("slotB").hidden) {
+        const gb = componentsToG25("B");
+        if (gb) samples.push({ name: "样本 B", values: gb });
+      }
     }
     state.samples = samples;
     state.lastG25 = samples[0].values;
-    $("resultBody").innerHTML = samples.map((s, i) => sampleBlock(s, s.values, i)).join("");
+    $("resultBody").innerHTML = (samples.length > 1 ? compareStrip(samples) : "")
+      + `<div class="cards${samples.length > 1 ? " two" : ""}">` + samples.map((s, i) => `<div class="cardcol">${sampleBlock(s, s.values, i)}</div>`).join("") + `</div>`;
     $("resultBlock").hidden = false;
     $("fitBlock").hidden = false;
     $("fitBody").innerHTML = "";
