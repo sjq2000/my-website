@@ -576,6 +576,7 @@
           #panel-convert .conv-hint b { color:#cfe7e9; font-weight:600; }
         </style>
         <div class="panel-head"><div><h2>成分换算（23魔方 / 微基因 → G25）</h2><p>填报告里的百分比，点「计算 G25」就得到你的 25 维坐标；再点「填入目标样本」直接去第 ② 步比距离。</p></div></div>
+        
         <div class="conv-toolbar">
           <select id="convertModel" style="width:auto;min-width:190px">
             <option value="mofang">23魔方 · 12 项</option>
@@ -585,7 +586,10 @@
           <button class="btn ghost" type="button" id="convertClear">清空</button>
           <span class="meta-chip" id="convertModelNote">—</span>
         </div>
-                <div class="paywall" id="paywall">
+                
+
+        <div class="conv-grid" id="convertFields"></div>
+        <div class="paywall" id="paywall">
           <div class="paywall-head">
             <div>
               <div class="paywall-title">G25 成分换算 · 单次解锁</div>
@@ -618,8 +622,6 @@
             换设备或清过缓存的老用户，点这里 <button class="linklike" type="button" id="showAddon">拿 ¥6 加购价</button>。
           </div>
         </div>
-
-        <div class="conv-grid" id="convertFields"></div>
         <div class="conv-toolbar">
           <input class="text-input" id="convertName" style="max-width:240px" placeholder="样本名" value="我的成分">
           <button class="btn primary" type="button" id="convertRun">计算 G25</button>
