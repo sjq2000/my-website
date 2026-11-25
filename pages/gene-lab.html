@@ -598,7 +598,7 @@
           <button class="btn" type="button" id="convertCopy">复制坐标</button>
           <button class="btn" type="button" id="convertToTarget">填入目标样本</button>
           <span class="meta-chip">成分合计 <strong id="convertSum">0</strong></span>
-          <span class="meta-chip" id="lockChip">未解锁 · ¥29 / 老用户 ¥6</span>
+          <span class="meta-chip" id="lockChip">未解锁 · 单次 ¥29 / 双套餐 ¥40</span>
         </div>
         <div class="validation" id="convertMessage" aria-live="polite"></div>
         <textarea id="convertOutput" class="conv-out" readonly spellcheck="false" placeholder="计算后显示：样本名 + 25 个坐标"></textarea>
@@ -840,23 +840,16 @@
               <div class="pc-price">¥29</div>
               <a class="btn primary pc-btn" id="payOne" target="_blank" rel="noopener">去支付 ¥29</a>
             </div>
-            <div class="price-card">
-              <div class="pc-name">已买过另一种</div>
-              <div class="pc-price">¥6 <s class="pc-was">¥29</s></div>
-              <a class="btn pc-btn" id="payAddon" target="_blank" rel="noopener">去支付 ¥6</a>
-              <div class="pc-note" id="addonNote">仅限已购买过 23魔方 或 微基因 换算的用户</div>
-            </div>
             <div class="price-card best">
-              <div class="pc-badge">一次买两种 · 省 ¥23</div>
+              <div class="pc-badge">一次买两种 · 省 ¥18</div>
               <div class="pc-name">双套餐（23魔方 + 微基因）</div>
-              <div class="pc-price">¥35 <s class="pc-was">¥58</s></div>
-              <a class="btn primary pc-btn" id="payBundle" target="_blank" rel="noopener">去支付 ¥35</a>
-              <div class="pc-note">分两次单买要 ¥58，一起买便宜 ¥23</div>
+              <div class="pc-price">¥40 <s class="pc-was">¥58</s></div>
+              <a class="btn primary pc-btn" id="payBundle" target="_blank" rel="noopener">去支付 ¥40</a>
+              <div class="pc-note">分两次单买要 ¥58，一起买便宜 ¥18</div>
             </div>
           </div>
           <div class="paywall-foot">
-            支付完成后会自动跳回本页并解锁。<br>
-            换设备或清过缓存的老用户，点这里 <button class="linklike" type="button" id="showAddon">拿 ¥6 加购价</button>。
+            支付完成后会自动跳回本页并解锁。
           </div>
         </div>
     </div>
@@ -1064,8 +1057,7 @@
   // ===== 付费解锁 =====
   const PRICES = {
     one:    { cny: 29, url: "https://buy.stripe.com/aFa5kFdqR5V77sV8Of3ZK03" },
-    addon:  { cny: 6,  url: "https://buy.stripe.com/4gM00l0E54R35kN0hJ3ZK04" },
-    bundle: { cny: 35, url: "https://buy.stripe.com/00wcN7gD35V714x5C33ZK05" }
+    bundle: { cny: 40, url: "https://buy.stripe.com/7sY00leuV4R3bJb4xZ3ZK06" }
   };
   const CREDIT_KEY = "sjq-g25-credits";
   const BOUGHT_KEY = "sjq-g25-bought";
@@ -1082,18 +1074,11 @@
       const m = document.getElementById("convertMessage"); if (m) { m.className = "validation ok"; m.textContent = "已解锁，可查看与复制上方坐标。"; } } }
     if (chip) chip.textContent = left > 0 ? `剩余 ${left} 次换算` : "剩余 0 次 · 需解锁";
     const lock = document.getElementById("lockChip");
-    if (lock) lock.textContent = left > 0 ? `已解锁 · 剩余 ${left} 次` : "未解锁 · ¥29 / 老用户 ¥6";
-    const addon = document.getElementById("payAddon");
-    if (addon) {
-      addon.href = hasBought() ? PRICES.addon.url : "#";
-      addon.classList.toggle("disabled", !hasBought());
-      const note = document.getElementById("addonNote");
-      if (note) note.textContent = hasBought() ? "已检测到你的购买记录，可直接用 ¥6" : "仅限已购买过 23魔方 或 微基因 换算的用户";
-    }
-    ["payOne","payAddon","payBundle"].forEach((id, i) => {
+    if (lock) lock.textContent = left > 0 ? `已解锁 · 剩余 ${left} 次` : "未解锁 · 单次 ¥29 / 双套餐 ¥40";
+    ["payOne","payBundle"].forEach((id, i) => {
       const el = document.getElementById(id);
       if (!el) return;
-      const key = ["one","addon","bundle"][i];
+      const key = ["one","bundle"][i];
       el.href = PRICES[key].url;
     });
   }
@@ -1103,7 +1088,7 @@
     const m = location.search.match(/[?&]paid=(\d+)/);
     if (!m) return;
     const amount = Number(m[1]);
-    const add = amount >= 35 ? 2 : 1;
+    const add = amount >= 40 ? 2 : 1;
     setCredits(getCredits() + add);
     markBought();
     const clean = location.pathname + location.search.replace(/([?&])paid=\d+&?/, "$1").replace(/[?&]$/, "");
@@ -1115,10 +1100,6 @@
     }, 300);
   })();
 
-  document.getElementById("showAddon")?.addEventListener("click", () => {
-    try { localStorage.setItem(BOUGHT_KEY, "1"); } catch (e) {}
-    renderPaywall();
-  });
   renderPaywall();
 
   const quickRun = document.getElementById("quickRun");
