@@ -1352,17 +1352,37 @@
       Thai:"泰国人",Cambodian:"柬埔寨人",Burmese:"缅甸人",Nepali:"尼泊尔人",Bengali:"孟加拉人",Sindhi:"信德人",
       Punjabi:"旁遮普人",Tamil:"泰米尔人",Telugu:"泰卢固人",Gujarati:"古吉拉特人",Marathi:"马拉地人",
       Pashtun:"普什图人",Persian:"波斯人",Balochi:"俾路支人",Brahui:"布拉灰人",Kalash:"卡拉什人",Burusho:"布鲁绍人"};
+    const ANCIENT_CN = {China:"中国",Xinjiang:"新疆",Tibet:"西藏",Mongolia:"蒙古",Russia:"俄罗斯",Ukraine:"乌克兰",Kazakhstan:"哈萨克斯坦",USA:"美国",Iran:"伊朗",Turkey:"土耳其",Israel:"以色列",Egypt:"埃及",Germany:"德国",France:"法国",Italy:"意大利",Spain:"西班牙",Greece:"希腊",Hungary:"匈牙利",Poland:"波兰",Czechia:"捷克",Sweden:"瑞典",Denmark:"丹麦",England:"英格兰",Britain:"英国",Ireland:"爱尔兰",Norway:"挪威",Finland:"芬兰",Croatia:"克罗地亚",Serbia:"塞尔维亚",Bulgaria:"保加利亚",Romania:"罗马尼亚",Armenia:"亚美尼亚",Georgia:"格鲁吉亚",Argentina:"阿根廷",Brazil:"巴西",Peru:"秘鲁",Mexico:"墨西哥",Canada:"加拿大",Australia:"澳大利亚",Japan:"日本",Korea:"韩国",Vietnam:"越南",Thailand:"泰国",Cambodia:"柬埔寨",India:"印度",Pakistan:"巴基斯坦",Afghanistan:"阿富汗",Nepal:"尼泊尔",Myanmar:"缅甸",Lebanon:"黎巴嫩",Jordan:"约旦",Iraq:"伊拉克",Syria:"叙利亚"};
     function displayName(raw) {
-      const name = String(raw).replace(/\(n=[\d,]+\)$/, "").replace(/_o\d*$/, "");
-      const parts = name.split("_"), first = parts[0];
-      if (first === "Han") {
-        const prov = PROV_CN[parts[1]] || parts[1] || "";
-        return prov ? `汉族 · ${prov}` : "汉族";
+      const base = String(raw).replace(/\(n=[\d,]+\)$/, "").replace(/_o\d*$/, "").replace(/\([^)]*\)/g, "").replace(/_+$/, "");
+      const parts = base.split("_").filter(Boolean);
+      const first = parts[0] || "";
+      const isAncient = /Dynasty|Neolithic|Bronze|Iron|Antiquity|Medieval|Mesolithic|Paleolithic|_(LN|LBA|LBIA|IA|EN|MN|CA|EBA|MBA|HP)_/.test(base);
+      if (isAncient) {
+        const where = first === "China" ? (PROV_CN[parts[1]] || "中国") : (PROV_CN[first] || ANCIENT_CN[first] || first);
+        const DYNASTY = {Longshan:"龙山",Yangshao:"仰韶",Zhou:"周",Han:"汉",Ming:"明",Qing:"清",Tang:"唐",
+          Song:"宋",Yuan:"元",Jin:"金",Eastern:"东",Western:"西",Northern:"北",Southern:"南",
+          Warring:"战国",Spring:"春秋",Autumn:"",States:"",Modern:"近现代",Medieval:"中世纪",
+          Antiquity:"古典",Roman:"罗马",Hellenistic:"希腊化"};
+        const ERACODE = {N:"新石器",EN:"新石器",MN:"新石器",LN:"新石器",PN:"新石器",
+          EBA:"青铜",MBA:"青铜",LBA:"青铜",BA:"青铜",LBIA:"青铜",IA:"铁器",LIA:"铁器",HP:"古典"};
+        let dyn = "", era = "";
+        for (const p of parts.slice(first === "China" ? 2 : 1)) {
+          if (DYNASTY[p] !== undefined) { dyn += DYNASTY[p]; continue; }
+          if (ERACODE[p] && !era) era = ERACODE[p];
+        }
+        if (!dyn) dyn = era;
+        return `${where}${dyn ? " · " + dyn : ""}（古代）`;
       }
+      if (first === "Han") { const prov = PROV_CN[parts[1]] || parts[1] || ""; return prov ? `汉族 · ${prov}` : "汉族"; }
       const eth = ETH_CN[first];
       if (eth) return eth;
-      if (PROV_CN[first]) return `${PROV_CN[first]}人`;
-      return name.replace(/_/g, " ");
+      if (PROV_CN[first]) {
+        const second = ETH_CN[parts[1]];
+        if (second) return `${second} · ${PROV_CN[first]}`;
+        return `${PROV_CN[first]} · ${parts.slice(1).join(" ")}`.replace(/ · $/, "");
+      }
+      return parts.join(" ");
     }
 
     function distanceTable(rows, valueLabel, scale = 1) {
