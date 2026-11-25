@@ -465,6 +465,7 @@
   .an-h p { margin: 0; font-size: 13px; color: #8f9ca9; line-height: 1.7; flex: 1 1 320px; }
   .an-i { flex: 0 0 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
           background: rgba(67,216,210,.14); color: #43d8d2; font-weight: 800; font-size: 12.5px; }
+  #panel-convert #convertOutput.locked { filter: blur(5px); user-select: none; }
   #panel-convert #convertOutput { white-space: pre !important; overflow-x: auto; word-break: keep-all; font-size: 13px; }
   .filterbar { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin: 4px 0 14px; }
   .filterbar label { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #8f9ca9; white-space: nowrap; }
@@ -982,10 +983,31 @@
     computeConvert();
   });
   document.getElementById("convertRun").addEventListener("click", () => {
-    if (getCredits() <= 0) { openPay(); return; }
-    const line = computeConvert();
-    if (line) { setCredits(getCredits() - 1); markBought(); }
+    const line = computeConvert();          // 先算出来
+    if (!line) return;
+    if (getCredits() <= 0) {
+      lockResult(true);                     // 结果先锁住
+      openPay();                            // 然后弹付费窗
+      return;
+    }
+    lockResult(false);
+    setCredits(getCredits() - 1);
+    markBought();
   });
+
+  let resultLocked = false;
+  function lockResult(on) {
+    resultLocked = on;
+    const out = document.getElementById("convertOutput");
+    if (out) { out.classList.toggle("locked", on); out.readOnly = true; }
+    const m = document.getElementById("convertMessage");
+    if (m && on) { m.className = "validation"; m.textContent = "坐标已算好，付款后即可查看与复制。"; }
+    if (m && !on) { m.className = "validation ok"; }
+  }
+  function requireUnlocked() {
+    if (resultLocked || getCredits() <= 0) { openPay(); return false; }
+    return true;
+  }
 
   function openPay() { const m = document.getElementById("payMask"); if (m) m.hidden = false; }
   function closePay() { const m = document.getElementById("payMask"); if (m) m.hidden = true; }
@@ -993,12 +1015,14 @@
   document.getElementById("payMask")?.addEventListener("click", ev => { if (ev.target.id === "payMask") closePay(); });
   document.addEventListener("keydown", ev => { if (ev.key === "Escape") closePay(); });
   document.getElementById("convertCopy").addEventListener("click", async () => {
+    if (!requireUnlocked()) return;
     const line = convertOutput.value || computeConvert();
     if (!line) return;
     try { await navigator.clipboard.writeText(line); convertMessage.className = "validation ok"; convertMessage.textContent = "已复制到剪贴板。"; }
     catch { convertOutput.select(); convertMessage.className = "validation"; convertMessage.textContent = "浏览器不允许自动复制，已选中文本，请手动复制。"; }
   });
   document.getElementById("convertToTarget").addEventListener("click", () => {
+    if (!requireUnlocked()) return;
     const line = convertOutput.value || computeConvert();
     if (!line) return;
     const existing = targetInput.value.trim();
@@ -1033,6 +1057,8 @@
   function renderPaywall() {
     const left = getCredits();
     const chip = document.getElementById("creditChip");
+    if (left > 0) { closePay(); lockResult(false); if (document.getElementById("convertOutput")?.value) {
+      const m = document.getElementById("convertMessage"); if (m) { m.className = "validation ok"; m.textContent = "已解锁，可查看与复制上方坐标。"; } } }
     if (chip) chip.textContent = left > 0 ? `剩余 ${left} 次换算` : "剩余 0 次 · 需解锁";
     const lock = document.getElementById("lockChip");
     if (lock) lock.textContent = left > 0 ? `已解锁 · 剩余 ${left} 次` : "未解锁 · ¥29 / 老用户 ¥6";
