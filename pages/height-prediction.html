@@ -1020,6 +1020,8 @@
     }
 
     function calculate() {
+      window.heightPredictionData = null;
+      window.dispatchEvent(new Event('sjq-height-invalidated'));
       var sex = document.getElementById('sex').value || 'male';
       var profile = heightProfiles[sex] || heightProfiles.male;
       var birthYear = parseInt(document.getElementById('birthYear').value, 10);
@@ -1090,8 +1092,10 @@
           currentHeight: currentHeight,
           percentile: percentile,
           predictedAdult: currentHeight,
+          isMature: true,
           zScore: z
         };
+        window.dispatchEvent(new Event('sjq-height-result'));
         return;
       }
 
@@ -1125,8 +1129,10 @@
         currentHeight: currentHeight,
         percentile: percentile,
         predictedAdult: predictedAdult,
+        isMature: false,
         zScore: z
       };
+      window.dispatchEvent(new Event('sjq-height-result'));
     }
 
     document.querySelectorAll('input').forEach(function(input) {
@@ -1239,5 +1245,6 @@
   </script>
 
   <script src="../assets/i18n.js"></script>
+  <script src="../assets/height-share.js"></script>
 </body>
 </html>

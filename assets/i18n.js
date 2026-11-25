@@ -2,6 +2,7 @@
   "use strict";
 
   const STORAGE_KEY = "sjq-language";
+  const analyticsUrl = new URL('analytics.js', document.currentScript.src).href;
   const translations = {
     "【SJQ】身体数据实验室": "SJQ Body Data Lab",
     "身体数据实验室": "Body Data Lab",
@@ -640,6 +641,9 @@
     const stored = localStorage.getItem(STORAGE_KEY);
     const preferred = stored || (navigator.language && !navigator.language.toLowerCase().startsWith("zh") ? "en" : "zh");
     setLanguage(preferred, false);
+    const analyticsScript = document.createElement('script');
+    analyticsScript.src = analyticsUrl;
+    document.head.appendChild(analyticsScript);
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
