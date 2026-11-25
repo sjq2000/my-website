@@ -470,6 +470,7 @@
   .filterbar label { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #8f9ca9; white-space: nowrap; }
   .filterbar select { padding: 7px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,.14);
                       background: rgba(255,255,255,.04); color: #dfe9ee; font-size: 13px; }
+  #fitInput { min-height: 86px; margin: 4px 0 0; }
   .sub-h { font-size: 15px; font-weight: 800; color: #e8f2f5; margin: 22px 0 4px; }
   .sub-note { font-size: 13px; color: #8f9ca9; line-height: 1.7; margin: 0 0 8px; }
   .pager { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 12px; }
@@ -662,12 +663,18 @@
       </div>
 
       <div class="tab-panel" id="panel-single" role="tabpanel">
-        <div class="panel-head"><div><h2>成分拟合</h2><p>把样本拆成参考人群的加权组合，百分比加起来 100%。先看一个样本，想一次看全部点「一次看全部」。</p></div></div>
+        <div class="panel-head"><div><h2>成分拟合</h2><p>把样本拆成参考人群的加权组合，百分比加起来 100%。先看一个样本，想批量看就切「多样本拟合」。</p></div></div>
         <div class="sub-h">① 要分析的人</div>
-        <p class="sub-note">点名字切换要看谁；「一次看全部」会依次算完所有样本。</p>
+        <p class="sub-note">一行就够：名字 + 25 个坐标（和②距离分析用的是同一份数据，两边同步）。</p>
+        <textarea id="fitInput" spellcheck="false" placeholder="例如：我的成分,0.0228,-0.4459,…,共 25 个数字"></textarea>
+        <div class="row-actions" style="margin:8px 0 4px">
+          <button class="btn ghost" type="button" id="fitFromConvert">从①成分换算带过来</button>
+          <span class="meta-chip">已识别 <strong id="fitCount">0</strong> 个样本</span>
+        </div>
+        <p class="sub-note">在下面粘一行「名字 + 25 个坐标」，或用②里已有的样本；切「多样本拟合」会把所有样本都算一遍。</p>
         <div class="seg" role="tablist" style="margin:6px 0 14px">
-          <button class="seg-btn active" type="button" data-fitview="one">看一个样本</button>
-          <button class="seg-btn" type="button" data-fitview="all">一次看全部</button>
+          <button class="seg-btn active" type="button" data-fitview="one">单样本拟合</button>
+          <button class="seg-btn" type="button" data-fitview="all">多样本拟合</button>
         </div>
         <div id="fitOne">
         <details class="adv"><summary>高级选项（一般不用动）</summary>
@@ -934,9 +941,27 @@
     });
   });
 
+  const fitInput = document.getElementById("fitInput");
+  if (fitInput) {
+    fitInput.addEventListener("input", () => {
+      targetInput.value = fitInput.value;
+      try { refreshData("target"); } catch (e) { console.warn(e); }
+      const c = document.getElementById("fitCount");
+      if (c) c.textContent = state.target.length;
+    });
+    const fitFromConvert = document.getElementById("fitFromConvert");
+    if (fitFromConvert) fitFromConvert.addEventListener("click", () => switchTab("convert"));
+  }
+
   function switchTab(name) {
       document.querySelectorAll(".tab-button").forEach(button => { const active = button.dataset.tab === name; button.classList.toggle("active", active); button.setAttribute("aria-selected", String(active)); });
       document.querySelectorAll(".tab-panel").forEach(panel => panel.classList.toggle("active", panel.id === `panel-${name}`));
+      if (name === "single") {
+        const fi = document.getElementById("fitInput");
+        if (fi && fi.value !== targetInput.value) fi.value = targetInput.value;
+        const fc = document.getElementById("fitCount");
+        if (fc) fc.textContent = state.target.length;
+      }
     }
     document.querySelectorAll(".tab-button").forEach(button => button.addEventListener("click", () => switchTab(button.dataset.tab)));
     const menuToggle = document.querySelector(".menu-toggle");
