@@ -498,7 +498,10 @@
   .pc-note { font-size: 11.5px; color: #8f9ca9; margin-top: 8px; line-height: 1.6; }
   .paywall-foot { font-size: 12px; color: #8f9ca9; margin-top: 12px; line-height: 1.8; }
   .linklike { border: 0; background: none; color: #9ef0ec; cursor: pointer; font-size: 12px; text-decoration: underline; padding: 0; }
-  #fitInput { min-height: 86px; margin: 4px 0 0; }
+  #fitInput { min-height: 190px; margin: 4px 0 0; }
+  /* ②③ 的坐标输入框统一为中等高度，超出可滚动 */
+  #targetInput, #sourceInput, #fitInput { min-height: 190px; max-height: none; height: 190px;
+      resize: vertical; overflow-y: auto; }
   .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
   .chip { display: inline-flex; align-items: center; gap: 7px; padding: 6px 10px; border-radius: 999px;
           background: rgba(67,216,210,.1); border: 1px solid rgba(67,216,210,.32); color: #cfe0e6; font-size: 12.5px; }
