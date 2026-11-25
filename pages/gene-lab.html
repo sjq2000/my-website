@@ -467,7 +467,7 @@
           background: rgba(67,216,210,.14); color: #43d8d2; font-weight: 800; font-size: 12.5px; }
   #panel-convert #convertOutput { white-space: pre !important; overflow-x: auto; word-break: keep-all; font-size: 13px; }
   .filterbar { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin: 4px 0 14px; }
-  .filterbar label { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #8f9ca9; }
+  .filterbar label { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #8f9ca9; white-space: nowrap; }
   .filterbar select { padding: 7px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,.14);
                       background: rgba(255,255,255,.04); color: #dfe9ee; font-size: 13px; }
   .seg { display: inline-flex; gap: 8px; background: rgba(255,255,255,.04); padding: 4px; border-radius: 10px; }
@@ -598,7 +598,7 @@
               <span class="meta-chip" id="facetCount">—</span>
             </div>
 
-            <details class="adv"><summary>自定义参考名单（默认已用内置 3,227 条，不用动）</summary>
+            <details class="adv"><summary>手动编辑名单 / 粘贴自己的（可选）</summary>
 
         <div class="panel-head"><div><h2>参考人群</h2><p>这些是「候选答案」——用来和你的样本比对。可以直接搜内置库加入，也可以粘贴自己的一行。</p></div><div class="toolbar"><label class="btn file-button">导入文件<input type="file" id="sourceFile" accept=".csv,.txt,text/csv,text/plain"></label><button class="btn ghost" type="button" data-format="source">整理格式</button><button class="btn danger" type="button" data-clear="source">清空</button></div></div>
         <textarea id="sourceInput" spellcheck="false" placeholder="参考群体名称,第1维,第2维,...,第25维"></textarea>
