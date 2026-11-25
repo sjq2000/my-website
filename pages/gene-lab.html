@@ -476,6 +476,11 @@
   details.adv { margin: 4px 0 16px; }
   details.adv > summary { cursor: pointer; color: #7f8c99; font-size: 13px; padding: 6px 0; }
   details.adv[open] > summary { color: #9ef0ec; }
+
+  /* 下拉菜单：原生弹出层也用深色，避免黑字看不清 */
+  select { color-scheme: dark; }
+  select option { background-color: #0e161f; color: #e6eef4; }
+  select option:checked, select option:hover { background-color: #1b2a36; color: #9ef0ec; }
 </style>
 </head>
 <body>
