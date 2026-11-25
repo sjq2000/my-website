@@ -545,6 +545,21 @@
         .simple .mixbar .tk i { display:block; height:100%; background:linear-gradient(90deg,#43d8d2,#6f8fd6); }
         .simple .mixbar .vl { width:56px; text-align:right; color:#9ef0ec; font-variant-numeric:tabular-nums; }
         .simple textarea { min-height:96px; }
+        @media (max-width: 620px) {
+          .simple { padding: 20px 16px 24px; }
+          .simple .lead { margin-left: 0; }
+          .simple .choice-row { margin-left: 0; }
+          .simple .panel { margin-left: 0; }
+          .simple .row-actions { margin-left: 0 !important; }
+          .simple .conv-grid { grid-template-columns: repeat(2, 1fr); }
+          .simple .bh h2 { font-size: 16.5px; }
+          .simple .verdict-name { font-size: 23px; }
+          .simple .mixbar { flex-wrap: wrap; gap: 4px; margin: 10px 0 2px; }
+          .simple .mixbar .nm { width: 100%; }
+          .simple .mixbar .tk { flex: 1 1 auto; height: 10px; }
+          .simple .mixbar .vl { width: auto; }
+          .simple .near-list li { padding: 8px 10px; font-size: 13px; }
+        }
       </style>
 
       <div class="block">
