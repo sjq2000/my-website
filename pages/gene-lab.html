@@ -699,6 +699,7 @@
           <button class="seg-btn active" type="button" data-fitview="one">单样本拟合</button>
           <button class="seg-btn" type="button" data-fitview="all">多样本拟合</button>
         </div>
+        <p class="mode-help" id="fitModeHelp" hidden>一次把所有样本都拆开，结果排成一张对照表。</p>
 
         <p class="sub-note">一行就够：名字 + 25 个坐标（和②距离分析用的是同一份数据，两边同步）。</p>
         <textarea id="fitInput" spellcheck="false" placeholder="例如：我的成分,0.0228,-0.4459,…,共 25 个数字"></textarea>
@@ -707,6 +708,18 @@
           <span class="meta-chip">已识别 <strong id="fitCount">0</strong> 个样本</span>
         </div>
         <p class="sub-note">在下面粘一行「名字 + 25 个坐标」，或用②里已有的样本；切「多样本拟合」会把所有样本都算一遍。</p>
+                <div class="sub-h">② 用来拟合的样本</div>
+        <p class="sub-note" id="fitSrcNote">点「＋ 添加参考人群」从库里挑，一般 5～15 个就够；不选则用「距离分析」的整张名单（3,000+ 条，结果容易碎）。单样本与多样本都使用这里的名单。</p>
+        <div class="chips" id="fitChips"></div>
+        <div class="toolbar" style="margin-top:8px">
+          <button class="btn ghost" type="button" id="fitAddOpen">＋ 添加参考人群</button>
+          <button class="btn ghost" type="button" id="fitClearRefs">清空参考</button>
+          <span class="meta-chip">已选 <strong id="fitRefCount">0</strong> 个</span>
+        </div>
+        <div id="fitPicker" hidden style="margin-top:10px">
+          <input class="text-input" id="fitSearch" placeholder="搜名字，如 Han_ 或 Manchu">
+          <div class="fit-picker-list" id="fitPickerList"></div>
+        </div>
         <div id="fitOne">
         <details class="adv"><summary>高级选项（一般不用动）</summary>
         <div class="option-grid">
@@ -720,18 +733,6 @@
           <div class="control"><label for="singleBars">条形图</label><select id="singleBars"><option value="1">模式 1</option><option value="2">模式 2</option><option value="0">关闭</option></select></div>
         </div>
         </details>
-        <div class="sub-h">② 用来拟合的样本</div>
-        <p class="sub-note" id="fitSrcNote">点「＋ 添加参考人群」从库里挑，一般 5～15 个就够；不选则用 ② 距离分析 的整张名单（3,000+ 条，结果容易碎）。</p>
-        <div class="chips" id="fitChips"></div>
-        <div class="toolbar" style="margin-top:8px">
-          <button class="btn ghost" type="button" id="fitAddOpen">＋ 添加参考人群</button>
-          <button class="btn ghost" type="button" id="fitClearRefs">清空参考</button>
-          <span class="meta-chip">已选 <strong id="fitRefCount">0</strong> 个</span>
-        </div>
-        <div id="fitPicker" hidden style="margin-top:10px">
-          <input class="text-input" id="fitSearch" placeholder="搜名字，如 Han_ 或 Manchu">
-          <div class="fit-picker-list" id="fitPickerList"></div>
-        </div>
         <div class="toolbar"><button class="btn primary" type="button" id="runSingle">拟合这个样本</button><button class="btn" type="button" id="runAllSingle" style="display:none">全部一起拆</button><button class="btn ghost" type="button" id="copySingle" style="display:none">复制结果</button><button class="btn danger" type="button" id="clearSingle">清空输出</button></div>
         <div class="sub-h">③ 结果</div>
         <div class="target-actions" id="singleTargets"></div><div class="output-stack" id="singleResults"><div class="empty-state">选择目标样本并开始拟合。</div></div>
@@ -739,7 +740,6 @@
         </div>
         <div id="fitAll" hidden>
 
-        <p class="mode-help">一次把所有样本都拆开，结果排成一张对照表。</p>
         <details class="adv"><summary>高级选项（一般不用动）</summary>
         <div class="option-grid">
           <div class="control"><label for="multiCycles">计算轮次</label><select id="multiCycles"><option value="0.25">0.25×</option><option value="1" selected>1×</option><option value="4">4×</option></select></div>
@@ -1024,6 +1024,8 @@
     const all = btn.dataset.fitview === "all";
     document.getElementById("fitOne").hidden = all;
     document.getElementById("fitAll").hidden = !all;
+    const modeHelp = document.getElementById("fitModeHelp");
+    if (modeHelp) modeHelp.hidden = !all;
   }));
 
   // ===== 付费解锁 =====
@@ -1779,13 +1781,32 @@
     document.getElementById("clearSingle").addEventListener("click",()=>{state.singleBlocks=[];state.singleText=[];document.getElementById("singleResults").innerHTML='<div class="empty-state">输出已清空。</div>';});
 
     document.getElementById("runMulti").addEventListener("click",async()=>{
-      const error=requireData(),container=document.getElementById("multiResults");if(error){container.innerHTML=`<div class="empty-state" style="margin-top:22px">${escapeHtml(error)}</div>`;return;}const options=fitOptions("multi");container.innerHTML='<div class="empty-state" style="margin-top:22px">正在批量计算…</div>';await new Promise(resolve=>requestAnimationFrame(resolve));
-      const results=state.target.map(target=>({target,result:fitTarget(target,options)})),groupNames=options.aggregate?[...new Set(state.source.map(ref=>displayName(ref.name.split(":")[0])))]:state.source.map(ref=>displayName(ref.name)),matrix=new Map(groupNames.map(name=>[name,Array(state.target.length).fill(0)]));
-      results.forEach((entry,t)=>state.source.forEach((ref,s)=>{const name=options.aggregate?displayName(ref.name.split(":")[0]):displayName(ref.name);matrix.get(name)[t]+=entry.result.weights[s];}));
-      let rows=[...matrix].map(([name,values])=>({name,values,average:values.reduce((s,v)=>s+v,0)/values.length})).sort((a,b)=>b.average-a.average);if(!options.zeros)rows=rows.filter(row=>row.values.some(v=>v>=.0005));
-      const color=value=>value===0?"rgba(255,255,255,.025)":`hsla(${205-value*80},${40+value*50}%,${25+value*35}%,.72)`,header=state.target.map((target,i)=>`<th>${escapeHtml(target.name)}<br><small>距 ${(results[i].result.distance*100).toFixed(3)}%</small></th>`).join(""),body=rows.map(row=>`<tr><td>${escapeHtml(row.name)}</td>${row.values.map(v=>`<td style="background:${color(v)}">${(v*100).toFixed(1)}</td>`).join("")}<td style="background:${color(row.average)}">${(row.average*100).toFixed(1)}</td></tr>`).join("");
-      container.innerHTML=`<div class="multi-wrap"><table class="multi-table"><thead><tr><th>参考成分</th>${header}<th>平均</th></tr></thead><tbody>${body}</tbody></table></div>`;
-      const csvRows=[["参考成分",...state.target.map(t=>t.name),"平均"],...rows.map(row=>[row.name,...row.values.map(v=>(v*100).toFixed(1)),(row.average*100).toFixed(1)])];state.multiCsv=csvRows.map(row=>row.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(",")).join("\n");state.multiTsv=csvRows.map(row=>row.join("\t")).join("\n");
+      const error=requireData(),container=document.getElementById("multiResults");
+      if(error){container.innerHTML=`<div class="empty-state" style="margin-top:22px">${escapeHtml(error)}</div>`;return;}
+      const options=fitOptions("multi");
+      const useRefs=state.fitRefs&&state.fitRefs.length>=2;
+      const savedSource=state.source;
+      if(useRefs)state.source=state.fitRefs;
+      try{
+        container.innerHTML='<div class="empty-state" style="margin-top:22px">正在批量计算…</div>';
+        await new Promise(resolve=>requestAnimationFrame(resolve));
+        const results=state.target.map(target=>({target,result:fitTarget(target,options)}));
+        const groupNames=options.aggregate?[...new Set(state.source.map(ref=>displayName(ref.name.split(":")[0])))]:state.source.map(ref=>displayName(ref.name));
+        const matrix=new Map(groupNames.map(name=>[name,Array(state.target.length).fill(0)]));
+        results.forEach((entry,t)=>state.source.forEach((ref,s)=>{const name=options.aggregate?displayName(ref.name.split(":")[0]):displayName(ref.name);matrix.get(name)[t]+=entry.result.weights[s];}));
+        let rows=[...matrix].map(([name,values])=>({name,values,average:values.reduce((s,v)=>s+v,0)/values.length})).sort((a,b)=>b.average-a.average);
+        if(!options.zeros)rows=rows.filter(row=>row.values.some(v=>v>=.0005));
+        const color=value=>value===0?"rgba(255,255,255,.025)":`hsla(${205-value*80},${40+value*50}%,${25+value*35}%,.72)`;
+        const header=state.target.map((target,i)=>`<th>${escapeHtml(target.name)}<br><small>距 ${(results[i].result.distance*100).toFixed(3)}%</small></th>`).join("");
+        const body=rows.map(row=>`<tr><td>${escapeHtml(row.name)}</td>${row.values.map(v=>`<td style="background:${color(v)}">${(v*100).toFixed(1)}</td>`).join("")}<td style="background:${color(row.average)}">${(row.average*100).toFixed(1)}</td></tr>`).join("");
+        const sourceNote=useRefs?`<p class="sub-note" style="margin-top:8px">本次仅使用②里所选 ${state.fitRefs.length} 个参考人群。</p>`:"";
+        container.innerHTML=`<div class="multi-wrap"><table class="multi-table"><thead><tr><th>参考成分</th>${header}<th>平均</th></tr></thead><tbody>${body}</tbody></table></div>`+sourceNote;
+        const csvRows=[["参考成分",...state.target.map(t=>t.name),"平均"],...rows.map(row=>[row.name,...row.values.map(v=>(v*100).toFixed(1)),(row.average*100).toFixed(1)])];
+        state.multiCsv=csvRows.map(row=>row.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(",")).join("\n");
+        state.multiTsv=csvRows.map(row=>row.join("\t")).join("\n");
+      }finally{
+        if(useRefs)state.source=savedSource;
+      }
     });
     document.getElementById("clearMulti").addEventListener("click",()=>{state.multiCsv="";state.multiTsv="";document.getElementById("multiResults").innerHTML='<div class="empty-state" style="margin-top:22px">输出已清空。</div>';});
 
