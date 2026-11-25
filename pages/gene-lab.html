@@ -465,6 +465,7 @@
   .an-h p { margin: 0; font-size: 13px; color: #8f9ca9; line-height: 1.7; flex: 1 1 320px; }
   .an-i { flex: 0 0 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
           background: rgba(67,216,210,.14); color: #43d8d2; font-weight: 800; font-size: 12.5px; }
+  #panel-convert #convertOutput { white-space: pre !important; overflow-x: auto; word-break: keep-all; font-size: 13px; }
   .seg { display: inline-flex; gap: 8px; background: rgba(255,255,255,.04); padding: 4px; border-radius: 10px; }
   .seg-btn { padding: 8px 16px; border-radius: 8px; border: 0; background: transparent; color: #9aa8b4; font-weight: 700; cursor: pointer; font-size: 13.5px; }
   .seg-btn.active { background: rgba(67,216,210,.14); color: #9ef0ec; }
@@ -615,13 +616,13 @@
           <div class="control"><label for="distanceMode">模式</label><select id="distanceMode"><option value="single">一个人：看最像谁</option><option value="difference">差值 AC − BC</option><option value="ratio">比值 AC ÷ BC</option><option value="d3">D3 (AC − BC) ÷ (AC + BC)</option></select></div>
           <div class="control"><label for="distanceTop">最大输出数量</label><input class="number-input" id="distanceTop" type="number" min="1" value="25"></div>
           <div class="control"><label for="distanceGradient">颜色渐变</label><select id="distanceGradient"><option value="yes">开启</option><option value="no">关闭</option></select></div>
-          <div class="control"><label for="distanceScale">距离显示</label><select id="distanceScale"><option value="1">原始距离</option><option value="100" selected>距离 × 100</option></select></div>
+          <div class="control"><label for="distanceScale">距离显示</label><select id="distanceScale"><option value="1" selected>原始距离</option><option value="100">距离 × 100</option></select></div>
           <div class="control"><label for="compareA">目标 A</label><select id="compareA"></select></div><div class="control"><label for="compareB">目标 B</label><select id="compareB"></select></div>
           <div class="control"><label for="gradientFrom">渐变起点</label><input class="number-input" id="gradientFrom" type="number" step="0.01" min="0" value="0"></div>
           <div class="control"><label for="gradientTo">渐变终点</label><input class="number-input" id="gradientTo" type="number" step="0.01" min="0" value="0.2"></div>
         </div>
         </details>
-        <div class="toolbar"><button class="btn primary" type="button" id="runDistanceMode">算 / 对比</button><button class="btn" type="button" id="runAllDistance">全部一起算</button><button class="btn ghost" type="button" id="copyDistance">复制结果</button><button class="btn danger" type="button" id="clearDistance">清空输出</button></div>
+        <div class="toolbar"><button class="btn primary" type="button" id="runDistanceMode">算 / 对比</button><button class="btn" type="button" id="runAllDistance" style="display:none">全部一起算</button><button class="btn ghost" type="button" id="copyDistance" style="display:none">复制结果</button><button class="btn danger" type="button" id="clearDistance">清空输出</button></div>
         <div class="target-actions" id="distanceTargets"></div><p class="mode-help" id="distanceModeHelp">一个人：点上方按钮，或「全部一起算」。</p>
         <div class="output-stack" id="distanceResults"><div class="empty-state">请先准备参考群体与目标样本。</div></div>
       
@@ -654,7 +655,7 @@
           <div class="control"><label for="singleBars">条形图</label><select id="singleBars"><option value="1">模式 1</option><option value="2">模式 2</option><option value="0">关闭</option></select></div>
         </div>
         </details>
-        <div class="toolbar"><button class="btn primary" type="button" id="runSingle">拆解这个样本</button><button class="btn" type="button" id="runAllSingle">全部一起拆</button><button class="btn ghost" type="button" id="copySingle">复制结果</button><button class="btn danger" type="button" id="clearSingle">清空输出</button></div>
+        <div class="toolbar"><button class="btn primary" type="button" id="runSingle">拆解这个样本</button><button class="btn" type="button" id="runAllSingle" style="display:none">全部一起拆</button><button class="btn ghost" type="button" id="copySingle" style="display:none">复制结果</button><button class="btn danger" type="button" id="clearSingle">清空输出</button></div>
         <div class="target-actions" id="singleTargets"></div><div class="output-stack" id="singleResults"><div class="empty-state">选择目标样本并开始拟合。</div></div>
       
         </div>
@@ -791,10 +792,12 @@
 
   function buildConvertFields() {
     const model = currentConvertModel();
-    convertFields.innerHTML = model.items.map(([label], index) =>
-      `<div class="conv-item"><label>${escapeHtml(label)}</label>` +
-      `<input class="text-input" type="number" min="0" step="0.01" inputmode="decimal" data-conv-index="${index}" placeholder="0"></div>`
-    ).join("");
+    const LABEL_CN = {"北汉":"北方汉族","南汉":"南方汉族"};
+    convertFields.innerHTML = model.items.map(([label0], index) => {
+      const label = LABEL_CN[label0] || label0;
+      return `<div class="conv-item"><label>${escapeHtml(label)}</label>` +
+        `<input class="text-input" type="number" min="0" step="0.01" inputmode="decimal" data-conv-index="${index}" placeholder="0"></div>`;
+    }).join("");
     document.getElementById("convertModelNote").textContent = model.note;
     document.getElementById("convertSum").textContent = "0";
     convertOutput.value = "";
