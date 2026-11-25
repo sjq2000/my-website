@@ -567,7 +567,29 @@
       .brand-mark { width: 48px; height: 32px; font-size: 14px; }
     }
 
-  </style>
+  
+    /* paid-report-upsell — 紧凑版（收进 680px 容器、清单化、按钮居中） */
+    .paid-report-upsell { max-width: 632px; margin: 22px auto 18px; padding: 20px; }
+    .paid-report-head { margin-bottom: 14px; align-items: center; gap: 12px; }
+    .paid-report-title { font-size: 16px; margin-bottom: 5px; }
+    .paid-report-subtitle { font-size: 13px; line-height: 1.65; }
+    .paid-report-price { font-size: 24px; }
+    .paid-report-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
+    .paid-report-item {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 0; border: 0; background: none;
+      font-size: 13.5px; line-height: 1.6; color: #c6d3cf;
+    }
+    .paid-report-item::before {
+      content: "\2713"; color: #00ff88; font-weight: 800;
+      font-size: 13px; line-height: 1.6; flex: none;
+    }
+    .paid-report-action {
+      display: flex; width: fit-content; min-width: 190px;
+      margin: 0 auto; padding: 0 30px; min-height: 40px;
+      font-size: 14px; border-radius: 8px;
+    }
+</style>
 </head>
 <body>
   <nav>
