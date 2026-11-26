@@ -2162,6 +2162,113 @@
 })();
 
   </script>
+
+  <script>
+    // 支付后回报：草稿保存 + 自动恢复 + 跨标签页同步
+    (function () {
+      var CREDIT_KEY = "sjq-g25-credits";
+      var DRAFT_KEY = "sjq-g25-draft";
+
+      function el(id) { return document.getElementById(id); }
+      function fieldInputs() {
+        var box = el("convertFields");
+        return box ? Array.prototype.slice.call(box.querySelectorAll("[data-conv-index]")) : [];
+      }
+      function credits() {
+        try { return Math.max(0, Number(localStorage.getItem(CREDIT_KEY)) || 0); } catch (e) { return 0; }
+      }
+
+      function saveDraft() {
+        var ins = fieldInputs();
+        if (!ins.length) return;
+        var payload = {
+          model: el("convertModel") ? el("convertModel").value : "",
+          name: el("convertName") ? el("convertName").value : "",
+          vals: ins.map(function (i) { return i.value; })
+        };
+        try { localStorage.setItem(DRAFT_KEY, JSON.stringify(payload)); } catch (e) {}
+      }
+
+      function restoreDraft() {
+        var raw = null;
+        try { raw = localStorage.getItem(DRAFT_KEY); } catch (e) {}
+        if (!raw) return false;
+        var d; try { d = JSON.parse(raw); } catch (e) { return false; }
+        if (!d || !d.vals) return false;
+        var sel = el("convertModel");
+        if (sel && d.model && sel.value !== d.model) {
+          sel.value = d.model;
+          sel.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+        setTimeout(function () {
+          var ins = fieldInputs();
+          (d.vals || []).forEach(function (v, i) { if (ins[i] && v) ins[i].value = v; });
+          if (el("convertName") && d.name) el("convertName").value = d.name;
+        }, 30);
+        return true;
+      }
+
+      function hasInput() {
+        return fieldInputs().some(function (i) { return i.value !== "" && Number(i.value) > 0; });
+      }
+
+      function hasOutput() {
+        var o = el("convertOutput");
+        return !!(o && o.value && o.value.trim());
+      }
+
+      function closePaywall() {
+        var x = el("payClose");
+        if (x) x.click();
+      }
+
+      function note(text) {
+        var m = el("convertMessage");
+        if (m) { m.className = "validation ok"; m.textContent = text; }
+      }
+
+      function autoRunIfPossible() {
+        if (credits() <= 0) return false;
+        if (!hasInput()) return false;
+        if (hasOutput()) return false;
+        var btn = el("convertRun");
+        if (!btn) return false;
+        closePaywall();
+        setTimeout(function () { btn.click(); }, 120);
+        return true;
+      }
+
+      // 1) 记录草稿
+      document.addEventListener("input", function (e) {
+        if (e.target && e.target.matches && e.target.matches("[data-conv-index]")) saveDraft();
+      });
+      if (el("convertName")) el("convertName").addEventListener("input", saveDraft);
+      if (el("convertModel")) el("convertModel").addEventListener("change", function () { setTimeout(saveDraft, 50); });
+      if (el("convertRun")) el("convertRun").addEventListener("click", saveDraft);
+
+      // 2) 另一个标签页完成支付 → 这一页立刻解锁并重算
+      window.addEventListener("storage", function (e) {
+        if (e.key !== CREDIT_KEY) return;
+        if (credits() > 0) {
+          note("已在另一个标签页完成支付，当前可换算 " + credits() + " 次");
+          restoreDraft();
+          setTimeout(autoRunIfPossible, 250);
+        }
+      });
+
+      // 3) 回到本页（含支付回跳）：若有草稿且已解锁，自动填回并重算
+      window.addEventListener("load", function () {
+        setTimeout(function () {
+          if (credits() <= 0) { restoreDraft(); return; }
+          var ok = restoreDraft();
+          setTimeout(function () {
+            if (!autoRunIfPossible() && ok && hasOutput()) closePaywall();
+          }, 120);
+        }, 400);
+      });
+    })();
+  </script>
+
 <script src="../assets/i18n.js"></script>
 </body>
 </html>
