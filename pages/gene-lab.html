@@ -2347,6 +2347,7 @@
 
 
   
+  
   <script>
 var EST_COUNTRY = {
       // 东亚
@@ -2399,6 +2400,8 @@ var EST_COUNTRY = {
   var popIndex = {};
   var loaded = false;
   var filtered = [];
+  var slotValues = ["", "", "", ""];
+  var activeSlot = 0;
 
   function el(id) { return document.getElementById(id); }
   function esc(s) {
@@ -2436,24 +2439,23 @@ var EST_COUNTRY = {
     '        <option value="4" selected>4 位祖父母</option>',
     '        <option value="8">8 位曾祖父母</option>',
     '      </select>',
-    '      <button class="btn ghost" type="button" id="estClear">清空</button>',
+    '      <button class="btn ghost" type="button" id="estClear">全部清空</button>',
     '    </div>',
     '  </div>',
     '</div>',
 
     '<div class="an-block">',
-    '  <div class="an-h"><span class="an-i">2</span><h3>祖先来源</h3><p>每栏一个来源人群。可以直接输入，也可以从下面筛选出的列表里点「选入」填到第一个空栏。</p></div>',
+    '  <div class="an-h"><span class="an-i">2</span><h3>祖先来源</h3><p>先在下面筛选人群，点「选入」填进当前高亮的那一栏；点某一栏可以把「选入」的目标切过去。</p></div>',
     '  <div class="an-body">',
-    '    <div id="estSlots" style="display:grid;gap:10px;margin-bottom:14px"></div>',
+    '    <div id="estSlots" style="display:grid;gap:8px;margin-bottom:14px"></div>',
 
     '    <div class="toolbar" style="margin-bottom:10px">',
     '      <select class="select-input" id="estCont" style="max-width:150px"></select>',
     '      <select class="select-input" id="estCtry" style="max-width:190px"></select>',
     '      <input class="text-input" id="estSearch" placeholder="搜索人群名" style="max-width:220px">',
     '    </div>',
-    '    <div class="data-meta"><span class="meta-chip">匹配 <strong id="estCount">0</strong> 个现代人群</span><span class="meta-chip">点「选入」填到空栏</span></div>',
+    '    <div class="data-meta"><span class="meta-chip">匹配 <strong id="estCount">0</strong> 个现代人群</span><span class="meta-chip">点「选入」填到高亮栏</span></div>',
     '    <div id="estList" style="max-height:260px;overflow:auto;border:1px solid rgba(255,255,255,.08);border-radius:10px;margin-top:8px"></div>',
-    '    <datalist id="estPops"></datalist>',
     '    <div class="validation" id="estMsg" aria-live="polite"></div>',
     '  </div>',
     '</div>',
@@ -2497,22 +2499,49 @@ var EST_COUNTRY = {
     return ["祖父来源", "祖母来源", "外祖父来源", "外祖母来源"];
   }
 
-  function buildSlots() {
+  function resizeSlots() {
+    var n = level();
+    while (slotValues.length < n) slotValues.push("");
+    slotValues = slotValues.slice(0, n);
+    if (activeSlot >= n) activeSlot = 0;
+  }
+
+  function renderSlots() {
     var n = level();
     var names = labels(n);
     var box = el("estSlots");
     if (!box) return;
-    var old = {};
-    box.querySelectorAll("input[data-est-slot]").forEach(function (i) {
-      old[i.dataset.estSlot] = i.value;
-    });
     box.innerHTML = names.map(function (label, i) {
-      return '<div style="display:flex;gap:10px;align-items:center">' +
+      var val = slotValues[i] || "";
+      var active = i === activeSlot;
+      var border = active ? "2px solid #43d8d2" : "1px solid rgba(255,255,255,.10)";
+      var valHtml = val
+        ? '<span style="flex:1;font-size:13px;color:#e7f3f5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(val) + "</span>" +
+          '<button class="btn ghost" type="button" data-est-clear="' + i + '" style="padding:2px 8px;font-size:12px">清除</button>'
+        : '<span style="flex:1;font-size:13px;color:#5f6b78">未选择</span>';
+      return '<div data-est-slot-row="' + i + '" style="display:flex;gap:10px;align-items:center;padding:8px 12px;border-radius:10px;border:' + border + ';cursor:pointer">' +
         '<span style="min-width:88px;font-size:13px;color:#cfe0e6">' + esc(label) + "</span>" +
-        '<input class="text-input" data-est-slot="' + i + '" list="estPops" placeholder="如 Han_Beijing" style="flex:1" value="' + esc(old[i] || "") + '">' +
+        valHtml +
         '<span style="font-size:12px;color:#7f8c99;min-width:46px;text-align:right">' + (100 / n).toFixed(1) + "%</span>" +
         "</div>";
     }).join("");
+
+    box.querySelectorAll("[data-est-slot-row]").forEach(function (row) {
+      row.addEventListener("click", function (ev) {
+        if (ev.target && ev.target.getAttribute && ev.target.getAttribute("data-est-clear") !== null) return;
+        activeSlot = Number(row.dataset.estSlotRow);
+        renderSlots();
+      });
+    });
+    box.querySelectorAll("[data-est-clear]").forEach(function (b) {
+      b.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+        var i = Number(b.dataset.estClear);
+        slotValues[i] = "";
+        activeSlot = i;
+        renderSlots();
+      });
+    });
   }
 
   function facetOf(name) {
@@ -2557,20 +2586,10 @@ var EST_COUNTRY = {
       });
       pops.sort(function (a, b) { return a.name.localeCompare(b.name); });
 
-      var conts = {}, ctrys = {};
-      pops.forEach(function (p) {
-        conts[p.continent] = (conts[p.continent] || 0) + 1;
-        var k = p.continent + "|" + p.country;
-        ctrys[k] = (ctrys[k] || 0) + 1;
-      });
+      var conts = {};
+      pops.forEach(function (p) { conts[p.continent] = (conts[p.continent] || 0) + 1; });
       options(el("estCont"), Object.keys(conts).sort().map(function (k) { return [k, conts[k]]; }), "全部大洲");
       refreshCountries();
-
-      var dl = el("estPops");
-      if (dl) dl.innerHTML = pops.map(function (p) {
-        return '<option value="' + esc(p.name) + '"></option>';
-      }).join("");
-
       loaded = true;
       applyFilter();
       if (msg) { msg.className = "validation"; msg.textContent = "已载入 " + pops.length + " 个现代人群。"; }
@@ -2634,57 +2653,42 @@ var EST_COUNTRY = {
   }
 
   function pickInto(name) {
-    var inputs = Array.prototype.slice.call(document.querySelectorAll("input[data-est-slot]"));
-    var target = inputs.find(function (i) { return !(i.value || "").trim(); }) || inputs[inputs.length - 1];
-    if (!target) return;
-    target.value = name;
+    var n = level();
+    var idx = activeSlot;
+    if (idx === null || idx === undefined || idx >= n) idx = 0;
+    slotValues[idx] = name;
     var msg = el("estMsg");
-    if (msg) { msg.className = "validation ok"; msg.textContent = "已选入：" + name; }
-    var next = inputs.find(function (i) { return !(i.value || "").trim(); });
-    if (next) next.focus();
-  }
-
-  function norm(s) {
-    return String(s).toLowerCase().replace(/\s+/g, "_");
+    if (msg) { msg.className = "validation ok"; msg.textContent = "已选入第 " + (idx + 1) + " 栏：" + name; }
+    var next = slotValues.findIndex(function (v) { return !v; });
+    activeSlot = next >= 0 ? next : idx;
+    renderSlots();
   }
 
   function resolveName(raw) {
     var v = String(raw || "").trim();
     if (!v) return null;
     if (popIndex[v]) return { name: v, coords: popIndex[v] };
-    var nv = norm(v);
-    var hits = [];
+    var nv = v.toLowerCase().replace(/\s+/g, "_");
     for (var i = 0; i < pops.length; i++) {
-      var pn = norm(pops[i].name);
-      if (pn === nv) return { name: pops[i].name, coords: pops[i].coords };
-      if (pn.indexOf(nv) === 0) hits.push(pops[i]);
-    }
-    if (hits.length) return { name: hits[0].name, coords: hits[0].coords, ambiguous: hits.length };
-    for (var j = 0; j < pops.length; j++) {
-      if (norm(pops[j].name).indexOf(nv) >= 0) {
-        return { name: pops[j].name, coords: pops[j].coords, ambiguous: -1 };
-      }
+      var pn = pops[i].name.toLowerCase().replace(/\s+/g, "_");
+      if (pn === nv || pn.indexOf(nv) === 0) return { name: pops[i].name, coords: pops[i].coords };
     }
     return null;
   }
 
   function run() {
     var msg = el("estMsg");
-    var inputs = Array.prototype.slice.call(document.querySelectorAll("input[data-est-slot]"));
+    resizeSlots();
     var chosen = [];
     var missing = [];
-    inputs.forEach(function (inp, i) {
-      var v = (inp.value || "").trim();
+    slotValues.forEach(function (v, i) {
       if (!v) { missing.push(i + 1); return; }
       var hit = resolveName(v);
       if (!hit) { missing.push(i + 1); return; }
       chosen.push({ name: hit.name, coords: hit.coords });
     });
     if (!chosen.length) {
-      if (msg) {
-        msg.className = "validation bad";
-        msg.textContent = "至少填一个能对上的人群名（必须与内置库里的名字一致）。";
-      }
+      if (msg) { msg.className = "validation bad"; msg.textContent = "先在上面的列表里选至少一个来源人群。"; }
       return;
     }
     var sum = new Array(DIM).fill(0);
@@ -2702,7 +2706,7 @@ var EST_COUNTRY = {
     if (msg) {
       msg.className = missing.length ? "validation" : "validation ok";
       msg.textContent = missing.length
-        ? ("第 " + missing.join("、") + " 栏没对上人群名，已跳过；结果按已填的 " + chosen.length + " 项等权平均。")
+        ? ("第 " + missing.join("、") + " 栏还空着，已跳过；结果按已填的 " + chosen.length + " 项等权平均。")
         : "已生成估算坐标。";
     }
   }
@@ -2723,7 +2727,7 @@ var EST_COUNTRY = {
     if (tab) tab.click();
   }
 
-  el("estLevel").addEventListener("change", function () { buildSlots(); });
+  el("estLevel").addEventListener("change", function () { resizeSlots(); activeSlot = 0; renderSlots(); });
   el("estCont").addEventListener("change", function () { refreshCountries(); applyFilter(); });
   el("estCtry").addEventListener("change", applyFilter);
   el("estSearch").addEventListener("input", applyFilter);
@@ -2737,7 +2741,10 @@ var EST_COUNTRY = {
   });
   el("estToTarget").addEventListener("click", toTarget);
   el("estClear").addEventListener("click", function () {
-    document.querySelectorAll("input[data-est-slot]").forEach(function (i) { i.value = ""; });
+    var n = level();
+    slotValues = new Array(n).fill("");
+    activeSlot = 0;
+    renderSlots();
     var out = el("estOut");
     if (out) out.value = "";
     var info = el("estInfo");
@@ -2746,7 +2753,8 @@ var EST_COUNTRY = {
     if (msg) { msg.className = "validation"; msg.textContent = ""; }
   });
 
-  buildSlots();
+  resizeSlots();
+  renderSlots();
   loadLibrary();
 })();
 
