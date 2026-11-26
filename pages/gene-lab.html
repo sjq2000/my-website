@@ -555,7 +555,7 @@
     <header class="page-header">
       <div class="eyebrow">SJQ G25 Workbench</div>
       <h1>基因<span>坐标实验室</span></h1>
-      <p>四个页签：① 成分换算 → ② 距离分析 → ③ 成分拟合 → ④ 数据导入。普通用户只用前两个就能出结果，高级选项默认折叠。</p>
+      <p>五个页签：① 成分换算 → ② 距离分析 → ③ 成分拟合 → ④ 数据导入 → ⑤ 天赋评分。普通用户只用前两个就能出结果，高级选项默认折叠。</p>
       <div class="status-row"><span class="status-pill"><span class="status-dot"></span>每行 25 个数字 · 自动校验</span><span class="status-pill secondary">本地计算 · 数据不上传</span></div>
     </header>
 
@@ -565,6 +565,7 @@
         <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="analyze">② 距离分析</button>
         <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="single">③ 成分拟合</button>
         <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="data">④ 数据导入</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="pgs">⑤ 天赋评分</button>
       </div>
 
       <div class="tab-panel active" id="panel-convert" role="tabpanel">
@@ -690,6 +691,34 @@
       
           </div>
         </div>
+      </div>
+
+      <div class="tab-panel" id="panel-pgs" role="tabpanel">
+        <div class="panel-head"><div><h2>多基因评分（PGS）</h2><p>上传 23andMe / 微基因 / AncestryDNA 的原始数据文件，在本机浏览器里计算三项评分。文件不会被上传。</p></div></div>
+
+        <div class="an-block">
+          <div class="an-h"><span class="an-i">1</span><h3>原始数据</h3><p>支持 23andMe、微基因（WeGene）、AncestryDNA 的 txt / csv 原始导出；只在本机解析，不联网上传。</p></div>
+          <div class="an-body">
+            <div class="toolbar">
+              <label class="btn file-button">选择原始数据文件<input type="file" id="pgsFile" accept=".txt,.csv,.tsv,text/plain"></label>
+              <button class="btn ghost" type="button" id="pgsDemo">用演示数据试算</button>
+            </div>
+            <div class="data-meta">
+              <span class="meta-chip">已解析位点 <strong id="pgsParsed">0</strong></span>
+              <span class="meta-chip" id="pgsStatus">等待文件</span>
+            </div>
+            <div class="validation" id="pgsMsg" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <div class="an-block">
+          <div class="an-h"><span class="an-i">2</span><h3>评分结果</h3><p>分数是该性状的多基因加权和，越高代表遗传倾向越强；覆盖度表示命中了多少个位点。</p></div>
+          <div class="an-body">
+            <div class="output-stack" id="pgsResults"><div class="empty-state">上传原始数据后自动计算。</div></div>
+          </div>
+        </div>
+
+        <aside class="science-note"><h3>关于这些分数</h3><p>三项评分来自 PGS Catalog 的公开评分文件（PGS004215 身高、PGS001232 认知、PGS001119 握力），权重均由欧洲人群训练。用在中国人或其他人种上，解释力会明显下降。分数只反映多基因倾向，不是诊断，也不代表实际成就；环境、训练、营养的影响通常更大。本站不提供百分位，因为缺少同人群的参考分布。</p></aside>
       </div>
 
     </section>
@@ -1919,6 +1948,139 @@
 
     refreshData("source"); refreshData("target"); renderFileList(); filterActiveFile();
   </script>
-  <script src="../assets/i18n.js"></script>
+  
+  <script>
+    (function () {
+      const DATA = [
+        { key: "height", label: "身高", note: "PGS004215" },
+        { key: "cognition", label: "认知 / 流体智力", note: "PGS001232" },
+        { key: "grip", label: "握力（力量代理）", note: "PGS001119" }
+      ];
+      const cache = {};
+      const C = { A: "T", T: "A", C: "G", G: "C" };
+      let parsed = null;
+
+      async function load(key) {
+        if (cache[key]) return cache[key];
+        const res = await fetch("../assets/data/pgs/" + key + ".json");
+        if (!res.ok) throw new Error("数据加载失败：" + key);
+        cache[key] = await res.json();
+        return cache[key];
+      }
+
+      function parseRaw(text) {
+        const byRsid = new Map(), byPos = new Map();
+        const lines = text.split(/\r?\n/);
+        for (const raw of lines) {
+          if (!raw || raw[0] === "#") continue;
+          const sep = raw.indexOf("\t") >= 0 ? "\t" : (raw.indexOf(",") >= 0 ? "," : null);
+          const parts = sep ? raw.split(sep) : raw.trim().split(/\s+/);
+          if (parts.length < 4) continue;
+          const rsid = parts[0].trim();
+          const chr = parts[1].trim();
+          const pos = parts[2].trim();
+          let geno;
+          if (parts.length >= 5 && /^[ACGT]$/i.test(parts[3].trim()) && /^[ACGT]$/i.test(parts[4].trim())) {
+            geno = (parts[3].trim() + parts[4].trim()).toUpperCase();
+          } else {
+            geno = (parts[3] || "").toUpperCase().replace(/[^ACGT]/g, "");
+          }
+          if (geno.length !== 2) continue;
+          const sorted = geno.split("").sort().join("");
+          byRsid.set(rsid, sorted);
+          byPos.set(chr + ":" + pos, sorted);
+        }
+        return { byRsid, byPos };
+      }
+
+      function dosage(geno, ea, oa) {
+        const g = geno.split("").sort().join("");
+        const e = (ea || "").toUpperCase(), o = (oa || "").toUpperCase();
+        const ok = (a, b) => g.split("").every(x => x === a || (b && x === b));
+        if (ok(e, o)) return g.split("").filter(x => x === e).length;
+        const ec = C[e], oc = o ? C[o] : null;
+        if (ec && ok(ec, oc)) return g.split("").filter(x => x === ec).length;
+        return null;
+      }
+
+      function compute(score) {
+        let sum = 0, hit = 0;
+        for (const row of score.rows) {
+          const key = row[0], ea = row[1], oa = row[2], w = row[3];
+          const geno = parsed.byRsid.get(key) || parsed.byPos.get(key);
+          if (!geno) continue;
+          const d = dosage(geno, ea, oa);
+          if (d === null) continue;
+          sum += d * w;
+          hit++;
+        }
+        return { sum, hit, total: score.rows.length, pct: hit / score.rows.length };
+      }
+
+      function render(results) {
+        const box = document.getElementById("pgsResults");
+        const rows = results.map(r => {
+          const cov = (r.pct * 100).toFixed(1);
+          const cls = r.pct >= 0.8 ? "ok" : r.pct >= 0.5 ? "" : "bad";
+          return `<tr><td>${r.label}<br><small style="color:#7f8c99">${r.note}</small></td>
+            <td style="font-variant-numeric:tabular-nums"><strong>${r.sum.toFixed(3)}</strong></td>
+            <td>${r.hit.toLocaleString()} / ${r.total.toLocaleString()}</td>
+            <td class="${cls}">${cov}%</td></tr>`;
+        }).join("");
+        box.innerHTML = `<div class="multi-wrap"><table class="multi-table"><thead><tr>
+            <th>项目</th><th>分数</th><th>命中位点</th><th>覆盖度</th></tr></thead><tbody>${rows}</tbody></table></div>
+          <p class="sub-note" style="margin-top:10px">覆盖度低于 50% 时结果不可靠，通常是原始文件位点太少或格式不同。</p>`;
+      }
+
+      async function run() {
+        const msg = document.getElementById("pgsMsg");
+        const status = document.getElementById("pgsStatus");
+        if (!parsed) { msg.className = "validation bad"; msg.textContent = "还没有可用的基因数据。"; return; }
+        status.textContent = "计算中…";
+        try {
+          const results = [];
+          for (const d of DATA) {
+            const score = await load(d.key);
+            const r = compute(score);
+            results.push({ label: d.label, note: d.note, sum: r.sum, hit: r.hit, total: r.total, pct: r.pct });
+          }
+          render(results);
+          status.textContent = "完成";
+          msg.className = "validation ok";
+          msg.textContent = "三项评分已在本机计算完成。";
+        } catch (err) {
+          status.textContent = "失败";
+          msg.className = "validation bad";
+          msg.textContent = String(err && err.message ? err.message : err);
+        }
+      }
+
+      function setParsed(text, sourceName) {
+        parsed = parseRaw(text);
+        const n = parsed.byRsid.size;
+        document.getElementById("pgsParsed").textContent = n.toLocaleString();
+        const msg = document.getElementById("pgsMsg");
+        msg.className = n ? "validation ok" : "validation bad";
+        msg.textContent = n ? ("已解析 " + n.toLocaleString() + " 个位点（" + sourceName + "）") : "没有解析到位点，请确认文件格式。";
+        if (n) run();
+      }
+
+      document.getElementById("pgsFile").addEventListener("change", async ev => {
+        const f = ev.target.files && ev.target.files[0];
+        if (!f) return;
+        document.getElementById("pgsStatus").textContent = "读取中…";
+        setParsed(await f.text(), f.name);
+        ev.target.value = "";
+      });
+
+      document.getElementById("pgsDemo").addEventListener("click", async () => {
+        const score = await load("height");
+        const rows = score.rows.slice(0, 4000).map(r => [r[0], "1", "100000", r[1] + r[2]]);
+        const text = rows.map(r => r.join("\t")).join("\n");
+        setParsed(text, "演示数据（4000 位点，仅供试算）");
+      });
+    })();
+  </script>
+<script src="../assets/i18n.js"></script>
 </body>
 </html>
