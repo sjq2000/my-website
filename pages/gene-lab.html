@@ -2272,8 +2272,8 @@
   </script>
 
 
-  <script>
-    // 开发者入口：输入口令直接解锁（口令以哈希形式校验，不存明文）
+    <script>
+    // 开发者入口（内联输入框，不依赖 window.prompt）
     (function () {
       var CREDIT_KEY = "sjq-g25-credits";
       var DEV_HASH = "78e370b587b145920213731b7c7c725e512b3b6577c51c800218a7c764c532ae"; // sha256("1985")
@@ -2284,9 +2284,9 @@
       async function sha256Hex(text) {
         var buf = new TextEncoder().encode(text);
         var digest = await crypto.subtle.digest("SHA-256", buf);
-        return Array.from(new Uint8Array(digest)).map(function (b) {
-          return b.toString(16).padStart(2, "0");
-        }).join("");
+        var out = "";
+        new Uint8Array(digest).forEach(function (b) { out += b.toString(16).padStart(2, "0"); });
+        return out;
       }
 
       function grant() {
@@ -2303,21 +2303,48 @@
         if (btn) setTimeout(function () { btn.click(); }, 150);
       }
 
+      function buildBox() {
+        var old = el("devBox");
+        if (old) return old;
+        var foot = document.querySelector(".paywall-foot");
+        if (!foot) return null;
+        var box = document.createElement("div");
+        box.id = "devBox";
+        box.style.cssText = "margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap";
+        box.innerHTML = '<input id="devCode" class="text-input" type="password" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="开发者口令" style="max-width:150px;padding:6px 8px">' +
+          '<button id="devOk" class="btn" type="button" style="padding:6px 12px">确定</button>' +
+          '<span id="devMsg" style="font-size:12px;color:#8f9ca9"></span>';
+        foot.appendChild(box);
+        box.querySelector("#devOk").addEventListener("click", submit);
+        box.querySelector("#devCode").addEventListener("keydown", function (e) {
+          if (e.key === "Enter") { e.preventDefault(); submit(); }
+        });
+        return box;
+      }
+
+      async function submit() {
+        var codeEl = el("devCode");
+        var msg = el("devMsg");
+        if (!codeEl) return;
+        var hex = await sha256Hex(String(codeEl.value || "").trim());
+        if (hex === DEV_HASH) { grant(); return; }
+        if (msg) { msg.textContent = "口令不对"; msg.style.color = "#f28b82"; }
+      }
+
       var entry = el("devEntry");
       if (entry) {
-        entry.addEventListener("click", async function () {
-          var code = window.prompt("开发者口令");
-          if (code === null) return;
-          var hex = await sha256Hex(String(code).trim());
-          if (hex === DEV_HASH) { grant(); }
-          else {
-            var msg = el("convertMessage");
-            if (msg) { msg.className = "validation bad"; msg.textContent = "口令不对。"; }
-          }
+        entry.style.userSelect = "none";
+        entry.addEventListener("click", function (ev) {
+          ev.preventDefault();
+          var box = buildBox();
+          var inp = el("devCode");
+          if (inp) { inp.focus(); inp.select && inp.select(); }
+          if (!box) { try { console.warn("devEntry: paywall-foot not found"); } catch (e) {} }
         });
       }
     })();
   </script>
+
 
 <script src="../assets/i18n.js"></script>
 </body>
