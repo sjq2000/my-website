@@ -1951,6 +1951,12 @@
   
   <script>
     (function () {
+      // 面板若被嵌进了别的 tab-panel，挂回 .lab-shell，否则永远不会显示
+      (function () {
+        const shell = document.querySelector(".lab-shell");
+        const panel = document.getElementById("panel-pgs");
+        if (shell && panel && panel.parentElement !== shell) shell.appendChild(panel);
+      })();
       const DATA = [
         { key: "height", label: "身高", note: "PGS004215" },
         { key: "cognition", label: "认知 / 流体智力", note: "PGS001232" },
