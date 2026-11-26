@@ -555,7 +555,7 @@
     <header class="page-header">
       <div class="eyebrow">SJQ G25 Workbench</div>
       <h1>基因<span>坐标实验室</span></h1>
-      <p>五个页签：① 成分换算 → ② 距离分析 → ③ 成分拟合 → ④ 数据导入 → ⑤ 天赋评分。普通用户只用前两个就能出结果，高级选项默认折叠。</p>
+      <p>六个页签：① 成分换算 → ② 距离分析 → ③ 成分拟合 → ④ 数据导入 → ⑤ 天赋评分 → ⑥ 祖源估算。普通用户只用前两个就能出结果，高级选项默认折叠。</p>
       <div class="status-row"><span class="status-pill"><span class="status-dot"></span>每行 25 个数字 · 自动校验</span><span class="status-pill secondary">本地计算 · 数据不上传</span></div>
     </header>
 
@@ -2346,6 +2346,281 @@
   </script>
 
 
+  <script>
+(function () {
+  var DIM = 25;
+  var LIB_URL = "../assets/data/g25-library.json";
+  var pops = [];
+  var popIndex = {};
+  var loaded = false;
+
+  function el(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+
+  var shell = document.querySelector(".lab-shell");
+  var tabList = shell ? shell.querySelector(".tab-list") : null;
+  if (!shell || !tabList) return;
+
+  var btn = document.createElement("button");
+  btn.className = "tab-button";
+  btn.type = "button";
+  btn.setAttribute("role", "tab");
+  btn.setAttribute("aria-selected", "false");
+  btn.dataset.tab = "est";
+  btn.textContent = "⑥ 祖源估算";
+  tabList.appendChild(btn);
+
+  var panel = document.createElement("div");
+  panel.className = "tab-panel";
+  panel.id = "panel-est";
+  panel.setAttribute("role", "tabpanel");
+  panel.innerHTML = [
+    '<div class="panel-head"><div><h2>祖源估算（Ancestry estimate）</h2><p>没有原始 DNA？按祖先的来源人群估算一组 G25 坐标，再用它去跑距离、拟合和匹配。取的是各人群平均坐标的加权平均，不是你的真实基因型。</p></div></div>',
+
+    '<div class="an-block">',
+    '  <div class="an-h"><span class="an-i">1</span><h3>精确度</h3><p>能往上追溯得越远，估算越平滑；只有父母就选「2 位父母」。</p></div>',
+    '  <div class="an-body">',
+    '    <div class="toolbar">',
+    '      <select class="select-input" id="estLevel" style="max-width:220px">',
+    '        <option value="4" selected>4 位祖父母</option>',
+    '        <option value="2">2 位父母</option>',
+    '        <option value="8">8 位曾祖父母</option>',
+    '      </select>',
+    '      <button class="btn ghost" type="button" id="estDemo">填示例</button>',
+    '      <button class="btn ghost" type="button" id="estClear">清空</button>',
+    '    </div>',
+    '  </div>',
+    '</div>',
+
+    '<div class="an-block">',
+    '  <div class="an-h"><span class="an-i">2</span><h3>祖先来源</h3><p>每一栏填一个来源人群（人名群名，可搜索内置库），人数相同的按等权平均。</p></div>',
+    '  <div class="an-body">',
+    '    <div id="estSlots" style="display:grid;gap:10px"></div>',
+    '    <datalist id="estPops"></datalist>',
+    '    <div class="validation" id="estMsg" aria-live="polite"></div>',
+    '  </div>',
+    '</div>',
+
+    '<div class="an-block">',
+    '  <div class="an-h"><span class="an-i">3</span><h3>估算坐标</h3><p>生成后可一键填进「② 距离分析」当目标样本。</p></div>',
+    '  <div class="an-body">',
+    '    <div class="toolbar">',
+    '      <button class="btn primary" type="button" id="estRun">估算坐标</button>',
+    '      <button class="btn ghost" type="button" id="estCopy">复制</button>',
+    '      <button class="btn ghost" type="button" id="estToTarget">填入目标样本</button>',
+    '    </div>',
+    '    <textarea id="estOut" class="text-input" spellcheck="false" style="width:100%;min-height:90px;font-family:ui-monospace,monospace;font-size:12.5px" placeholder="点「估算坐标」生成；结果形如 估算样本,0.0228,-0.4459,..."></textarea>',
+    '    <div class="data-meta"><span class="meta-chip" id="estInfo">尚未生成</span></div>',
+    '  </div>',
+    '</div>',
+
+    '<aside class="science-note"><h3>这个估算意味着什么</h3><p>它把所选人群的平均坐标按份额加权，得到一个合成样本。因此它只反映这些人群在 PCA 空间中的位置，不含个人变异；真实个体与人群平均的距离通常在 0.5 到 3 之间。用来做方向性判断可以，用来做个人鉴定不行。</p></aside>'
+  ].join("");
+  shell.appendChild(panel);
+
+  btn.addEventListener("click", function () {
+    document.querySelectorAll(".tab-button").forEach(function (b) {
+      var on = b === btn;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-selected", String(on));
+    });
+    document.querySelectorAll(".tab-panel").forEach(function (p) {
+      p.classList.toggle("active", p === panel);
+    });
+  });
+
+  function level() {
+    var s = el("estLevel");
+    return s ? Number(s.value) : 4;
+  }
+
+  function labels(n) {
+    if (n === 2) return ["父亲来源", "母亲来源"];
+    if (n === 8) return ["曾祖 1", "曾祖 2", "曾祖 3", "曾祖 4", "曾祖 5", "曾祖 6", "曾祖 7", "曾祖 8"];
+    return ["祖父来源", "祖母来源", "外祖父来源", "外祖母来源"];
+  }
+
+  function buildSlots() {
+    var n = level();
+    var names = labels(n);
+    var box = el("estSlots");
+    if (!box) return;
+    var old = {};
+    box.querySelectorAll("input[data-est-slot]").forEach(function (i) {
+      old[i.dataset.estSlot] = i.value;
+    });
+    box.innerHTML = names.map(function (label, i) {
+      return '<div style="display:flex;gap:10px;align-items:center">' +
+        '<span style="min-width:88px;font-size:13px;color:#cfe0e6">' + esc(label) + "</span>" +
+        '<input class="text-input" data-est-slot="' + i + '" list="estPops" placeholder="如 Han_Beijing" style="flex:1" value="' + esc(old[i] || "") + '">' +
+        '<span style="font-size:12px;color:#7f8c99;min-width:46px;text-align:right">' + (100 / n).toFixed(1) + "%</span>" +
+        "</div>";
+    }).join("");
+  }
+
+  async function loadLibrary() {
+    if (loaded) return true;
+    var msg = el("estMsg");
+    try {
+      var res = await fetch(LIB_URL);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      var data = await res.json();
+      (data.sources || []).forEach(function (src) {
+        if (String(src.id || "").indexOf("modern") !== 0) return;
+        (src.rows || []).forEach(function (row) {
+          var name = row[0];
+          var coords = row.slice(1, 1 + DIM).map(Number);
+          if (coords.length !== DIM || coords.some(isNaN)) return;
+          if (popIndex[name]) return;
+          popIndex[name] = coords;
+          pops.push({ name: name, coords: coords });
+        });
+      });
+      pops.sort(function (a, b) { return a.name.localeCompare(b.name); });
+      var dl = el("estPops");
+      if (dl) {
+        dl.innerHTML = pops.map(function (p) {
+          return '<option value="' + esc(p.name) + '"></option>';
+        }).join("");
+      }
+      loaded = true;
+      if (msg) {
+        msg.className = "validation";
+        msg.textContent = "已载入 " + pops.length + " 个现代人群可供选择。";
+      }
+      return true;
+    } catch (e) {
+      if (msg) {
+        msg.className = "validation bad";
+        msg.textContent = "人群库载入失败：" + (e && e.message ? e.message : e);
+      }
+      return false;
+    }
+  }
+
+  function norm(s) {
+    return String(s).toLowerCase().replace(/\s+/g, "_");
+  }
+
+  function resolveName(raw) {
+    var v = String(raw || "").trim();
+    if (!v) return null;
+    if (popIndex[v]) return { name: v, coords: popIndex[v] };
+    var nv = norm(v);
+    var hits = [];
+    for (var i = 0; i < pops.length; i++) {
+      var pn = norm(pops[i].name);
+      if (pn === nv) return { name: pops[i].name, coords: pops[i].coords };
+      if (pn.indexOf(nv) === 0) hits.push(pops[i]);
+    }
+    if (hits.length) return { name: hits[0].name, coords: hits[0].coords, ambiguous: hits.length };
+    for (var j = 0; j < pops.length; j++) {
+      if (norm(pops[j].name).indexOf(nv) >= 0) {
+        return { name: pops[j].name, coords: pops[j].coords, ambiguous: -1 };
+      }
+    }
+    return null;
+  }
+
+  function run() {
+    var msg = el("estMsg");
+    var inputs = Array.prototype.slice.call(document.querySelectorAll("input[data-est-slot]"));
+    var chosen = [];
+    var missing = [];
+    inputs.forEach(function (inp, i) {
+      var v = (inp.value || "").trim();
+      if (!v) { missing.push(i + 1); return; }
+      var hit = resolveName(v);
+      if (!hit) { missing.push(i + 1); return; }
+      chosen.push({ name: hit.name, coords: hit.coords, input: v });
+    });
+    if (!chosen.length) {
+      if (msg) {
+        msg.className = "validation bad";
+        msg.textContent = "至少填一个能对上的人群名（必须与内置库里的名字一致）。";
+      }
+      return;
+    }
+    var sum = new Array(DIM).fill(0);
+    chosen.forEach(function (c) {
+      for (var d = 0; d < DIM; d++) sum[d] += c.coords[d] / chosen.length;
+    });
+    var line = "估算样本," + sum.map(function (v) { return v.toFixed(6); }).join(",");
+    var out = el("estOut");
+    if (out) out.value = line;
+    var info = el("estInfo");
+    if (info) {
+      info.textContent = "已用 " + chosen.length + " 个来源等权平均：" +
+        chosen.map(function (c) { return c.name; }).join(" / ");
+    }
+    if (msg) {
+      msg.className = missing.length ? "validation" : "validation ok";
+      msg.textContent = missing.length
+        ? ("第 " + missing.join("、") + " 栏没对上人群名，已跳过；结果按已填的 " + chosen.length + " 项等权平均。")
+        : "已生成估算坐标。";
+    }
+  }
+
+  function toTarget() {
+    var out = el("estOut");
+    var target = el("targetInput");
+    var msg = el("estMsg");
+    if (!out || !out.value.trim()) {
+      if (msg) { msg.className = "validation bad"; msg.textContent = "先生成坐标。"; }
+      return;
+    }
+    if (!target) return;
+    var cur = target.value.trim();
+    target.value = cur ? (cur + "\n" + out.value) : out.value;
+    target.dispatchEvent(new Event("input", { bubbles: true }));
+    var tab = document.querySelector('[data-tab="analyze"]');
+    if (tab) tab.click();
+    setTimeout(function () {
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 200);
+  }
+
+  el("estLevel").addEventListener("change", function () { buildSlots(); });
+  el("estRun").addEventListener("click", function () { loadLibrary().then(run); });
+  el("estCopy").addEventListener("click", function () {
+    var out = el("estOut");
+    if (!out || !out.value) return;
+    if (navigator.clipboard) navigator.clipboard.writeText(out.value);
+    var msg = el("estMsg");
+    if (msg) { msg.className = "validation ok"; msg.textContent = "已复制。"; }
+  });
+  el("estToTarget").addEventListener("click", toTarget);
+  el("estClear").addEventListener("click", function () {
+    document.querySelectorAll("input[data-est-slot]").forEach(function (i) { i.value = ""; });
+    var out = el("estOut");
+    if (out) out.value = "";
+    var info = el("estInfo");
+    if (info) info.textContent = "尚未生成";
+    var msg = el("estMsg");
+    if (msg) { msg.className = "validation"; msg.textContent = ""; }
+  });
+  el("estDemo").addEventListener("click", function () {
+    loadLibrary().then(function () {
+      var demo = [
+        "Han_Beijing_(Northern_China_Profile)_(n=65)",
+        "Han_Beijing_(Northern_China_Profile)_(n=65)",
+        "Han_Fujian_(n=35)",
+        "Han_Fujian_(n=35)"
+      ];
+      var inputs = Array.prototype.slice.call(document.querySelectorAll("input[data-est-slot]"));
+      inputs.forEach(function (inp, i) { if (demo[i]) inp.value = demo[i]; });
+    });
+  });
+
+  buildSlots();
+  loadLibrary();
+})();
+
+  </script>
 <script src="../assets/i18n.js"></script>
 </body>
 </html>
