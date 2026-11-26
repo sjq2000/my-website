@@ -555,7 +555,7 @@
     <header class="page-header">
       <div class="eyebrow">SJQ G25 Workbench</div>
       <h1>基因<span>坐标实验室</span></h1>
-      <p>七个页签：① 成分换算 → ② 距离分析 → ③ 成分拟合 → ④ 数据导入 → ⑤ 身高评分 → ⑥ 认知评分 → ⑦ 力量评分。普通用户只用前两个就能出结果，高级选项默认折叠。</p>
+      <p>五个页签：① 成分换算 → ② 距离分析 → ③ 成分拟合 → ④ 数据导入 → ⑤ 天赋评分。普通用户只用前两个就能出结果，高级选项默认折叠。</p>
       <div class="status-row"><span class="status-pill"><span class="status-dot"></span>每行 25 个数字 · 自动校验</span><span class="status-pill secondary">本地计算 · 数据不上传</span></div>
     </header>
 
@@ -1924,26 +1924,23 @@
   </script>
   
   
-  <script>
+    <script>
 (function () {
   const ITEMS = [
     {
-      key: "height", tab: "⑤ 身高评分", title: "身高评分",
-      pid: "PGS004215", variants: 22938,
+      key: "height", tab: "身高评分", title: "身高评分", pid: "PGS004215",
       meta: "Raben 2023 · LASSO · 41.5 万欧洲人训练",
       verdi: "论文报告 R² 0.712，可能含协变量；同领域稳妥区间约 0.4–0.5。",
       note: "分数越高，遗传层面的身高倾向越强。环境、营养、睡眠的影响通常更大；不构成身高预测。"
     },
     {
-      key: "cognition", tab: "⑥ 认知评分", title: "认知 / 流体智力评分",
-      pid: "PGS001232", variants: 10054,
+      key: "cognition", tab: "认知评分", title: "认知 / 流体智力评分", pid: "PGS001232",
       meta: "Tanigawa 2022 · snpnet · 10.9 万欧洲人训练",
       verdi: "论文报告 R² 0.127。智力类 PGS 的天花板目前在 0.15 左右。",
       note: "只能反映多基因倾向，与受教育程度、训练、家庭环境高度混杂，不能当作智力判定。"
     },
     {
-      key: "grip", tab: "⑦ 力量评分", title: "握力评分（力量代理）",
-      pid: "PGS001119", variants: 13767,
+      key: "grip", tab: "力量评分", title: "握力评分（力量代理）", pid: "PGS001119",
       meta: "Tanigawa 2022 · snpnet · 26.9 万欧洲人训练",
       verdi: "论文报告 R² 0.578，含协变量；纯遗传解释力实际约 0.1。",
       note: "握力常被当作整体力量的代理指标。没有公认的“爆发力 PGS”，这是最接近的公开分数。"
@@ -1953,6 +1950,83 @@
   const cache = {};
   const COMP = { A: "T", T: "A", C: "G", G: "C" };
   let parsed = null;
+  const results = {};
+  let active = "height";
+
+  const shell = document.querySelector(".lab-shell");
+  const tabList = shell ? shell.querySelector(".tab-list") : null;
+  if (!shell || !tabList) return;
+
+  // 页签
+  const tabBtn = document.createElement("button");
+  tabBtn.className = "tab-button";
+  tabBtn.type = "button";
+  tabBtn.setAttribute("role", "tab");
+  tabBtn.setAttribute("aria-selected", "false");
+  tabBtn.dataset.tab = "pgs";
+  tabBtn.textContent = "⑤ 天赋评分";
+  tabList.appendChild(tabBtn);
+
+  // 面板
+  const panel = document.createElement("div");
+  panel.className = "tab-panel";
+  panel.id = "panel-pgs";
+  panel.setAttribute("role", "tabpanel");
+  panel.innerHTML = `
+    <div class="panel-head"><div><h2>多基因评分（PGS）</h2><p>上传一次原始数据，下面三个计算器分别给出对应性状的评分。文件只在本机解析，不上传。</p></div></div>
+
+    <div class="an-block">
+      <div class="an-h"><span class="an-i">1</span><h3>原始数据</h3><p>支持 23andMe、微基因（WeGene）、AncestryDNA 的 txt / csv 导出。一个文件同时供下面三项使用。</p></div>
+      <div class="an-body">
+        <div class="toolbar">
+          <label class="btn file-button">选择原始数据文件<input type="file" class="pgs-file" accept=".txt,.csv,.tsv,text/plain"></label>
+          <button class="btn ghost pgs-recalc" type="button">重新计算</button>
+        </div>
+        <div class="data-meta">
+          <span class="meta-chip">已解析位点 <strong class="pgs-parsed">0</strong></span>
+          <span class="meta-chip pgs-status">等待文件</span>
+        </div>
+        <div class="validation pgs-msg" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <div class="an-block">
+      <div class="an-h"><span class="an-i">2</span><h3>评分结果</h3><p>三项分别独立计算，切换查看。分数为该性状的多基因加权和，覆盖度表示命中位点占比。</p></div>
+      <div class="an-body">
+        <div class="seg" role="tablist" style="margin:0 0 14px">
+          ${ITEMS.map((it, i) => `<button class="seg-btn${i === 0 ? " active" : ""}" type="button" data-pgs="${it.key}">${it.tab}</button>`).join("")}
+        </div>
+        <div class="pgs-pane" style="min-height:120px"></div>
+      </div>
+    </div>
+
+    <aside class="science-note"><h3>关于这三个分数</h3><p>评分文件分别来自 PGS Catalog：身高 PGS004215、认知 PGS001232、握力 PGS001119，权重均由欧洲人群训练。用在中国人身上解释力会明显下降。分数只反映多基因倾向，不是诊断，也不代表实际成就。本站不提供百分位，因为缺少同人群的参考分布。</p></aside>
+  `;
+  shell.appendChild(panel);
+
+  const fileInput = panel.querySelector(".pgs-file");
+  const recalcBtn = panel.querySelector(".pgs-recalc");
+  const statusEl = panel.querySelector(".pgs-status");
+  const parsedEl = panel.querySelector(".pgs-parsed");
+  const msgEl = panel.querySelector(".pgs-msg");
+  const paneEl = panel.querySelector(".pgs-pane");
+
+  tabBtn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-button").forEach(b => {
+      const on = b === tabBtn;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-selected", String(on));
+    });
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p === panel));
+  });
+
+  panel.querySelectorAll(".seg-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      active = btn.dataset.pgs;
+      panel.querySelectorAll(".seg-btn").forEach(b => b.classList.toggle("active", b === btn));
+      renderPane();
+    });
+  });
 
   async function loadScore(key) {
     if (cache[key]) return cache[key];
@@ -2007,121 +2081,69 @@
     return { sum, hit, total: score.rows.length };
   }
 
-  // 建页签与面板
-  const shell = document.querySelector(".lab-shell");
-  const tabList = shell ? shell.querySelector(".tab-list") : null;
-
-  function makePanel(item) {
-    const wrap = document.createElement("div");
-    wrap.className = "tab-panel";
-    wrap.id = "panel-pgs-" + item.key;
-    wrap.setAttribute("role", "tabpanel");
-    wrap.innerHTML = `
-      <div class="panel-head"><div><h2>${item.title}</h2><p>用原始基因数据计算该项多基因评分（${item.pid}）。文件只在本机解析，不上传。</p></div></div>
-
-      <div class="an-block">
-        <div class="an-h"><span class="an-i">1</span><h3>原始数据</h3><p>支持 23andMe、微基因（WeGene）、AncestryDNA 的 txt / csv 导出。</p></div>
-        <div class="an-body">
-          <div class="toolbar">
-            <label class="btn file-button">选择原始数据文件<input type="file" class="pgs-file" accept=".txt,.csv,.tsv,text/plain"></label>
-            <button class="btn ghost pgs-reuse" type="button">用已上传的数据计算</button>
-          </div>
-          <div class="data-meta">
-            <span class="meta-chip">已解析位点 <strong class="pgs-parsed">0</strong></span>
-            <span class="meta-chip pgs-status">等待文件</span>
-          </div>
-          <div class="validation pgs-msg" aria-live="polite"></div>
-        </div>
-      </div>
-
-      <div class="an-block">
-        <div class="an-h"><span class="an-i">2</span><h3>结果</h3><p>分数为该性状的多基因加权和；覆盖度表示命中位点数占权重位点总数的比例。</p></div>
-        <div class="an-body"><div class="output-stack pgs-out"><div class="empty-state">上传数据后自动计算。</div></div></div>
-      </div>
-
-      <aside class="science-note"><h3>关于这个分数</h3><p>评分文件 ${item.pid}，${item.meta}。${item.verdi}${item.note}权重来自欧洲人群，用在中国人身上解释力会明显下降。本站不提供百分位，因为缺少同人群的参考分布。</p></aside>
+  function renderPane() {
+    const item = ITEMS.find(i => i.key === active);
+    const r = results[active];
+    if (!item) return;
+    if (!r) {
+      paneEl.innerHTML = `<div class="empty-state">上传原始数据后自动计算。</div>
+        <p class="sub-note" style="margin-top:10px">评分文件 ${item.pid} · ${item.meta}</p>`;
+      return;
+    }
+    const pct = r.hit / r.total;
+    const cls = pct >= 0.8 ? "ok" : pct >= 0.5 ? "" : "bad";
+    paneEl.innerHTML = `
+      <div class="multi-wrap"><table class="multi-table"><thead><tr>
+        <th>项目</th><th>分数</th><th>命中位点</th><th>覆盖度</th></tr></thead><tbody>
+        <tr><td>${item.title}<br><small style="color:#7f8c99">${item.pid}</small></td>
+        <td style="font-variant-numeric:tabular-nums"><strong>${r.sum.toFixed(3)}</strong></td>
+        <td>${r.hit.toLocaleString()} / ${r.total.toLocaleString()}</td>
+        <td class="${cls}">${(pct * 100).toFixed(1)}%</td></tr>
+      </tbody></table></div>
+      <p class="sub-note" style="margin-top:10px">${item.verdi}${item.note}</p>
+      ${pct < 0.5 ? '<p class="validation bad" style="margin-top:6px">覆盖度低于 50%，结果不可靠：原始文件位点太少或格式不同。</p>' : ""}
     `;
-
-    const fileInput = wrap.querySelector(".pgs-file");
-    const reuseBtn = wrap.querySelector(".pgs-reuse");
-    const statusEl = wrap.querySelector(".pgs-status");
-    const parsedEl = wrap.querySelector(".pgs-parsed");
-    const msgEl = wrap.querySelector(".pgs-msg");
-    const outEl = wrap.querySelector(".pgs-out");
-
-    function setParsed(text, source) {
-      parsed = parseRaw(text);
-      const n = parsed.byRsid.size;
-      parsedEl.textContent = n.toLocaleString();
-      msgEl.className = n ? "validation ok" : "validation bad";
-      msgEl.textContent = n ? ("已解析 " + n.toLocaleString() + " 个位点（" + source + "）") : "没有解析到位点，请确认文件格式。";
-      if (n) run();
-    }
-
-    async function run() {
-      if (!parsed) { msgEl.className = "validation bad"; msgEl.textContent = "还没有可用的基因数据。"; return; }
-      statusEl.textContent = "计算中…";
-      try {
-        const score = await loadScore(item.key);
-        const r = compute(score);
-        const pct = r.hit / r.total;
-        const cls = pct >= 0.8 ? "ok" : pct >= 0.5 ? "" : "bad";
-        outEl.innerHTML = `<div class="multi-wrap"><table class="multi-table"><thead><tr>
-            <th>项目</th><th>分数</th><th>命中位点</th><th>覆盖度</th></tr></thead><tbody>
-            <tr><td>${item.title}<br><small style="color:#7f8c99">${item.pid}</small></td>
-            <td style="font-variant-numeric:tabular-nums"><strong>${r.sum.toFixed(3)}</strong></td>
-            <td>${r.hit.toLocaleString()} / ${r.total.toLocaleString()}</td>
-            <td class="${cls}">${(pct * 100).toFixed(1)}%</td></tr>
-          </tbody></table></div>
-          <p class="sub-note" style="margin-top:10px">覆盖度低于 50% 时结果不可靠，通常是原始文件位点太少或格式不同。</p>`;
-        statusEl.textContent = "完成";
-        msgEl.className = "validation ok";
-        msgEl.textContent = "已在本机计算完成。";
-      } catch (err) {
-        statusEl.textContent = "失败";
-        msgEl.className = "validation bad";
-        msgEl.textContent = String(err && err.message ? err.message : err);
-      }
-    }
-
-    fileInput.addEventListener("change", async ev => {
-      const f = ev.target.files && ev.target.files[0];
-      if (!f) return;
-      statusEl.textContent = "读取中…";
-      setParsed(await f.text(), f.name);
-      ev.target.value = "";
-    });
-
-    reuseBtn.addEventListener("click", () => {
-      if (!parsed) { msgEl.className = "validation bad"; msgEl.textContent = "还没有上传过数据。"; return; }
-      parsedEl.textContent = parsed.byRsid.size.toLocaleString();
-      run();
-    });
-
-    return wrap;
   }
 
-  if (!shell || !tabList) return;
+  async function runAll() {
+    if (!parsed) { msgEl.className = "validation bad"; msgEl.textContent = "还没有可用的基因数据。"; return; }
+    statusEl.textContent = "计算中…";
+    try {
+      for (const item of ITEMS) {
+        const score = await loadScore(item.key);
+        results[item.key] = compute(score);
+      }
+      statusEl.textContent = "完成";
+      msgEl.className = "validation ok";
+      msgEl.textContent = "三项评分已在本机计算完成。";
+      renderPane();
+    } catch (err) {
+      statusEl.textContent = "失败";
+      msgEl.className = "validation bad";
+      msgEl.textContent = String(err && err.message ? err.message : err);
+    }
+  }
 
-  ITEMS.forEach(item => {
-    const btn = document.createElement("button");
-    btn.className = "tab-button";
-    btn.type = "button";
-    btn.setAttribute("role", "tab");
-    btn.setAttribute("aria-selected", "false");
-    btn.dataset.tab = "pgs-" + item.key;
-    btn.textContent = item.tab;
-    tabList.appendChild(btn);
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".tab-button").forEach(b => {
-        const on = b === btn;
-        b.classList.toggle("active", on);
-        b.setAttribute("aria-selected", String(on));
-      });
-      document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id === "panel-pgs-" + item.key));
-    });
-    shell.appendChild(makePanel(item));
+  fileInput.addEventListener("change", async ev => {
+    const f = ev.target.files && ev.target.files[0];
+    if (!f) return;
+    statusEl.textContent = "读取中…";
+    parsed = parseRaw(await f.text());
+    const n = parsed.byRsid.size;
+    parsedEl.textContent = n.toLocaleString();
+    msgEl.className = n ? "validation ok" : "validation bad";
+    msgEl.textContent = n ? ("已解析 " + n.toLocaleString() + " 个位点（" + f.name + "）") : "没有解析到位点，请确认文件格式。";
+    if (n) runAll();
+    ev.target.value = "";
   });
+
+  recalcBtn.addEventListener("click", () => {
+    if (!parsed) { msgEl.className = "validation bad"; msgEl.textContent = "还没有上传过数据。"; return; }
+    parsedEl.textContent = parsed.byRsid.size.toLocaleString();
+    runAll();
+  });
+
+  renderPane();
 })();
 
   </script>
