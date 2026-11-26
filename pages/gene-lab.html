@@ -2346,13 +2346,59 @@
   </script>
 
 
+  
   <script>
+var EST_COUNTRY = {
+      // 东亚
+      Chinese:["亚洲","中国"], China:["亚洲","中国"], Han:["亚洲","中国"], Tibetan:["亚洲","中国"], Tibetanized:["亚洲","中国"],
+      Uyghur:["亚洲","中国"], Kazakh_China:["亚洲","中国"], Manchu:["亚洲","中国"], Mongol_Inner:["亚洲","中国"],
+      Japanese:["亚洲","日本"], Korean:["亚洲","韩国"], Mongolian:["亚洲","蒙古"], Mongol:["亚洲","蒙古"],
+      Vietnamese:["亚洲","越南"], Kinh:["亚洲","越南"], Thai:["亚洲","泰国"], Cambodian:["亚洲","柬埔寨"],
+      Burmese:["亚洲","缅甸"], Lao:["亚洲","老挝"], Malay:["亚洲","马来西亚"], Indonesian:["亚洲","印尼"],
+      Filipino:["亚洲","菲律宾"], Papuan:["大洋洲","巴布亚新几内亚"], Negrito:["亚洲","菲律宾"],
+      Indian:["亚洲","印度"], Tamil:["亚洲","印度"], Telugu:["亚洲","印度"], Kannada:["亚洲","印度"],
+      Malayali:["亚洲","印度"], Bengali_India:["亚洲","印度"], Gujarati:["亚洲","印度"], Marathi:["亚洲","印度"],
+      Punjabi_India:["亚洲","印度"], Rajasthani:["亚洲","印度"], Bihari:["亚洲","印度"], Odia:["亚洲","印度"],
+      Assamese:["亚洲","印度"], Toda:["亚洲","印度"], Irula:["亚洲","印度"], Bhil:["亚洲","印度"],
+      Sindhi:["亚洲","巴基斯坦"], Balochi:["亚洲","巴基斯坦"], Brahui:["亚洲","巴基斯坦"], Kalash:["亚洲","巴基斯坦"],
+      Burusho:["亚洲","巴基斯坦"], Pathan:["亚洲","巴基斯坦"], Makrani:["亚洲","巴基斯坦"],
+      Pashtun:["亚洲","阿富汗"], Hazara:["亚洲","阿富汗"], Tajik:["亚洲","塔吉克斯坦"], Uzbek:["亚洲","乌兹别克斯坦"],
+      Turkmen:["亚洲","土库曼斯坦"], Kyrgyz:["亚洲","吉尔吉斯斯坦"], Kazakh:["亚洲","哈萨克斯坦"],
+      Nepali:["亚洲","尼泊尔"], Bengali:["亚洲","孟加拉国"], Sinhalese:["亚洲","斯里兰卡"], Sri_Lankan:["亚洲","斯里兰卡"],
+      Persian:["亚洲","伊朗"], Iranian:["亚洲","伊朗"], Assyrian:["亚洲","伊拉克"], Arab:["亚洲","阿拉伯半岛"],
+      Bedouin:["亚洲","阿拉伯半岛"], Saudi:["亚洲","沙特阿拉伯"], Yemeni:["亚洲","也门"], Druze:["亚洲","黎凡特"],
+      Lebanese:["亚洲","黎巴嫩"], Israeli:["亚洲","以色列"], Turkish:["亚洲","土耳其"], Armenian:["亚洲","亚美尼亚"],
+      Georgian:["亚洲","格鲁吉亚"], Azerbaijan:["亚洲","阿塞拜疆"],
+      // 欧洲
+      English:["欧洲","英国"], Scottish:["欧洲","英国"], Welsh:["欧洲","英国"], Irish:["欧洲","爱尔兰"],
+      French:["欧洲","法国"], German:["欧洲","德国"], Dutch:["欧洲","荷兰"], Belgian:["欧洲","比利时"],
+      Spanish:["欧洲","西班牙"], Portuguese:["欧洲","葡萄牙"], Italian:["欧洲","意大利"], Sardinian:["欧洲","意大利"],
+      Greek:["欧洲","希腊"], Albanian:["欧洲","阿尔巴尼亚"], Bulgarian:["欧洲","保加利亚"], Romanian:["欧洲","罗马尼亚"],
+      Hungarian:["欧洲","匈牙利"], Polish:["欧洲","波兰"], Czech:["欧洲","捷克"], Slovak:["欧洲","斯洛伐克"],
+      Austrian:["欧洲","奥地利"], Swiss:["欧洲","瑞士"], Swedish:["欧洲","瑞典"], Norwegian:["欧洲","挪威"],
+      Danish:["欧洲","丹麦"], Finnish:["欧洲","芬兰"], Russian:["欧洲","俄罗斯"], Ukrainian:["欧洲","乌克兰"],
+      Belarusian:["欧洲","白俄罗斯"], Lithuanian:["欧洲","立陶宛"], Latvian:["欧洲","拉脱维亚"], Estonian:["欧洲","爱沙尼亚"],
+      Serbian:["欧洲","塞尔维亚"], Croatian:["欧洲","克罗地亚"], Bosnian:["欧洲","波黑"], Slovenian:["欧洲","斯洛文尼亚"],
+      // 非洲
+      Egyptian:["非洲","埃及"], Moroccan:["非洲","摩洛哥"], Algerian:["非洲","阿尔及利亚"], Tunisian:["非洲","突尼斯"],
+      Libyan:["非洲","利比亚"], Sudanese:["非洲","苏丹"], Ethiopian:["非洲","埃塞俄比亚"], Somali:["非洲","索马里"],
+      Kenyan:["非洲","肯尼亚"], Tanzanian:["非洲","坦桑尼亚"], Nigerian:["非洲","尼日利亚"], Yoruba:["非洲","尼日利亚"],
+      Igbo:["非洲","尼日利亚"], Ghanaian:["非洲","加纳"], Bantu:["非洲","南非"], Zulu:["非洲","南非"],
+      Mbuti:["非洲","刚果"], Pygmy:["非洲","刚果"], San:["非洲","博茨瓦纳"], Khoisan:["非洲","南非"],
+      // 美洲 / 大洋洲
+      Pima:["北美洲","墨西哥"], Maya:["北美洲","墨西哥"], Inuit:["北美洲","美国"], Alaska:["北美洲","美国"],
+      Navajo:["北美洲","美国"], Ojibwe:["北美洲","加拿大"], Cree:["北美洲","加拿大"], Quechua:["南美洲","秘鲁"],
+      Aymara:["南美洲","玻利维亚"], Yanomami:["南美洲","巴西"], Karitiana:["南美洲","巴西"], Surui:["南美洲","巴西"],
+      Australian:["大洋洲","澳大利亚"], Aboriginal:["大洋洲","澳大利亚"], Maori:["大洋洲","新西兰"],
+      Hawaiian:["大洋洲","美国"], Samoan:["大洋洲","萨摩亚"], Tongan:["大洋洲","汤加"]
+    };
 (function () {
   var DIM = 25;
   var LIB_URL = "../assets/data/g25-library.json";
   var pops = [];
   var popIndex = {};
   var loaded = false;
+  var filtered = [];
 
   function el(id) { return document.getElementById(id); }
   function esc(s) {
@@ -2386,20 +2432,27 @@
     '  <div class="an-body">',
     '    <div class="toolbar">',
     '      <select class="select-input" id="estLevel" style="max-width:220px">',
-    '        <option value="4" selected>4 位祖父母</option>',
     '        <option value="2">2 位父母</option>',
+    '        <option value="4" selected>4 位祖父母</option>',
     '        <option value="8">8 位曾祖父母</option>',
     '      </select>',
-    '      <button class="btn ghost" type="button" id="estDemo">填示例</button>',
     '      <button class="btn ghost" type="button" id="estClear">清空</button>',
     '    </div>',
     '  </div>',
     '</div>',
 
     '<div class="an-block">',
-    '  <div class="an-h"><span class="an-i">2</span><h3>祖先来源</h3><p>每一栏填一个来源人群（人名群名，可搜索内置库），人数相同的按等权平均。</p></div>',
+    '  <div class="an-h"><span class="an-i">2</span><h3>祖先来源</h3><p>每栏一个来源人群。可以直接输入，也可以从下面筛选出的列表里点「选入」填到第一个空栏。</p></div>',
     '  <div class="an-body">',
-    '    <div id="estSlots" style="display:grid;gap:10px"></div>',
+    '    <div id="estSlots" style="display:grid;gap:10px;margin-bottom:14px"></div>',
+
+    '    <div class="toolbar" style="margin-bottom:10px">',
+    '      <select class="select-input" id="estCont" style="max-width:150px"></select>',
+    '      <select class="select-input" id="estCtry" style="max-width:190px"></select>',
+    '      <input class="text-input" id="estSearch" placeholder="搜索人群名" style="max-width:220px">',
+    '    </div>',
+    '    <div class="data-meta"><span class="meta-chip">匹配 <strong id="estCount">0</strong> 个现代人群</span><span class="meta-chip">点「选入」填到空栏</span></div>',
+    '    <div id="estList" style="max-height:260px;overflow:auto;border:1px solid rgba(255,255,255,.08);border-radius:10px;margin-top:8px"></div>',
     '    <datalist id="estPops"></datalist>',
     '    <div class="validation" id="estMsg" aria-live="polite"></div>',
     '  </div>',
@@ -2413,7 +2466,7 @@
     '      <button class="btn ghost" type="button" id="estCopy">复制</button>',
     '      <button class="btn ghost" type="button" id="estToTarget">填入目标样本</button>',
     '    </div>',
-    '    <textarea id="estOut" class="text-input" spellcheck="false" style="width:100%;min-height:90px;font-family:ui-monospace,monospace;font-size:12.5px" placeholder="点「估算坐标」生成；结果形如 估算样本,0.0228,-0.4459,..."></textarea>',
+    '    <textarea id="estOut" class="text-input" spellcheck="false" style="width:100%;min-height:90px;font-family:ui-monospace,monospace;font-size:12.5px" placeholder="点「估算坐标」生成"></textarea>',
     '    <div class="data-meta"><span class="meta-chip" id="estInfo">尚未生成</span></div>',
     '  </div>',
     '</div>',
@@ -2462,6 +2515,27 @@
     }).join("");
   }
 
+  function facetOf(name) {
+    var map = (typeof EST_COUNTRY === "object" && EST_COUNTRY) ? EST_COUNTRY : {};
+    var raw = String(name).replace(/\(n=[\d,]+\)$/, "");
+    var tokens = raw.split("_");
+    for (var i = tokens.length - 1; i >= 0; i--) {
+      var hit = map[tokens[i]];
+      if (hit) return { continent: hit[0], country: hit[1] };
+    }
+    if (/^Han|^Tibetan|^Uyghur|^Manchu|^Mongol_Inner/.test(raw)) return { continent: "亚洲", country: "中国" };
+    return { continent: "其他", country: "其他" };
+  }
+
+  function options(sel, entries, allLabel) {
+    if (!sel) return;
+    var cur = sel.value;
+    sel.innerHTML = '<option value="">' + allLabel + "</option>" + entries.map(function (e) {
+      return '<option value="' + esc(e[0]) + '">' + esc(e[0]) + "（" + e[1] + "）</option>";
+    }).join("");
+    if (cur) sel.value = cur;
+  }
+
   async function loadLibrary() {
     if (loaded) return true;
     var msg = el("estMsg");
@@ -2476,30 +2550,98 @@
           var coords = row.slice(1, 1 + DIM).map(Number);
           if (coords.length !== DIM || coords.some(isNaN)) return;
           if (popIndex[name]) return;
+          var f = facetOf(name);
           popIndex[name] = coords;
-          pops.push({ name: name, coords: coords });
+          pops.push({ name: name, coords: coords, continent: f.continent, country: f.country });
         });
       });
       pops.sort(function (a, b) { return a.name.localeCompare(b.name); });
+
+      var conts = {}, ctrys = {};
+      pops.forEach(function (p) {
+        conts[p.continent] = (conts[p.continent] || 0) + 1;
+        var k = p.continent + "|" + p.country;
+        ctrys[k] = (ctrys[k] || 0) + 1;
+      });
+      options(el("estCont"), Object.keys(conts).sort().map(function (k) { return [k, conts[k]]; }), "全部大洲");
+      refreshCountries();
+
       var dl = el("estPops");
-      if (dl) {
-        dl.innerHTML = pops.map(function (p) {
-          return '<option value="' + esc(p.name) + '"></option>';
-        }).join("");
-      }
+      if (dl) dl.innerHTML = pops.map(function (p) {
+        return '<option value="' + esc(p.name) + '"></option>';
+      }).join("");
+
       loaded = true;
-      if (msg) {
-        msg.className = "validation";
-        msg.textContent = "已载入 " + pops.length + " 个现代人群可供选择。";
-      }
+      applyFilter();
+      if (msg) { msg.className = "validation"; msg.textContent = "已载入 " + pops.length + " 个现代人群。"; }
       return true;
     } catch (e) {
-      if (msg) {
-        msg.className = "validation bad";
-        msg.textContent = "人群库载入失败：" + (e && e.message ? e.message : e);
-      }
+      if (msg) { msg.className = "validation bad"; msg.textContent = "人群库载入失败：" + (e && e.message ? e.message : e); }
       return false;
     }
+  }
+
+  function refreshCountries() {
+    var cont = el("estCont").value;
+    var counts = {};
+    pops.forEach(function (p) {
+      if (cont && p.continent !== cont) return;
+      counts[p.country] = (counts[p.country] || 0) + 1;
+    });
+    options(el("estCtry"), Object.keys(counts).sort().map(function (k) { return [k, counts[k]]; }), "全部国家");
+  }
+
+  function applyFilter() {
+    var cont = el("estCont").value;
+    var ctry = el("estCtry").value;
+    var q = (el("estSearch").value || "").trim().toLowerCase();
+    filtered = pops.filter(function (p) {
+      if (cont && p.continent !== cont) return false;
+      if (ctry && p.country !== ctry) return false;
+      if (q && p.name.toLowerCase().indexOf(q) < 0) return false;
+      return true;
+    });
+    var cnt = el("estCount");
+    if (cnt) cnt.textContent = filtered.length.toLocaleString();
+    renderList();
+  }
+
+  function renderList() {
+    var box = el("estList");
+    if (!box) return;
+    var LIMIT = 80;
+    var shown = filtered.slice(0, LIMIT);
+    if (!shown.length) {
+      box.innerHTML = '<div style="padding:14px;color:#8f9ca9;font-size:13px">没有匹配的人群，换个筛选条件。</div>';
+      return;
+    }
+    box.innerHTML = shown.map(function (p, i) {
+      return '<div style="display:flex;gap:8px;align-items:center;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.05)">' +
+        '<span style="flex:1;font-size:12.5px;color:#cfe0e6">' + esc(p.name) + '</span>' +
+        '<span style="font-size:11.5px;color:#7f8c99;min-width:96px;text-align:right">' + esc(p.continent + " · " + p.country) + "</span>" +
+        '<button class="btn ghost" type="button" data-est-pick="' + i + '" style="padding:2px 10px;font-size:12px">选入</button>' +
+        "</div>";
+    }).join("") + (filtered.length > LIMIT
+      ? '<div style="padding:8px 10px;color:#7f8c99;font-size:12px">只显示前 ' + LIMIT + " 个，共 " + filtered.length + " 个；用搜索缩小范围。</div>"
+      : "");
+
+    box.querySelectorAll("[data-est-pick]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var p = filtered[Number(b.dataset.estPick)];
+        if (p) pickInto(p.name);
+      });
+    });
+  }
+
+  function pickInto(name) {
+    var inputs = Array.prototype.slice.call(document.querySelectorAll("input[data-est-slot]"));
+    var target = inputs.find(function (i) { return !(i.value || "").trim(); }) || inputs[inputs.length - 1];
+    if (!target) return;
+    target.value = name;
+    var msg = el("estMsg");
+    if (msg) { msg.className = "validation ok"; msg.textContent = "已选入：" + name; }
+    var next = inputs.find(function (i) { return !(i.value || "").trim(); });
+    if (next) next.focus();
   }
 
   function norm(s) {
@@ -2536,7 +2678,7 @@
       if (!v) { missing.push(i + 1); return; }
       var hit = resolveName(v);
       if (!hit) { missing.push(i + 1); return; }
-      chosen.push({ name: hit.name, coords: hit.coords, input: v });
+      chosen.push({ name: hit.name, coords: hit.coords });
     });
     if (!chosen.length) {
       if (msg) {
@@ -2579,12 +2721,12 @@
     target.dispatchEvent(new Event("input", { bubbles: true }));
     var tab = document.querySelector('[data-tab="analyze"]');
     if (tab) tab.click();
-    setTimeout(function () {
-      target.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 200);
   }
 
   el("estLevel").addEventListener("change", function () { buildSlots(); });
+  el("estCont").addEventListener("change", function () { refreshCountries(); applyFilter(); });
+  el("estCtry").addEventListener("change", applyFilter);
+  el("estSearch").addEventListener("input", applyFilter);
   el("estRun").addEventListener("click", function () { loadLibrary().then(run); });
   el("estCopy").addEventListener("click", function () {
     var out = el("estOut");
@@ -2602,18 +2744,6 @@
     if (info) info.textContent = "尚未生成";
     var msg = el("estMsg");
     if (msg) { msg.className = "validation"; msg.textContent = ""; }
-  });
-  el("estDemo").addEventListener("click", function () {
-    loadLibrary().then(function () {
-      var demo = [
-        "Han_Beijing_(Northern_China_Profile)_(n=65)",
-        "Han_Beijing_(Northern_China_Profile)_(n=65)",
-        "Han_Fujian_(n=35)",
-        "Han_Fujian_(n=35)"
-      ];
-      var inputs = Array.prototype.slice.call(document.querySelectorAll("input[data-est-slot]"));
-      inputs.forEach(function (inp, i) { if (demo[i]) inp.value = demo[i]; });
-    });
   });
 
   buildSlots();
