@@ -854,6 +854,8 @@
             </div>
           </div>
           <div class="paywall-foot">
+            <span id="devEntry" style="float:right;font-size:11px;color:#4a5a68;cursor:pointer">开发者</span>
+            
             支付完成后会自动跳回本页并解锁。
           </div>
         </div>
@@ -2266,6 +2268,54 @@
           }, 120);
         }, 400);
       });
+    })();
+  </script>
+
+
+  <script>
+    // 开发者入口：输入口令直接解锁（口令以哈希形式校验，不存明文）
+    (function () {
+      var CREDIT_KEY = "sjq-g25-credits";
+      var DEV_HASH = "78e370b587b145920213731b7c7c725e512b3b6577c51c800218a7c764c532ae"; // sha256("1985")
+      var GRANT = 99;
+
+      function el(id) { return document.getElementById(id); }
+
+      async function sha256Hex(text) {
+        var buf = new TextEncoder().encode(text);
+        var digest = await crypto.subtle.digest("SHA-256", buf);
+        return Array.from(new Uint8Array(digest)).map(function (b) {
+          return b.toString(16).padStart(2, "0");
+        }).join("");
+      }
+
+      function grant() {
+        try { localStorage.setItem(CREDIT_KEY, String(GRANT)); } catch (e) {}
+        var chip = el("lockChip");
+        if (chip) chip.textContent = "已解锁 · 剩余 " + GRANT + " 次";
+        var credit = el("creditChip");
+        if (credit) credit.textContent = "剩余 " + GRANT + " 次换算";
+        var x = el("payClose");
+        if (x) x.click();
+        var msg = el("convertMessage");
+        if (msg) { msg.className = "validation ok"; msg.textContent = "开发者模式：已发放 " + GRANT + " 次换算"; }
+        var btn = el("convertRun");
+        if (btn) setTimeout(function () { btn.click(); }, 150);
+      }
+
+      var entry = el("devEntry");
+      if (entry) {
+        entry.addEventListener("click", async function () {
+          var code = window.prompt("开发者口令");
+          if (code === null) return;
+          var hex = await sha256Hex(String(code).trim());
+          if (hex === DEV_HASH) { grant(); }
+          else {
+            var msg = el("convertMessage");
+            if (msg) { msg.className = "validation bad"; msg.textContent = "口令不对。"; }
+          }
+        });
+      }
     })();
   </script>
 
