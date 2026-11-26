@@ -1,23 +1,17 @@
 {
  "height": {
-  "id": "PGS004215",
-  "label": "身高 PGS",
-  "variants": 22938,
-  "bytes": 733378,
-  "file": "height.json"
+  "rows": 22938,
+  "with_af": 19801,
+  "bytes": 905306
  },
  "cognition": {
-  "id": "PGS001232",
-  "label": "认知/流体智力 PGS",
-  "variants": 10054,
-  "bytes": 317935,
-  "file": "cognition.json"
+  "rows": 10054,
+  "with_af": 7846,
+  "bytes": 390840
  },
  "grip": {
-  "id": "PGS001119",
-  "label": "握力 PGS（力量代理）",
-  "variants": 13767,
-  "bytes": 435765,
-  "file": "grip.json"
+  "rows": 13767,
+  "with_af": 10686,
+  "bytes": 535406
  }
 }
