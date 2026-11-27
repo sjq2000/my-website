@@ -1,190 +1,521 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>专栏 · 数据集 | SJQ 身体数据实验室</title>
-<meta name="description" content="中国人群基因与体成分数据集：省级父系 Y、母系 mtDNA、常染色体成分、Y 染色体支系频率矩阵、地级市汉族祖源成分谱。xlsx，付款后立即下载。">
-<link rel="canonical" href="https://sjqlab.top/pages/column.html">
-<style>
-  :root {
-    --bg: #0a0e12;
-    --panel: #11171d;
-    --panel2: #0d1319;
-    --line: #1e2a33;
-    --text: #d7e3e6;
-    --dim: #8b9aa1;
-    --accent: #23d3b0;
-    --accent2: #4fd1ff;
-    --warn: #ffb84d;
-  }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font: 15px/1.75 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
-  a { color: var(--accent2); text-decoration: none; }
-  a:hover { text-decoration: underline; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="中国人群基因与体成分数据集：省级父系 Y、母系 mtDNA、常染色体成分、Y 染色体支系频率矩阵、地级市汉族祖源成分谱。xlsx 表格，付款后立即下载。">
+  <title>【SJQ】身体数据实验室 | 专栏 · 数据集</title>
+  <link rel="canonical" href="https://sjqlab.top/pages/column.html">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  header {
-    position: sticky; top: 0; z-index: 20;
-    background: rgba(10, 14, 18, .92);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--line);
-  }
-  .nav {
-    max-width: 1080px; margin: 0 auto; padding: 12px 20px;
-    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
-  }
-  .brand { font-weight: 700; letter-spacing: .5px; color: #fff; }
-  .brand span { color: var(--accent); }
-  .nav-links { display: flex; gap: 16px; flex-wrap: wrap; margin-left: auto; font-size: 14px; }
-  .nav-links a { color: var(--dim); }
-  .nav-links a:hover, .nav-links a[aria-current="page"] { color: var(--accent); text-decoration: none; }
+    body {
+      font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+      background-color: #0a0a0a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-  main { max-width: 1080px; margin: 0 auto; padding: 44px 20px 80px; }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(0, 191, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(0, 255, 136, 0.06) 0%, transparent 50%);
+      z-index: -1;
+    }
 
-  .hero h1 { font-size: 30px; margin: 0 0 10px; letter-spacing: .3px; }
-  .hero h1 em { font-style: normal; color: var(--accent); }
-  .hero p { color: var(--dim); margin: 0 0 6px; max-width: 720px; }
-  .hero .meta { font-size: 13px; color: #6f8089; margin-top: 14px; }
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0, 191, 255, 0.15);
+      z-index: 1000;
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
 
-  .grid { display: grid; grid-template-columns: 1fr; gap: 22px; margin-top: 34px; }
-  .card {
-    background: linear-gradient(180deg, var(--panel) 0%, var(--panel2) 100%);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 20px 20px 18px;
-    position: relative;
-  }
-  .card.owned { border-color: rgba(35, 211, 176, .45); }
-  .card-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
-  .badge {
-    font-size: 12px; letter-spacing: .8px; text-transform: uppercase;
-    color: var(--accent); border: 1px solid rgba(35, 211, 176, .35);
-    background: rgba(35, 211, 176, .07);
-    padding: 2px 9px; border-radius: 999px;
-  }
-  .tag { font-size: 12px; color: var(--dim); border: 1px solid var(--line); padding: 2px 9px; border-radius: 999px; }
-  .src {
-    font-size: 12px; font-weight: 600;
-    color: var(--warn); border: 1px solid rgba(255, 184, 77, .45);
-    background: rgba(255, 184, 77, .08);
-    padding: 2px 9px; border-radius: 999px;
-  }
-  .card h3 { font-size: 19px; margin: 4px 0 4px; line-height: 1.5; }
-  .card .sub { color: var(--dim); font-size: 13.5px; margin: 0 0 14px; }
+    .nav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #eaf6ff !important;
+      text-decoration: none;
+      letter-spacing: 0;
+      font-weight: 900;
+      white-space: nowrap;
+    }
 
-  .spec { list-style: none; padding: 0; margin: 0 0 16px; display: grid; gap: 6px; }
-  .spec li { font-size: 13.5px; color: #b9c8ce; padding-left: 16px; position: relative; }
-  .spec li::before { content: "▸"; position: absolute; left: 0; color: var(--accent); font-size: 11px; top: 2px; }
-  .spec b { color: #e6f1f3; font-weight: 600; }
+    .brand-mark {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 36px;
+      border-radius: 10px;
+      background: #15d8d2;
+      color: #051015;
+      font-size: 15px;
+      font-weight: 950;
+      letter-spacing: 0;
+      box-shadow: 0 8px 22px rgba(0, 191, 255, 0.18);
+      font-family: Arial, Helvetica, sans-serif;
+    }
 
-  .prevwrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; margin-bottom: 16px; }
-  table.prev { border-collapse: collapse; width: 100%; font-size: 12.5px; min-width: 480px; }
-  table.prev th, table.prev td { padding: 7px 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--line); }
-  table.prev th:first-child, table.prev td:first-child { text-align: left; color: #cfdde1; }
-  table.prev th { background: #0f1519; color: var(--dim); font-weight: 500; }
-  table.prev tr:last-child td { border-bottom: 0; }
-  .prevnote { font-size: 12px; color: #6f8089; margin: -10px 0 16px; }
+    .brand-mark::after {
+      content: '';
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      width: 10px;
+      height: 5px;
+      border-right: 3px solid #2168ff;
+      border-bottom: 3px solid #2168ff;
+      border-radius: 0 0 8px 0;
+      transform: rotate(20deg);
+    }
 
-  .buy { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding-top: 14px; border-top: 1px solid var(--line); }
-  .price { font-size: 22px; font-weight: 700; color: #fff; }
-  .price small { font-size: 12px; font-weight: 400; color: var(--dim); margin-left: 4px; }
-  .btn {
-    display: inline-block; padding: 9px 20px; border-radius: 9px;
-    background: linear-gradient(135deg, var(--accent) 0%, #17b795 100%);
-    color: #06231c; font-weight: 700; font-size: 14px; border: 0; cursor: pointer;
-  }
-  .btn:hover { text-decoration: none; filter: brightness(1.06); }
-  .owned-box { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 13.5px; }
-  .owned-tag { color: var(--accent); border: 1px solid rgba(35,211,176,.4); border-radius: 999px; padding: 2px 10px; font-size: 12px; }
-  .dl { display: inline-block; padding: 8px 16px; border-radius: 9px; border: 1px solid rgba(79,209,255,.45); color: var(--accent2); font-weight: 600; font-size: 13.5px; }
-  .dl:hover { background: rgba(79,209,255,.08); text-decoration: none; }
-  [hidden] { display: none !important; }
+    .brand-text { font-size: 15px; letter-spacing: 0; white-space: nowrap; }
 
-  section.notes { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 24px; }
-  section.notes h2 { font-size: 16px; margin: 0 0 12px; }
-  section.notes dl { margin: 0; display: grid; gap: 14px; }
-  section.notes dt { color: #cfe0e4; font-weight: 600; font-size: 14px; }
-  section.notes dd { margin: 3px 0 0; color: var(--dim); font-size: 13.5px; }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
 
-  .devbar { margin-top: 26px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .devlink {
-    background: none; border: 0; padding: 0; cursor: pointer;
-    color: #55666e; font-size: 12.5px; text-decoration: underline dotted;
-  }
-  .devlink:hover { color: var(--dim); }
-  .devbox { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .devbox input {
-    background: #0b1116; border: 1px solid var(--line); color: var(--text);
-    border-radius: 8px; padding: 6px 10px; font-size: 13px; width: 130px;
-  }
-  .devbox input:focus { outline: none; border-color: rgba(35,211,176,.5); }
-  .devbtn {
-    background: #17323a; border: 1px solid var(--line); color: var(--text);
-    border-radius: 8px; padding: 6px 14px; font-size: 13px; cursor: pointer;
-  }
-  .devbtn:hover { border-color: rgba(35,211,176,.5); }
-  .devmsg { font-size: 12.5px; color: #ff8f8f; }
-  .devmsg.ok { color: var(--accent); }
+    .nav-links a {
+      color: #aaa;
+      text-decoration: none;
+      font-size: 15px;
+      transition: color 0.3s;
+      position: relative;
+    }
 
-  footer { border-top: 1px solid var(--line); padding: 24px 20px 40px; text-align: center; color: #5f7079; font-size: 12.5px; }
-  footer a { color: #7f9199; }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #00bfff;
+      transition: width 0.3s;
+    }
 
-  .toast {
-    position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%);
-    background: #12331f; border: 1px solid rgba(35,211,176,.5); color: #b8ffe4;
-    padding: 10px 18px; border-radius: 10px; font-size: 13.5px; z-index: 50;
-  }
-  @media (min-width: 860px) {
-    .grid { grid-template-columns: 1fr; }
-  }
-</style>
+    .nav-links a:hover { color: #00bfff; }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: #00bfff; }
+    .nav-links a.active::after { width: 100%; }
+
+    .nav-dropdown { position: relative; }
+    .nav-dropdown > a { cursor: pointer; }
+    .nav-dropdown > a::after { content: ' \25BE'; font-size: 10px; }
+
+    .nav-dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0,191,255,0.15);
+      border-radius: 10px;
+      padding: 8px 0;
+      min-width: 190px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+
+    .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+
+    .nav-dropdown-menu a {
+      display: block;
+      padding: 10px 20px;
+      color: #aaa;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .nav-dropdown-menu a::after { display: none !important; }
+    .nav-dropdown-menu a:hover { color: #00bfff; background: rgba(0,191,255,0.08); }
+    .nav-dropdown-menu a.active { color: #00bfff; font-weight: 600; }
+
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: #00bfff;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .page-container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 100px 24px 60px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #888;
+      text-decoration: none;
+      font-size: 14px;
+      margin-bottom: 32px;
+      transition: color 0.3s;
+    }
+
+    .back-link:hover { color: #00bfff; }
+
+    .page-header { text-align: center; margin-bottom: 34px; }
+
+    .page-header h1 {
+      font-size: 34px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .page-header h1 span { color: #00ff88; }
+
+    .page-header p {
+      color: #aaa;
+      font-size: 16px;
+      line-height: 1.8;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .service-hero {
+      border: 1px solid rgba(0, 255, 136, 0.18);
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.08), rgba(0, 191, 255, 0.04));
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 18px;
+      color: #b7c2c8;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(0, 191, 255, 0.1);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .panel h2 { color: #fff; font-size: 18px; margin-bottom: 14px; }
+
+    .panel p, .panel li { color: #aaa; font-size: 14px; line-height: 1.8; }
+
+    .panel ul { list-style: none; display: grid; gap: 8px; }
+
+    .panel li::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #00bfff;
+      margin-right: 10px;
+      vertical-align: 2px;
+    }
+
+    .wide-panel { margin-bottom: 18px; }
+
+    .price {
+      color: #00ff88;
+      font-size: 34px;
+      font-weight: 900;
+    }
+
+    .stripe-pay-btn, .contact-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 22px;
+      border-radius: 10px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 900;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stripe-pay-btn {
+      background: linear-gradient(135deg, #635bff, #00bfff);
+      box-shadow: 0 10px 28px rgba(99, 91, 255, 0.25);
+    }
+
+    .stripe-pay-btn:hover, .contact-btn:hover { transform: translateY(-1px); }
+
+    .contact-btn {
+      margin-top: 14px;
+      background: rgba(0, 191, 255, 0.14);
+      border: 1px solid rgba(0, 191, 255, 0.3);
+    }
+
+    .note { color: #666; font-size: 12px; line-height: 1.7; margin-top: 12px; }
+
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 40px;
+      text-align: center;
+      color: #555;
+      font-size: 14px;
+    }
+
+    .visit-counter { margin-top: 8px; color: #444; font-size: 12px; }
+    .visit-counter span { color: #555; }
+
+    /* ===== 数据集卡片 ===== */
+    .dataset { margin-bottom: 18px; }
+
+    .ds-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .ds-badge {
+      font-size: 12px; font-weight: 800; letter-spacing: .5px;
+      color: #00ff88;
+      border: 1px solid rgba(0, 255, 136, .35);
+      background: rgba(0, 255, 136, .08);
+      padding: 3px 10px; border-radius: 999px;
+    }
+
+    .ds-src {
+      font-size: 12px; font-weight: 800;
+      color: #00bfff;
+      border: 1px solid rgba(0, 191, 255, .4);
+      background: rgba(0, 191, 255, .1);
+      padding: 3px 10px; border-radius: 999px;
+    }
+
+    .ds-tag {
+      font-size: 12px; color: #888;
+      border: 1px solid rgba(255, 255, 255, .08);
+      padding: 3px 10px; border-radius: 999px;
+    }
+
+    .dataset h2 { font-size: 20px; line-height: 1.5; margin-bottom: 6px; }
+
+    .ds-sub { color: #999; font-size: 14px; margin-bottom: 14px; }
+
+    .ds-prev {
+      overflow-x: auto;
+      border: 1px solid rgba(0, 191, 255, .12);
+      border-radius: 10px;
+      margin: 16px 0 8px;
+    }
+
+    .ds-prev table { border-collapse: collapse; width: 100%; min-width: 520px; font-size: 13px; }
+
+    .ds-prev th, .ds-prev td {
+      padding: 8px 12px;
+      text-align: right;
+      white-space: nowrap;
+      border-bottom: 1px solid rgba(255, 255, 255, .05);
+    }
+
+    .ds-prev th:first-child, .ds-prev td:first-child { text-align: left; color: #cfdde1; }
+    .ds-prev th { background: rgba(0, 191, 255, .05); color: #8fb3c4; font-weight: 600; }
+    .ds-prev tr:last-child td { border-bottom: 0; }
+
+    .ds-note { color: #666; font-size: 12px; margin-bottom: 4px; }
+
+    .ds-buy {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255, 255, 255, .05);
+    }
+
+    .ds-buy .price small { font-size: 13px; color: #777; font-weight: 600; }
+
+    .ds-owned { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+    .ds-own-tag {
+      color: #00ff88;
+      border: 1px solid rgba(0, 255, 136, .4);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .ds-owned .contact-btn { margin-top: 0; }
+
+    /* ===== 开发者入口 ===== */
+    .devbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 18px 0 0;
+    }
+
+    .dev-link {
+      background: none; border: 0; padding: 0; cursor: pointer;
+      color: #4a4a4a; font-size: 12px; text-decoration: underline dotted;
+      font-family: inherit;
+    }
+
+    .dev-link:hover { color: #777; }
+
+    .dev-box { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .dev-box input {
+      background: #0f0f0f;
+      border: 1px solid rgba(255, 255, 255, .1);
+      color: #e0e0e0;
+      border-radius: 8px;
+      padding: 7px 11px;
+      font-size: 13px;
+      width: 132px;
+      font-family: inherit;
+    }
+
+    .dev-box input:focus { outline: none; border-color: rgba(0, 191, 255, .5); }
+
+    .dev-btn {
+      background: rgba(0, 191, 255, .12);
+      border: 1px solid rgba(0, 191, 255, .3);
+      color: #e0e0e0;
+      border-radius: 8px;
+      padding: 7px 15px;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .dev-btn:hover { border-color: rgba(0, 191, 255, .6); }
+
+    .dev-msg { font-size: 12.5px; color: #ff8f8f; }
+    .dev-msg.ok { color: #00ff88; }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%);
+      background: rgba(0, 255, 136, .1);
+      border: 1px solid rgba(0, 255, 136, .4);
+      color: #b8ffe4;
+      padding: 11px 20px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      z-index: 2000;
+    }
+
+    @media (max-width: 820px) {
+      .page-container { padding: 90px 18px 50px; }
+      .panel, .service-hero { padding: 20px; }
+      .price { font-size: 30px; }
+      .dataset h2 { font-size: 18px; }
+    }
+
+    @media (max-width: 600px) {
+      .menu-toggle { display: block; }
+      nav { padding: 0 20px; }
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        width: 100%;
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: 20px;
+        gap: 16px;
+        border-bottom: 1px solid rgba(0, 191, 255, 0.15);
+      }
+      .nav-links.open { display: flex; }
+      .nav-dropdown-menu {
+        position: static;
+        transform: none;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        padding: 0 0 0 16px;
+        display: block !important;
+      }
+      .nav-dropdown-menu a { padding: 8px 0; }
+      .brand-text { font-size: 13px; }
+      .brand-mark { width: 48px; height: 32px; font-size: 14px; }
+    }
+  </style>
 </head>
 <body>
-
-<header>
-  <nav class="nav">
-    <div class="brand">SJQ <span>身体数据实验室</span></div>
-    <div class="nav-links">
-      <a href="../index.html">首页</a>
-      <a href="column.html" aria-current="page">专栏</a>
-      <a href="gene-lab.html">基因分析实验室</a>
-      <a href="fitness-calculator.html">体测计算器</a>
-      <a href="private-service.html">私人分析服务</a>
-    </div>
+  <nav>
+    <a href="../index.html" class="nav-brand"><span class="brand-mark">SJQ</span><span class="brand-text">身体数据实验室</span></a>
+    <button class="menu-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li class="nav-dropdown">
+        <a href="private-service.html">项目</a>
+        <div class="nav-dropdown-menu">
+          <a href="height-prediction.html">身高预测计算器</a>
+          <a href="fitness-calculator.html">体测计算器</a>
+          <a href="body-fat-calculator.html">体脂率计算器</a>
+          <a href="testosterone.html">睾酮评估</a>
+          <a href="muscle-potential.html">增肌潜力计算器</a>
+          <a href="bio-age-calculator.html">生理年龄计算器</a>
+          <a href="gene-lab.html">基因分析实验室</a>
+          <a href="private-service.html">私人分析服务</a>
+        </div>
+      </li>
+      <li><a href="column.html" class="active">专栏</a></li>
+      <li><a href="records.html">个人记录</a></li>
+    </ul>
   </nav>
-</header>
 
-<main>
-  <div class="hero">
-    <h1>专栏 · <em>数据集</em></h1>
-    <p>中国人群的父系、母系与常染色体结构，按省级与地级市整理成可直接使用的表格。全部为 xlsx，付款后本页立即出现下载按钮。</p>
-    <div class="meta">¥5 / 份 · 一次性付费 · 下载后可长期使用 · 文件在浏览器本地下载，不上传任何数据</div>
-  </div>
+  <div class="page-container">
+    <a href="../index.html" class="back-link">&larr; 返回首页</a>
 
-  <div class="grid">
+    <div class="page-header">
+      <h1>专栏 · <span>数据集</span></h1>
+      <p>中国人群的父系、母系与常染色体结构，按省级与地级市整理成可直接使用的表格。全部为 xlsx，付款后本页立即出现下载按钮。</p>
+    </div>
 
-    <article class="card" data-set="a">
-      <div class="card-top">
-        <span class="badge">数据集 A</span>
-        <span class="src">微基因</span>
-        <span class="tag">xlsx · 3 个工作表</span>
-        <span class="tag">37 个省级单元</span>
+    <div class="service-hero">
+      ¥5 / 份 · 一次性付费 · 下载后可长期使用 · 文件在浏览器本地下载，不上传任何个人数据
+    </div>
+
+    <div class="panel wide-panel dataset" data-set="a">
+      <div class="ds-head">
+        <span class="ds-badge">数据集 A</span>
+        <span class="ds-src">微基因</span>
+        <span class="ds-tag">xlsx · 3 个工作表</span>
+        <span class="ds-tag">37 个省级单元</span>
       </div>
-      <h3>中国省级基因图谱：父系 Y · 母系 mtDNA · 常染色体</h3>
-      <p class="sub">同一套省级样本口径下的三个维度，父系、母系、常染可以互相对照。</p>
-      <ul class="spec">
+      <h2>中国省级基因图谱：父系 Y · 母系 mtDNA · 常染色体</h2>
+      <p class="ds-sub">同一套省级样本口径下的三个维度，父系、母系、常染可以互相对照。</p>
+      <ul>
         <li><b>省级 Y</b>：O2 / O1a / O1b / N / C / D / Q / R / J / E / 其他，共 11 类，含各省样本量</li>
         <li><b>省级 mtDNA</b>：M 大支、M7-M10、D、C、G、Z、E、Q、N 大支、A、B、F、R、H 等 16 类</li>
         <li><b>省级常染</b>：42 个族群成分占比（北方汉族、南方汉族、藏缅、傣、苗瑶、蒙古语族群、通古斯…）</li>
       </ul>
-      <div class="prevwrap">
-        <table class="prev">
+      <div class="ds-prev">
+        <table>
           <thead><tr><th>省份</th><th>样本量</th><th>O2</th><th>O1a</th><th>O1b</th><th>N</th><th>C</th></tr></thead>
           <tbody>
             <tr><td>江苏省</td><td>843</td><td>53.9%</td><td>19.1%</td><td>6.3%</td><td>6.4%</td><td>9.1%</td></tr>
@@ -193,34 +524,34 @@
           </tbody>
         </table>
       </div>
-      <p class="prevnote">上表为文件内「省级 Y」工作表的前 3 行实际数值预览。</p>
-      <div class="buy">
-        <div class="price">¥5<small>/ 份</small></div>
-        <a class="btn" data-buy href="https://buy.stripe.com/eVqcN73Qh0ANbJbd4v3ZK07" target="_blank" rel="noopener">购买并下载</a>
-        <span class="owned-box" data-owned hidden>
-          <span class="owned-tag">已解锁</span>
-          <a class="dl" data-file href="https://sjqlab.top/assets/data/column/中国省级基因图谱-父系Y-母系mtDNA-常染-2f7c.xlsx" download="中国省级基因图谱-父系Y-母系mtDNA-常染.xlsx">下载 xlsx</a>
+      <p class="ds-note">上表为文件内「省级 Y」工作表的前 3 行实际数值预览。</p>
+      <div class="ds-buy">
+        <div class="price">¥5 <small>/ 份</small></div>
+        <a class="stripe-pay-btn" data-buy href="https://buy.stripe.com/eVqcN73Qh0ANbJbd4v3ZK07" target="_blank" rel="noopener">购买并下载</a>
+        <span class="ds-owned" data-owned hidden>
+          <span class="ds-own-tag">已解锁</span>
+          <a class="contact-btn" data-file href="https://sjqlab.top/assets/data/column/中国省级基因图谱-父系Y-母系mtDNA-常染-2f7c.xlsx" download="中国省级基因图谱-父系Y-母系mtDNA-常染.xlsx">下载 xlsx</a>
         </span>
       </div>
-    </article>
+    </div>
 
-    <article class="card" data-set="b">
-      <div class="card-top">
-        <span class="badge">数据集 B</span>
-        <span class="src">23魔方</span>
-        <span class="tag">xlsx · 4 个工作表</span>
-        <span class="tag">省级 + 民族 + 汉族</span>
+    <div class="panel wide-panel dataset" data-set="b">
+      <div class="ds-head">
+        <span class="ds-badge">数据集 B</span>
+        <span class="ds-src">23魔方</span>
+        <span class="ds-tag">xlsx · 4 个工作表</span>
+        <span class="ds-tag">省级 + 民族 + 汉族</span>
       </div>
-      <h3>中国 Y 染色体父系支系频率矩阵（省级 / 民族 / 汉族）</h3>
-      <p class="sub">一级大类可相加为 1，细分支系列单独给出，适合直接做堆叠图与聚类。</p>
-      <ul class="spec">
+      <h2>中国 Y 染色体父系支系频率矩阵（省级 / 民族 / 汉族）</h2>
+      <p class="ds-sub">一级大类可相加为 1，细分支系列单独给出，适合直接做堆叠图与聚类。</p>
+      <ul>
         <li><b>省级矩阵</b>：32 行，NO / C / D / Q / R / 其他合计为 1，附「一级大类合计」校验列</li>
         <li><b>民族矩阵</b>：82 行，含各民族检测人数，并附语系分组汇总行</li>
         <li><b>汉族省级矩阵</b>：66 行，筛掉少数民族后的汉族口径</li>
         <li><b>细分列</b>：N 总计、O 总计、O2-M122、O1a-M119、O1b-M268、C2a-L1373、C2b-F1067</li>
       </ul>
-      <div class="prevwrap">
-        <table class="prev">
+      <div class="ds-prev">
+        <table>
           <thead><tr><th>省级地区</th><th>NO</th><th>C</th><th>D</th><th>Q</th><th>R</th><th>其他</th></tr></thead>
           <tbody>
             <tr><td>北京</td><td>77.25%</td><td>12.48%</td><td>2.04%</td><td>3.44%</td><td>2.56%</td><td>2.23%</td></tr>
@@ -229,33 +560,33 @@
           </tbody>
         </table>
       </div>
-      <p class="prevnote">上表为文件内「省级矩阵」工作表的前 3 行实际数值预览。附数据说明表一张。</p>
-      <div class="buy">
-        <div class="price">¥5<small>/ 份</small></div>
-        <a class="btn" data-buy href="https://buy.stripe.com/28E8wRgD3abn9B3d4v3ZK08" target="_blank" rel="noopener">购买并下载</a>
-        <span class="owned-box" data-owned hidden>
-          <span class="owned-tag">已解锁</span>
-          <a class="dl" data-file href="https://sjqlab.top/assets/data/column/中国Y染色体父系支系矩阵-23魔方-9d41.xlsx" download="中国Y染色体父系支系矩阵-23魔方.xlsx">下载 xlsx</a>
+      <p class="ds-note">上表为文件内「省级矩阵」工作表的前 3 行实际数值预览。附数据说明表一张。</p>
+      <div class="ds-buy">
+        <div class="price">¥5 <small>/ 份</small></div>
+        <a class="stripe-pay-btn" data-buy href="https://buy.stripe.com/28E8wRgD3abn9B3d4v3ZK08" target="_blank" rel="noopener">购买并下载</a>
+        <span class="ds-owned" data-owned hidden>
+          <span class="ds-own-tag">已解锁</span>
+          <a class="contact-btn" data-file href="https://sjqlab.top/assets/data/column/中国Y染色体父系支系矩阵-23魔方-9d41.xlsx" download="中国Y染色体父系支系矩阵-23魔方.xlsx">下载 xlsx</a>
         </span>
       </div>
-    </article>
+    </div>
 
-    <article class="card" data-set="c">
-      <div class="card-top">
-        <span class="badge">数据集 C</span>
-        <span class="src">23魔方</span>
-        <span class="tag">xlsx · 335 行</span>
-        <span class="tag">31 个省级行政区</span>
+    <div class="panel wide-panel dataset" data-set="c">
+      <div class="ds-head">
+        <span class="ds-badge">数据集 C</span>
+        <span class="ds-src">23魔方</span>
+        <span class="ds-tag">xlsx · 335 行</span>
+        <span class="ds-tag">31 个省级行政区</span>
       </div>
-      <h3>中国地级市汉族祖源成分谱（335 市 × 12 成分）</h3>
-      <p class="sub">下到地级市粒度，适合做省内差异、南北过渡带、以及和 Y 单倍群做对照。</p>
-      <ul class="spec">
+      <h2>中国地级市汉族祖源成分谱（335 市 × 12 成分）</h2>
+      <p class="ds-sub">下到地级市粒度，适合做省内差异、南北过渡带、以及和 Y 单倍群做对照。</p>
+      <ul>
         <li><b>粒度</b>：31 个省级行政区、335 个地级市，每行一个市</li>
         <li><b>12 项成分</b>：北汉、南汉、藏缅、傣、苗瑶、朝鲜、蒙通、拉祜、维吾尔、日本、雅库特、布里亚特</li>
         <li><b>校验</b>：每行带「合计」列，可直接核对求和</li>
       </ul>
-      <div class="prevwrap">
-        <table class="prev">
+      <div class="ds-prev">
+        <table>
           <thead><tr><th>省</th><th>地级市</th><th>北汉</th><th>南汉</th><th>藏缅</th><th>傣</th><th>苗瑶</th><th>合计</th></tr></thead>
           <tbody>
             <tr><td>云南</td><td>曲靖市</td><td>44.55</td><td>32.19</td><td>10.95</td><td>2.68</td><td>3.37</td><td>99.10</td></tr>
@@ -264,145 +595,143 @@
           </tbody>
         </table>
       </div>
-      <p class="prevnote">上表为文件前 3 行的实际数值预览，完整表 335 行。</p>
-      <div class="buy">
-        <div class="price">¥5<small>/ 份</small></div>
-        <a class="btn" data-buy href="https://buy.stripe.com/bJecN7gD3fvHaF78Of3ZK09" target="_blank" rel="noopener">购买并下载</a>
-        <span class="owned-box" data-owned hidden>
-          <span class="owned-tag">已解锁</span>
-          <a class="dl" data-file href="https://sjqlab.top/assets/data/column/中国地级市汉族祖源成分谱-335市-6b58.xlsx" download="中国地级市汉族祖源成分谱-335市.xlsx">下载 xlsx</a>
+      <p class="ds-note">上表为文件前 3 行的实际数值预览，完整表 335 行。</p>
+      <div class="ds-buy">
+        <div class="price">¥5 <small>/ 份</small></div>
+        <a class="stripe-pay-btn" data-buy href="https://buy.stripe.com/bJecN7gD3fvHaF78Of3ZK09" target="_blank" rel="noopener">购买并下载</a>
+        <span class="ds-owned" data-owned hidden>
+          <span class="ds-own-tag">已解锁</span>
+          <a class="contact-btn" data-file href="https://sjqlab.top/assets/data/column/中国地级市汉族祖源成分谱-335市-6b58.xlsx" download="中国地级市汉族祖源成分谱-335市.xlsx">下载 xlsx</a>
         </span>
       </div>
-    </article>
+    </div>
 
+    <div class="panel wide-panel">
+      <h2>购买与使用说明</h2>
+      <ul>
+        <li><b>付款后怎么拿到文件</b>：付款成功后会自动跳回本页，对应数据集的「购买并下载」会变成「下载 xlsx」，点一下即可。同一浏览器会记住解锁状态，之后回来可以重复下载。</li>
+        <li><b>文件格式</b>：标准 xlsx，Excel / WPS / Numbers / Python(pandas) 都能直接打开。百分比在文件内为小数（0.539 表示 53.9%），表头已注明。</li>
+        <li><b>数据口径</b>：各数据集来源与统计口径不同，已在文件内用单独的工作表或说明页标注；不同数据集之间不建议直接混用，混用前请先读说明页。</li>
+        <li><b>能不能退</b>：数字商品，文件一经下载不支持退款。下载前可以先核对上面的预览表，确认口径符合用途。</li>
+        <li><b>使用范围</b>：数据集为人群统计与坐标频率，用于研究、教学与可视化，不构成个体鉴定、亲缘认定或医学诊断。</li>
+      </ul>
+    </div>
+
+    <div class="devbar">
+      <button class="dev-link" id="devBtn" type="button">开发者</button>
+      <span class="dev-box" id="devBox" hidden>
+        <input id="devCode" type="password" placeholder="开发者口令" autocomplete="off" spellcheck="false">
+        <button class="dev-btn" id="devOk" type="button">确定</button>
+        <span class="dev-msg" id="devMsg"></span>
+      </span>
+    </div>
   </div>
 
-  <section class="notes">
-    <h2>购买与使用说明</h2>
-    <dl>
-      <dt>付款后怎么拿到文件</dt>
-      <dd>付款成功后会自动跳回本页，对应数据集的「购买」按钮会变成「下载 xlsx」，点一下即可。同一浏览器会记住解锁状态，之后回来可以重复下载。</dd>
-      <dt>文件格式</dt>
-      <dd>标准 xlsx，Excel / WPS / Numbers / Python(pandas) 都能直接打开。百分比在文件内为小数（0.539 = 53.9%），表头已注明。</dd>
-      <dt>数据口径</dt>
-      <dd>各数据集来源与统计口径不同，已在文件内用单独的工作表或说明页标注。不同数据集之间的数值不建议直接混用，混用前请先读说明页。</dd>
-      <dt>能不能退</dt>
-      <dd>数字商品，文件一经下载不支持退款。下载前可以先核对上面的预览表，确认口径符合你的用途。</dd>
-      <dt>范围说明</dt>
-      <dd>数据集为人群统计与坐标频率，用于研究、教学与可视化。不构成个体鉴定、亲缘认定或医学诊断。</dd>
-    </dl>
-  </section>
+  <footer>
+    <p>&copy; 2026 【SJQ】身体数据实验室 &middot; ABN 18 395 906 312</p>
+    <p class="visit-counter">联系邮箱：<a href="mailto:songjueqing@gmail.com" style="color:#666;">songjueqing@gmail.com</a></p>
+    <p class="visit-counter">
+      访问量 <span id="busuanzi_value_site_pv">--</span> &middot; 本页 <span id="busuanzi_value_page_pv">--</span>
+    </p>
+  </footer>
 
-  <div class="devbar">
-    <button class="devlink" id="devBtn" type="button">开发者</button>
-    <span class="devbox" id="devBox" hidden>
-      <input id="devCode" type="password" placeholder="开发者口令" autocomplete="off" spellcheck="false">
-      <button class="devbtn" id="devOk" type="button">确定</button>
-      <span class="devmsg" id="devMsg"></span>
-    </span>
-  </div>
-</main>
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <script>
+    (function () {
+      var CFG = {
+        a: { tok: "7c4e19b8a2d05f31" },
+        b: { tok: "3a91f6d2c47b08e5" },
+        c: { tok: "e5842bd1f9a736c0" }
+      };
+      var KEY = "sjq-col-sets";
 
-<footer>
-  © 2025 【SJQ】身体数据实验室 · <a href="privacy.html">隐私与统计说明</a>
-</footer>
-
-<script>
-(function () {
-  var CFG = {
-    a: { tok: "7c4e19b8a2d05f31" },
-    b: { tok: "3a91f6d2c47b08e5" },
-    c: { tok: "e5842bd1f9a736c0" }
-  };
-  var KEY = "sjq-col-sets";
-
-  function unlocked() {
-    try { return (localStorage.getItem(KEY) || "").split(",").filter(Boolean); } catch (e) { return []; }
-  }
-  function addSet(id) {
-    var cur = unlocked();
-    if (cur.indexOf(id) < 0) cur.push(id);
-    try { localStorage.setItem(KEY, cur.join(",")); } catch (e) {}
-  }
-  function render() {
-    var have = unlocked();
-    document.querySelectorAll("[data-set]").forEach(function (card) {
-      var id = card.getAttribute("data-set");
-      var on = have.indexOf(id) >= 0;
-      card.classList.toggle("owned", on);
-      var buy = card.querySelector("[data-buy]");
-      var own = card.querySelector("[data-owned]");
-      if (buy) buy.hidden = on;
-      if (own) own.hidden = !on;
-    });
-  }
-  function toast(msg) {
-    var d = document.createElement("div");
-    d.className = "toast";
-    d.textContent = msg;
-    document.body.appendChild(d);
-    setTimeout(function () { d.remove(); }, 4200);
-  }
-
-  // 支付回跳：?paid=5&set=a&k=token
-  (function handlePaid() {
-    var q = new URLSearchParams(location.search);
-    var set = q.get("set"), k = q.get("k"), paid = q.get("paid");
-    if (!set || !k || !paid) return;
-    if (!CFG[set] || CFG[set].tok !== k) return;         // 参数不对就不解锁
-    addSet(set);
-    history.replaceState(null, "", location.pathname);
-    setTimeout(function () { toast("支付已确认，可以下载「数据集 " + set.toUpperCase() + "」了"); }, 400);
-  })();
-
-  // 开发者入口（与基因实验室一致：口令走 sha256 比对，不用 window.prompt）
-  var DEV_HASH = "78e370b587b145920213731b7c7c725e512b3b6577c51c800218a7c764c532ae";
-  function sha256Hex(text) {
-    var buf = new TextEncoder().encode(text);
-    return crypto.subtle.digest("SHA-256", buf).then(function (d) {
-      var out = "";
-      new Uint8Array(d).forEach(function (b) { out += b.toString(16).padStart(2, "0"); });
-      return out;
-    });
-  }
-  (function devEntry() {
-    var btn = document.getElementById("devBtn");
-    var box = document.getElementById("devBox");
-    var input = document.getElementById("devCode");
-    var ok = document.getElementById("devOk");
-    var msg = document.getElementById("devMsg");
-    if (!btn || !box || !input || !ok) return;
-    btn.addEventListener("click", function () {
-      box.hidden = !box.hidden;
-      if (!box.hidden) {
-        input.value = "";
-        msg.textContent = "";
-        setTimeout(function () { input.focus(); }, 30);
+      function unlocked() {
+        try { return (localStorage.getItem(KEY) || "").split(",").filter(Boolean); } catch (e) { return []; }
       }
-    });
-    function submit() {
-      var v = (input.value || "").trim();
-      if (!v) { msg.className = "devmsg"; msg.textContent = "请输入口令"; return; }
-      sha256Hex(v).then(function (h) {
-        if (h !== DEV_HASH) { msg.className = "devmsg"; msg.textContent = "口令不对"; return; }
-        ["a", "b", "c"].forEach(addSet);
-        render();
-        msg.className = "devmsg ok";
-        msg.textContent = "已解锁全部三份";
-        input.value = "";
-        setTimeout(function () { box.hidden = true; toast("开发者模式：三份数据集已解锁"); }, 1000);
-      }).catch(function () {
-        msg.className = "devmsg";
-        msg.textContent = "浏览器不支持口令校验";
-      });
-    }
-    ok.addEventListener("click", submit);
-    input.addEventListener("keydown", function (e) { if (e.key === "Enter") submit(); });
-  })();
+      function addSet(id) {
+        var cur = unlocked();
+        if (cur.indexOf(id) < 0) cur.push(id);
+        try { localStorage.setItem(KEY, cur.join(",")); } catch (e) {}
+      }
+      function render() {
+        var have = unlocked();
+        document.querySelectorAll("[data-set]").forEach(function (card) {
+          var id = card.getAttribute("data-set");
+          var on = have.indexOf(id) >= 0;
+          card.classList.toggle("owned", on);
+          var buy = card.querySelector("[data-buy]");
+          var own = card.querySelector("[data-owned]");
+          if (buy) buy.hidden = on;
+          if (own) own.hidden = !on;
+        });
+      }
+      function toast(msg) {
+        var d = document.createElement("div");
+        d.className = "toast";
+        d.textContent = msg;
+        document.body.appendChild(d);
+        setTimeout(function () { d.remove(); }, 4200);
+      }
 
-  render();
-})();
-</script>
+      // 支付回跳：?paid=5&set=a&k=token
+      (function handlePaid() {
+        var q = new URLSearchParams(location.search);
+        var set = q.get("set"), k = q.get("k"), paid = q.get("paid");
+        if (!set || !k || !paid) return;
+        if (!CFG[set] || CFG[set].tok !== k) return;
+        addSet(set);
+        history.replaceState({}, document.title, location.pathname);
+        setTimeout(function () { toast("支付已确认，可以下载「数据集 " + set.toUpperCase() + "」了"); }, 400);
+      })();
 
+      // 开发者入口（与基因实验室一致：口令走 sha256 比对，不用 window.prompt）
+      var DEV_HASH = "78e370b587b145920213731b7c7c725e512b3b6577c51c800218a7c764c532ae";
+      function sha256Hex(text) {
+        var buf = new TextEncoder().encode(text);
+        return crypto.subtle.digest("SHA-256", buf).then(function (d) {
+          var out = "";
+          new Uint8Array(d).forEach(function (b) { out += b.toString(16).padStart(2, "0"); });
+          return out;
+        });
+      }
+      (function devEntry() {
+        var btn = document.getElementById("devBtn");
+        var box = document.getElementById("devBox");
+        var input = document.getElementById("devCode");
+        var ok = document.getElementById("devOk");
+        var msg = document.getElementById("devMsg");
+        if (!btn || !box || !input || !ok) return;
+        btn.addEventListener("click", function () {
+          box.hidden = !box.hidden;
+          if (!box.hidden) {
+            input.value = "";
+            msg.textContent = "";
+            setTimeout(function () { input.focus(); }, 30);
+          }
+        });
+        function submit() {
+          var v = (input.value || "").trim();
+          if (!v) { msg.className = "dev-msg"; msg.textContent = "请输入口令"; return; }
+          sha256Hex(v).then(function (h) {
+            if (h !== DEV_HASH) { msg.className = "dev-msg"; msg.textContent = "口令不对"; return; }
+            ["a", "b", "c"].forEach(addSet);
+            render();
+            msg.className = "dev-msg ok";
+            msg.textContent = "已解锁全部三份";
+            input.value = "";
+            setTimeout(function () { box.hidden = true; toast("开发者模式：三份数据集已解锁"); }, 1000);
+          }).catch(function () {
+            msg.className = "dev-msg";
+            msg.textContent = "浏览器不支持口令校验";
+          });
+        }
+        ok.addEventListener("click", submit);
+        input.addEventListener("keydown", function (e) { if (e.key === "Enter") submit(); });
+      })();
+
+      render();
+    })();
+  </script>
+  <script src="../assets/i18n.js"></script>
 </body>
 </html>
