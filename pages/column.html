@@ -106,6 +106,26 @@
   section.notes dt { color: #cfe0e4; font-weight: 600; font-size: 14px; }
   section.notes dd { margin: 3px 0 0; color: var(--dim); font-size: 13.5px; }
 
+  .devbar { margin-top: 26px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .devlink {
+    background: none; border: 0; padding: 0; cursor: pointer;
+    color: #55666e; font-size: 12.5px; text-decoration: underline dotted;
+  }
+  .devlink:hover { color: var(--dim); }
+  .devbox { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .devbox input {
+    background: #0b1116; border: 1px solid var(--line); color: var(--text);
+    border-radius: 8px; padding: 6px 10px; font-size: 13px; width: 130px;
+  }
+  .devbox input:focus { outline: none; border-color: rgba(35,211,176,.5); }
+  .devbtn {
+    background: #17323a; border: 1px solid var(--line); color: var(--text);
+    border-radius: 8px; padding: 6px 14px; font-size: 13px; cursor: pointer;
+  }
+  .devbtn:hover { border-color: rgba(35,211,176,.5); }
+  .devmsg { font-size: 12.5px; color: #ff8f8f; }
+  .devmsg.ok { color: var(--accent); }
+
   footer { border-top: 1px solid var(--line); padding: 24px 20px 40px; text-align: center; color: #5f7079; font-size: 12.5px; }
   footer a { color: #7f9199; }
 
@@ -264,6 +284,15 @@
       <dd>数据集为人群统计与坐标频率，用于研究、教学与可视化。不构成个体鉴定、亲缘认定或医学诊断。</dd>
     </dl>
   </section>
+
+  <div class="devbar">
+    <button class="devlink" id="devBtn" type="button">开发者</button>
+    <span class="devbox" id="devBox" hidden>
+      <input id="devCode" type="password" placeholder="开发者口令" autocomplete="off" spellcheck="false">
+      <button class="devbtn" id="devOk" type="button">确定</button>
+      <span class="devmsg" id="devMsg"></span>
+    </span>
+  </div>
 </main>
 
 <footer>
@@ -316,6 +345,51 @@
     addSet(set);
     history.replaceState(null, "", location.pathname);
     setTimeout(function () { toast("支付已确认，可以下载「数据集 " + set.toUpperCase() + "」了"); }, 400);
+  })();
+
+  // 开发者入口（与基因实验室一致：口令走 sha256 比对，不用 window.prompt）
+  var DEV_HASH = "78e370b587b145920213731b7c7c725e512b3b6577c51c800218a7c764c532ae";
+  function sha256Hex(text) {
+    var buf = new TextEncoder().encode(text);
+    return crypto.subtle.digest("SHA-256", buf).then(function (d) {
+      var out = "";
+      new Uint8Array(d).forEach(function (b) { out += b.toString(16).padStart(2, "0"); });
+      return out;
+    });
+  }
+  (function devEntry() {
+    var btn = document.getElementById("devBtn");
+    var box = document.getElementById("devBox");
+    var input = document.getElementById("devCode");
+    var ok = document.getElementById("devOk");
+    var msg = document.getElementById("devMsg");
+    if (!btn || !box || !input || !ok) return;
+    btn.addEventListener("click", function () {
+      box.hidden = !box.hidden;
+      if (!box.hidden) {
+        input.value = "";
+        msg.textContent = "";
+        setTimeout(function () { input.focus(); }, 30);
+      }
+    });
+    function submit() {
+      var v = (input.value || "").trim();
+      if (!v) { msg.className = "devmsg"; msg.textContent = "请输入口令"; return; }
+      sha256Hex(v).then(function (h) {
+        if (h !== DEV_HASH) { msg.className = "devmsg"; msg.textContent = "口令不对"; return; }
+        ["a", "b", "c"].forEach(addSet);
+        render();
+        msg.className = "devmsg ok";
+        msg.textContent = "已解锁全部三份";
+        input.value = "";
+        setTimeout(function () { box.hidden = true; toast("开发者模式：三份数据集已解锁"); }, 1000);
+      }).catch(function () {
+        msg.className = "devmsg";
+        msg.textContent = "浏览器不支持口令校验";
+      });
+    }
+    ok.addEventListener("click", submit);
+    input.addEventListener("keydown", function (e) { if (e.key === "Enter") submit(); });
   })();
 
   render();
