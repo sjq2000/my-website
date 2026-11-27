@@ -69,6 +69,12 @@
     padding: 2px 9px; border-radius: 999px;
   }
   .tag { font-size: 12px; color: var(--dim); border: 1px solid var(--line); padding: 2px 9px; border-radius: 999px; }
+  .src {
+    font-size: 12px; font-weight: 600;
+    color: var(--warn); border: 1px solid rgba(255, 184, 77, .45);
+    background: rgba(255, 184, 77, .08);
+    padding: 2px 9px; border-radius: 999px;
+  }
   .card h3 { font-size: 19px; margin: 4px 0 4px; line-height: 1.5; }
   .card .sub { color: var(--dim); font-size: 13.5px; margin: 0 0 14px; }
 
@@ -135,8 +141,7 @@
     padding: 10px 18px; border-radius: 10px; font-size: 13.5px; z-index: 50;
   }
   @media (min-width: 860px) {
-    .grid { grid-template-columns: 1fr 1fr; }
-    .card:first-child { grid-column: 1 / -1; }
+    .grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -167,6 +172,7 @@
     <article class="card" data-set="a">
       <div class="card-top">
         <span class="badge">数据集 A</span>
+        <span class="src">微基因</span>
         <span class="tag">xlsx · 3 个工作表</span>
         <span class="tag">37 个省级单元</span>
       </div>
@@ -193,7 +199,7 @@
         <a class="btn" data-buy href="https://buy.stripe.com/eVqcN73Qh0ANbJbd4v3ZK07" target="_blank" rel="noopener">购买并下载</a>
         <span class="owned-box" data-owned hidden>
           <span class="owned-tag">已解锁</span>
-          <a class="dl" data-file href="https://sjqlab.top/assets/data/column/cn-prov-y-mt-adm-2f7c.xlsx" download>下载 xlsx</a>
+          <a class="dl" data-file href="https://sjqlab.top/assets/data/column/中国省级基因图谱-父系Y-母系mtDNA-常染-2f7c.xlsx" download="中国省级基因图谱-父系Y-母系mtDNA-常染.xlsx">下载 xlsx</a>
         </span>
       </div>
     </article>
@@ -201,6 +207,7 @@
     <article class="card" data-set="b">
       <div class="card-top">
         <span class="badge">数据集 B</span>
+        <span class="src">23魔方</span>
         <span class="tag">xlsx · 4 个工作表</span>
         <span class="tag">省级 + 民族 + 汉族</span>
       </div>
@@ -228,7 +235,7 @@
         <a class="btn" data-buy href="https://buy.stripe.com/28E8wRgD3abn9B3d4v3ZK08" target="_blank" rel="noopener">购买并下载</a>
         <span class="owned-box" data-owned hidden>
           <span class="owned-tag">已解锁</span>
-          <a class="dl" data-file href="https://sjqlab.top/assets/data/column/cn-y-haplo-matrix-9d41.xlsx" download>下载 xlsx</a>
+          <a class="dl" data-file href="https://sjqlab.top/assets/data/column/中国Y染色体父系支系矩阵-23魔方-9d41.xlsx" download="中国Y染色体父系支系矩阵-23魔方.xlsx">下载 xlsx</a>
         </span>
       </div>
     </article>
@@ -236,6 +243,7 @@
     <article class="card" data-set="c">
       <div class="card-top">
         <span class="badge">数据集 C</span>
+        <span class="src">23魔方</span>
         <span class="tag">xlsx · 335 行</span>
         <span class="tag">31 个省级行政区</span>
       </div>
@@ -262,7 +270,7 @@
         <a class="btn" data-buy href="https://buy.stripe.com/bJecN7gD3fvHaF78Of3ZK09" target="_blank" rel="noopener">购买并下载</a>
         <span class="owned-box" data-owned hidden>
           <span class="owned-tag">已解锁</span>
-          <a class="dl" data-file href="https://sjqlab.top/assets/data/column/cn-pref-han-admix-6b58.xlsx" download>下载 xlsx</a>
+          <a class="dl" data-file href="https://sjqlab.top/assets/data/column/中国地级市汉族祖源成分谱-335市-6b58.xlsx" download="中国地级市汉族祖源成分谱-335市.xlsx">下载 xlsx</a>
         </span>
       </div>
     </article>
