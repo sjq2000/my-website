@@ -27,6 +27,19 @@ html[data-theme="light"] body {
 html[data-theme="light"] body::before,
 html[data-theme="light"] body::after { opacity: .35; }
 
+/* ---------- 导航下拉（gene-lab 自己的规则优先级更高，这里要压回去） ---------- */
+html[data-theme="light"] .nav-dropdown:hover .nav-dropdown-menu,
+html[data-theme="light"] .nav-dropdown .nav-dropdown-menu {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 14px 34px rgba(60, 50, 35, 0.14);
+}
+html[data-theme="light"] .nav-dropdown-menu a { color: #333333; }
+html[data-theme="light"] .nav-dropdown-menu a:hover {
+  color: #0068b0;
+  background: rgba(0, 104, 176, 0.07);
+}
+
 /* ---------- 页头 ---------- */
 html[data-theme="light"] .page-header p,
 html[data-theme="light"] .eyebrow { color: #444444; }
