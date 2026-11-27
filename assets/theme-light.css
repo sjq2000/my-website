@@ -310,6 +310,10 @@ html[data-theme="light"] .growth-chart-meta { color: #444444; }
 html[data-theme="light"] .unit-btn { color: #333333; border-color: rgba(0, 0, 0, 0.18); }
 html[data-theme="light"] [class$="-label"] { color: #333333; }
 html[data-theme="light"] [class$="-meta"] { color: #444444; }
+html[data-theme="light"] .sample-tag { color: #056436; }
+html[data-theme="light"] .page-container a:not([class]) { color: #0068b0; }
+html[data-theme="light"] button:not([class]),
+html[data-theme="light"] input[type="button"] { color: #111111; }
 
 /* 标题里高亮的那几个字原本是青蓝色，白底上几乎看不见 */
 html[data-theme="light"] .page-header h1 span,
