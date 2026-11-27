@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>专栏 · 数据集 | SJQ 身体数据实验室</title>
+<meta name="description" content="中国人群基因与体成分数据集：省级父系 Y、母系 mtDNA、常染色体成分、Y 染色体支系频率矩阵、地级市汉族祖源成分谱。xlsx，付款后立即下载。">
+<link rel="canonical" href="https://sjqlab.top/pages/column.html">
+<style>
+  :root {
+    --bg: #0a0e12;
+    --panel: #11171d;
+    --panel2: #0d1319;
+    --line: #1e2a33;
+    --text: #d7e3e6;
+    --dim: #8b9aa1;
+    --accent: #23d3b0;
+    --accent2: #4fd1ff;
+    --warn: #ffb84d;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.75 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  header {
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(10, 14, 18, .92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav {
+    max-width: 1080px; margin: 0 auto; padding: 12px 20px;
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  }
+  .brand { font-weight: 700; letter-spacing: .5px; color: #fff; }
+  .brand span { color: var(--accent); }
+  .nav-links { display: flex; gap: 16px; flex-wrap: wrap; margin-left: auto; font-size: 14px; }
+  .nav-links a { color: var(--dim); }
+  .nav-links a:hover, .nav-links a[aria-current="page"] { color: var(--accent); text-decoration: none; }
+
+  main { max-width: 1080px; margin: 0 auto; padding: 44px 20px 80px; }
+
+  .hero h1 { font-size: 30px; margin: 0 0 10px; letter-spacing: .3px; }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero p { color: var(--dim); margin: 0 0 6px; max-width: 720px; }
+  .hero .meta { font-size: 13px; color: #6f8089; margin-top: 14px; }
+
+  .grid { display: grid; grid-template-columns: 1fr; gap: 22px; margin-top: 34px; }
+  .card {
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel2) 100%);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px 20px 18px;
+    position: relative;
+  }
+  .card.owned { border-color: rgba(35, 211, 176, .45); }
+  .card-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+  .badge {
+    font-size: 12px; letter-spacing: .8px; text-transform: uppercase;
+    color: var(--accent); border: 1px solid rgba(35, 211, 176, .35);
+    background: rgba(35, 211, 176, .07);
+    padding: 2px 9px; border-radius: 999px;
+  }
+  .tag { font-size: 12px; color: var(--dim); border: 1px solid var(--line); padding: 2px 9px; border-radius: 999px; }
+  .card h3 { font-size: 19px; margin: 4px 0 4px; line-height: 1.5; }
+  .card .sub { color: var(--dim); font-size: 13.5px; margin: 0 0 14px; }
+
+  .spec { list-style: none; padding: 0; margin: 0 0 16px; display: grid; gap: 6px; }
+  .spec li { font-size: 13.5px; color: #b9c8ce; padding-left: 16px; position: relative; }
+  .spec li::before { content: "▸"; position: absolute; left: 0; color: var(--accent); font-size: 11px; top: 2px; }
+  .spec b { color: #e6f1f3; font-weight: 600; }
+
+  .prevwrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; margin-bottom: 16px; }
+  table.prev { border-collapse: collapse; width: 100%; font-size: 12.5px; min-width: 480px; }
+  table.prev th, table.prev td { padding: 7px 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--line); }
+  table.prev th:first-child, table.prev td:first-child { text-align: left; color: #cfdde1; }
+  table.prev th { background: #0f1519; color: var(--dim); font-weight: 500; }
+  table.prev tr:last-child td { border-bottom: 0; }
+  .prevnote { font-size: 12px; color: #6f8089; margin: -10px 0 16px; }
+
+  .buy { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding-top: 14px; border-top: 1px solid var(--line); }
+  .price { font-size: 22px; font-weight: 700; color: #fff; }
+  .price small { font-size: 12px; font-weight: 400; color: var(--dim); margin-left: 4px; }
+  .btn {
+    display: inline-block; padding: 9px 20px; border-radius: 9px;
+    background: linear-gradient(135deg, var(--accent) 0%, #17b795 100%);
+    color: #06231c; font-weight: 700; font-size: 14px; border: 0; cursor: pointer;
+  }
+  .btn:hover { text-decoration: none; filter: brightness(1.06); }
+  .owned-box { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 13.5px; }
+  .owned-tag { color: var(--accent); border: 1px solid rgba(35,211,176,.4); border-radius: 999px; padding: 2px 10px; font-size: 12px; }
+  .dl { display: inline-block; padding: 8px 16px; border-radius: 9px; border: 1px solid rgba(79,209,255,.45); color: var(--accent2); font-weight: 600; font-size: 13.5px; }
+  .dl:hover { background: rgba(79,209,255,.08); text-decoration: none; }
+  [hidden] { display: none !important; }
+
+  section.notes { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 24px; }
+  section.notes h2 { font-size: 16px; margin: 0 0 12px; }
+  section.notes dl { margin: 0; display: grid; gap: 14px; }
+  section.notes dt { color: #cfe0e4; font-weight: 600; font-size: 14px; }
+  section.notes dd { margin: 3px 0 0; color: var(--dim); font-size: 13.5px; }
+
+  footer { border-top: 1px solid var(--line); padding: 24px 20px 40px; text-align: center; color: #5f7079; font-size: 12.5px; }
+  footer a { color: #7f9199; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%);
+    background: #12331f; border: 1px solid rgba(35,211,176,.5); color: #b8ffe4;
+    padding: 10px 18px; border-radius: 10px; font-size: 13.5px; z-index: 50;
+  }
+  @media (min-width: 860px) {
+    .grid { grid-template-columns: 1fr 1fr; }
+    .card:first-child { grid-column: 1 / -1; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <div class="brand">SJQ <span>身体数据实验室</span></div>
+    <div class="nav-links">
+      <a href="../index.html">首页</a>
+      <a href="column.html" aria-current="page">专栏</a>
+      <a href="gene-lab.html">基因分析实验室</a>
+      <a href="fitness-calculator.html">体测计算器</a>
+      <a href="private-service.html">私人分析服务</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>专栏 · <em>数据集</em></h1>
+    <p>中国人群的父系、母系与常染色体结构，按省级与地级市整理成可直接使用的表格。全部为 xlsx，付款后本页立即出现下载按钮。</p>
+    <div class="meta">¥5 / 份 · 一次性付费 · 下载后可长期使用 · 文件在浏览器本地下载，不上传任何数据</div>
+  </div>
+
+  <div class="grid">
+
+    <article class="card" data-set="a">
+      <div class="card-top">
+        <span class="badge">数据集 A</span>
+        <span class="tag">xlsx · 3 个工作表</span>
+        <span class="tag">37 个省级单元</span>
+      </div>
+      <h3>中国省级基因图谱：父系 Y · 母系 mtDNA · 常染色体</h3>
+      <p class="sub">同一套省级样本口径下的三个维度，父系、母系、常染可以互相对照。</p>
+      <ul class="spec">
+        <li><b>省级 Y</b>：O2 / O1a / O1b / N / C / D / Q / R / J / E / 其他，共 11 类，含各省样本量</li>
+        <li><b>省级 mtDNA</b>：M 大支、M7-M10、D、C、G、Z、E、Q、N 大支、A、B、F、R、H 等 16 类</li>
+        <li><b>省级常染</b>：42 个族群成分占比（北方汉族、南方汉族、藏缅、傣、苗瑶、蒙古语族群、通古斯…）</li>
+      </ul>
+      <div class="prevwrap">
+        <table class="prev">
+          <thead><tr><th>省份</th><th>样本量</th><th>O2</th><th>O1a</th><th>O1b</th><th>N</th><th>C</th></tr></thead>
+          <tbody>
+            <tr><td>江苏省</td><td>843</td><td>53.9%</td><td>19.1%</td><td>6.3%</td><td>6.4%</td><td>9.1%</td></tr>
+            <tr><td>山东省</td><td>784</td><td>58.3%</td><td>4.7%</td><td>8.2%</td><td>6.9%</td><td>15.7%</td></tr>
+            <tr><td>浙江省</td><td>581</td><td>48.9%</td><td>26.5%</td><td>6.2%</td><td>7.7%</td><td>6.7%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="prevnote">上表为文件内「省级 Y」工作表的前 3 行实际数值预览。</p>
+      <div class="buy">
+        <div class="price">¥5<small>/ 份</small></div>
+        <a class="btn" data-buy href="https://buy.stripe.com/eVqcN73Qh0ANbJbd4v3ZK07" target="_blank" rel="noopener">购买并下载</a>
+        <span class="owned-box" data-owned hidden>
+          <span class="owned-tag">已解锁</span>
+          <a class="dl" data-file href="https://sjqlab.top/assets/data/column/cn-prov-y-mt-adm-2f7c.xlsx" download>下载 xlsx</a>
+        </span>
+      </div>
+    </article>
+
+    <article class="card" data-set="b">
+      <div class="card-top">
+        <span class="badge">数据集 B</span>
+        <span class="tag">xlsx · 4 个工作表</span>
+        <span class="tag">省级 + 民族 + 汉族</span>
+      </div>
+      <h3>中国 Y 染色体父系支系频率矩阵（省级 / 民族 / 汉族）</h3>
+      <p class="sub">一级大类可相加为 1，细分支系列单独给出，适合直接做堆叠图与聚类。</p>
+      <ul class="spec">
+        <li><b>省级矩阵</b>：32 行，NO / C / D / Q / R / 其他合计为 1，附「一级大类合计」校验列</li>
+        <li><b>民族矩阵</b>：82 行，含各民族检测人数，并附语系分组汇总行</li>
+        <li><b>汉族省级矩阵</b>：66 行，筛掉少数民族后的汉族口径</li>
+        <li><b>细分列</b>：N 总计、O 总计、O2-M122、O1a-M119、O1b-M268、C2a-L1373、C2b-F1067</li>
+      </ul>
+      <div class="prevwrap">
+        <table class="prev">
+          <thead><tr><th>省级地区</th><th>NO</th><th>C</th><th>D</th><th>Q</th><th>R</th><th>其他</th></tr></thead>
+          <tbody>
+            <tr><td>北京</td><td>77.25%</td><td>12.48%</td><td>2.04%</td><td>3.44%</td><td>2.56%</td><td>2.23%</td></tr>
+            <tr><td>天津</td><td>77.43%</td><td>13.39%</td><td>1.72%</td><td>3.80%</td><td>2.20%</td><td>1.46%</td></tr>
+            <tr><td>河北</td><td>78.20%</td><td>11.51%</td><td>1.78%</td><td>4.21%</td><td>2.41%</td><td>1.89%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="prevnote">上表为文件内「省级矩阵」工作表的前 3 行实际数值预览。附数据说明表一张。</p>
+      <div class="buy">
+        <div class="price">¥5<small>/ 份</small></div>
+        <a class="btn" data-buy href="https://buy.stripe.com/28E8wRgD3abn9B3d4v3ZK08" target="_blank" rel="noopener">购买并下载</a>
+        <span class="owned-box" data-owned hidden>
+          <span class="owned-tag">已解锁</span>
+          <a class="dl" data-file href="https://sjqlab.top/assets/data/column/cn-y-haplo-matrix-9d41.xlsx" download>下载 xlsx</a>
+        </span>
+      </div>
+    </article>
+
+    <article class="card" data-set="c">
+      <div class="card-top">
+        <span class="badge">数据集 C</span>
+        <span class="tag">xlsx · 335 行</span>
+        <span class="tag">31 个省级行政区</span>
+      </div>
+      <h3>中国地级市汉族祖源成分谱（335 市 × 12 成分）</h3>
+      <p class="sub">下到地级市粒度，适合做省内差异、南北过渡带、以及和 Y 单倍群做对照。</p>
+      <ul class="spec">
+        <li><b>粒度</b>：31 个省级行政区、335 个地级市，每行一个市</li>
+        <li><b>12 项成分</b>：北汉、南汉、藏缅、傣、苗瑶、朝鲜、蒙通、拉祜、维吾尔、日本、雅库特、布里亚特</li>
+        <li><b>校验</b>：每行带「合计」列，可直接核对求和</li>
+      </ul>
+      <div class="prevwrap">
+        <table class="prev">
+          <thead><tr><th>省</th><th>地级市</th><th>北汉</th><th>南汉</th><th>藏缅</th><th>傣</th><th>苗瑶</th><th>合计</th></tr></thead>
+          <tbody>
+            <tr><td>云南</td><td>曲靖市</td><td>44.55</td><td>32.19</td><td>10.95</td><td>2.68</td><td>3.37</td><td>99.10</td></tr>
+            <tr><td>云南</td><td>昆明市</td><td>36.37</td><td>36.09</td><td>13.60</td><td>3.53</td><td>3.67</td><td>99.16</td></tr>
+            <tr><td>云南</td><td>玉溪市</td><td>34.37</td><td>35.43</td><td>15.32</td><td>3.97</td><td>3.21</td><td>99.27</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="prevnote">上表为文件前 3 行的实际数值预览，完整表 335 行。</p>
+      <div class="buy">
+        <div class="price">¥5<small>/ 份</small></div>
+        <a class="btn" data-buy href="https://buy.stripe.com/bJecN7gD3fvHaF78Of3ZK09" target="_blank" rel="noopener">购买并下载</a>
+        <span class="owned-box" data-owned hidden>
+          <span class="owned-tag">已解锁</span>
+          <a class="dl" data-file href="https://sjqlab.top/assets/data/column/cn-pref-han-admix-6b58.xlsx" download>下载 xlsx</a>
+        </span>
+      </div>
+    </article>
+
+  </div>
+
+  <section class="notes">
+    <h2>购买与使用说明</h2>
+    <dl>
+      <dt>付款后怎么拿到文件</dt>
+      <dd>付款成功后会自动跳回本页，对应数据集的「购买」按钮会变成「下载 xlsx」，点一下即可。同一浏览器会记住解锁状态，之后回来可以重复下载。</dd>
+      <dt>文件格式</dt>
+      <dd>标准 xlsx，Excel / WPS / Numbers / Python(pandas) 都能直接打开。百分比在文件内为小数（0.539 = 53.9%），表头已注明。</dd>
+      <dt>数据口径</dt>
+      <dd>各数据集来源与统计口径不同，已在文件内用单独的工作表或说明页标注。不同数据集之间的数值不建议直接混用，混用前请先读说明页。</dd>
+      <dt>能不能退</dt>
+      <dd>数字商品，文件一经下载不支持退款。下载前可以先核对上面的预览表，确认口径符合你的用途。</dd>
+      <dt>范围说明</dt>
+      <dd>数据集为人群统计与坐标频率，用于研究、教学与可视化。不构成个体鉴定、亲缘认定或医学诊断。</dd>
+    </dl>
+  </section>
+</main>
+
+<footer>
+  © 2025 【SJQ】身体数据实验室 · <a href="privacy.html">隐私与统计说明</a>
+</footer>
+
+<script>
+(function () {
+  var CFG = {
+    a: { tok: "7c4e19b8a2d05f31" },
+    b: { tok: "3a91f6d2c47b08e5" },
+    c: { tok: "e5842bd1f9a736c0" }
+  };
+  var KEY = "sjq-col-sets";
+
+  function unlocked() {
+    try { return (localStorage.getItem(KEY) || "").split(",").filter(Boolean); } catch (e) { return []; }
+  }
+  function addSet(id) {
+    var cur = unlocked();
+    if (cur.indexOf(id) < 0) cur.push(id);
+    try { localStorage.setItem(KEY, cur.join(",")); } catch (e) {}
+  }
+  function render() {
+    var have = unlocked();
+    document.querySelectorAll("[data-set]").forEach(function (card) {
+      var id = card.getAttribute("data-set");
+      var on = have.indexOf(id) >= 0;
+      card.classList.toggle("owned", on);
+      var buy = card.querySelector("[data-buy]");
+      var own = card.querySelector("[data-owned]");
+      if (buy) buy.hidden = on;
+      if (own) own.hidden = !on;
+    });
+  }
+  function toast(msg) {
+    var d = document.createElement("div");
+    d.className = "toast";
+    d.textContent = msg;
+    document.body.appendChild(d);
+    setTimeout(function () { d.remove(); }, 4200);
+  }
+
+  // 支付回跳：?paid=5&set=a&k=token
+  (function handlePaid() {
+    var q = new URLSearchParams(location.search);
+    var set = q.get("set"), k = q.get("k"), paid = q.get("paid");
+    if (!set || !k || !paid) return;
+    if (!CFG[set] || CFG[set].tok !== k) return;         // 参数不对就不解锁
+    addSet(set);
+    var clean = location.pathname + location.search.replace(/([?&])(paid|set|k)=[^&]*&?/g, "$1").replace(/[?&]$/, "");
+    history.replaceState(null, "", clean);
+    setTimeout(function () { toast("支付已确认，可以下载「数据集 " + set.toUpperCase() + "」了"); }, 400);
+  })();
+
+  render();
+})();
+</script>
+
+</body>
+</html>
