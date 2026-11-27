@@ -304,6 +304,14 @@ html[data-theme="light"] .pay-section strong,
 html[data-theme="light"] .report-text strong { color: #111111; }
 
 html[data-theme="light"] .paid-report-price { color: #06713f; }
+
+/* 标题里高亮的那几个字原本是青蓝色，白底上几乎看不见 */
+html[data-theme="light"] .page-header h1 span,
+html[data-theme="light"] h1 span,
+html[data-theme="light"] h2 span,
+html[data-theme="light"] .section-title span { color: #0068b0; }
+html[data-theme="light"] .hero-name span,
+html[data-theme="light"] .hero-brand-text { color: transparent; }
 html[data-theme="light"] .paid-report-upsell {
   background: linear-gradient(135deg, rgba(0, 200, 110, 0.10), rgba(0, 120, 200, 0.08));
   border-color: rgba(0, 104, 176, 0.2);
