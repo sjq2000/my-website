@@ -314,8 +314,7 @@
     if (!set || !k || !paid) return;
     if (!CFG[set] || CFG[set].tok !== k) return;         // 参数不对就不解锁
     addSet(set);
-    var clean = location.pathname + location.search.replace(/([?&])(paid|set|k)=[^&]*&?/g, "$1").replace(/[?&]$/, "");
-    history.replaceState(null, "", clean);
+    history.replaceState(null, "", location.pathname);
     setTimeout(function () { toast("支付已确认，可以下载「数据集 " + set.toUpperCase() + "」了"); }, 400);
   })();
 
