@@ -311,6 +311,10 @@ html[data-theme="light"] .unit-btn { color: #333333; border-color: rgba(0, 0, 0,
 html[data-theme="light"] [class$="-label"] { color: #333333; }
 html[data-theme="light"] [class$="-meta"] { color: #444444; }
 html[data-theme="light"] .sample-tag { color: #056436; }
+html[data-theme="light"] .report-section {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+}
 html[data-theme="light"] a:not([class]) { color: #0068b0; }
 /* 有些链接把青蓝写死在 style="" 里，只能按属性选择器盖掉 */
 html[data-theme="light"] a[style*="#00bfff"] { color: #0068b0 !important; }
