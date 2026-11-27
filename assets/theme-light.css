@@ -22,6 +22,8 @@
   padding: 0;
   transition: border-color .2s, color .2s, background .2s;
   font-family: Arial, "Segoe UI Symbol", sans-serif;
+  order: 99;
+  flex: 0 0 auto;
 }
 .theme-toggle:hover {
   border-color: rgba(0, 191, 255, 0.5);
