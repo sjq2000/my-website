@@ -240,6 +240,26 @@ html[data-theme="light"] .toast {
   color: #0a5e3a;
 }
 
+/* ---------- 访问统计偏好（页面底部提示） ---------- */
+html[data-theme="light"] .sjq-analytics-choice {
+  background: #fffdf7 !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  color: #2b2723 !important;
+  box-shadow: 0 14px 34px rgba(60, 50, 35, 0.16);
+}
+html[data-theme="light"] .sjq-analytics-choice * { color: #2b2723 !important; }
+html[data-theme="light"] .sjq-analytics-choice button,
+html[data-theme="light"] .sjq-analytics-choice a {
+  background: #f2ece0 !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  color: #2b2723 !important;
+}
+html[data-theme="light"] .sjq-analytics-settings {
+  background: #fffdf7 !important;
+  border-color: rgba(0, 0, 0, 0.14) !important;
+  color: #4e4840 !important;
+}
+
 /* ---------- 页脚 ---------- */
 html[data-theme="light"] footer {
   border-top-color: rgba(0, 0, 0, 0.07);

@@ -43,8 +43,8 @@
       apply(next);
     });
     var links = nav.querySelector(".nav-links");
-    if (links && links.parentNode === nav) nav.insertBefore(btn, links);
-    else nav.appendChild(btn);
+    // 放到导航最右侧（语言切换按钮之前/之后都可以，靠右即可）
+    nav.appendChild(btn);
     apply(read());
   }
 
