@@ -1,0 +1,191 @@
+/* ==========================================================================
+   SJQ 主题：基因分析实验室（gene-lab.html）日间模式
+   这个页面自己用了一套 :root 变量 + 大量写死的深色，所以单独补一层。
+   ========================================================================== */
+
+/* 变量层：一次覆盖大部分用 var() 的地方 */
+html[data-theme="light"] {
+  --bg: #f7f2e8;
+  --panel: #ffffff;
+  --panel-soft: rgba(0, 0, 0, 0.035);
+  --line: rgba(0, 104, 176, 0.22);
+  --line-strong: rgba(0, 104, 176, 0.45);
+  --text: #111111;
+  --muted: #333333;
+  --cyan: #0a7a76;
+  --blue: #0068b0;
+  --green: #06713f;
+  --orange: #8a5200;
+  --danger: #b3253b;
+}
+
+html[data-theme="light"] body {
+  background: #f7f2e8;
+  color: #111111;
+}
+
+html[data-theme="light"] body::before,
+html[data-theme="light"] body::after { opacity: .35; }
+
+/* ---------- 页头 ---------- */
+html[data-theme="light"] .page-header p,
+html[data-theme="light"] .eyebrow { color: #444444; }
+html[data-theme="light"] .status-pill {
+  background: rgba(10, 157, 92, 0.1);
+  color: #056436;
+  border-color: rgba(10, 157, 92, 0.3);
+}
+html[data-theme="light"] .status-pill.secondary {
+  background: rgba(0, 104, 176, 0.07);
+  color: #005c9c;
+  border-color: rgba(0, 104, 176, 0.22);
+}
+
+/* ---------- 主容器 / 页签 ---------- */
+html[data-theme="light"] .lab-shell {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(90, 75, 50, 0.08);
+}
+html[data-theme="light"] .tab-list {
+  background: #f2ece0;
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+html[data-theme="light"] .tab-button {
+  background: transparent;
+  color: #333333;
+  border-right-color: rgba(0, 0, 0, 0.06);
+}
+html[data-theme="light"] .tab-button:hover {
+  color: #0068b0;
+  background: rgba(0, 104, 176, 0.06);
+}
+html[data-theme="light"] .tab-button.active {
+  background: #0068b0;
+  color: #ffffff;
+}
+html[data-theme="light"] .tab-panel { background: transparent; }
+
+/* ---------- 步骤 / 说明块 ---------- */
+html[data-theme="light"] .step {
+  background: #faf6ee;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+html[data-theme="light"] .step p,
+html[data-theme="light"] .panel-head p { color: #333333; }
+html[data-theme="light"] .note {
+  background: rgba(255, 189, 106, 0.14);
+  color: #4a3a20;
+  border-left-color: #b07400;
+}
+html[data-theme="light"] .format-example {
+  background: #f2ece0;
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #222222;
+}
+
+/* ---------- 表单控件 ---------- */
+html[data-theme="light"] button,
+html[data-theme="light"] select,
+html[data-theme="light"] input,
+html[data-theme="light"] textarea {
+  color: #111111;
+  background-color: #ffffff;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+html[data-theme="light"] select option { background: #ffffff; color: #111111; }
+html[data-theme="light"] .btn {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.18);
+  color: #111111;
+}
+html[data-theme="light"] .btn:hover { background: #f2ece0; }
+html[data-theme="light"] .btn.primary {
+  background: linear-gradient(135deg, #0a8fd8, #0068b0);
+  color: #ffffff;
+  border-color: transparent;
+}
+html[data-theme="light"] .btn.ghost {
+  background: #f7f2e8;
+  color: #222222;
+  border-color: rgba(0, 0, 0, 0.14);
+}
+html[data-theme="light"] .btn.danger {
+  background: rgba(179, 37, 59, 0.08);
+  color: #a3223a;
+  border-color: rgba(179, 37, 59, 0.3);
+}
+
+/* ---------- 结果表格 ---------- */
+html[data-theme="light"] .result-card {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+html[data-theme="light"] .result-head {
+  background: #f2ece0;
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+html[data-theme="light"] .result-head span { color: #444444; }
+html[data-theme="light"] .result-table th { color: #333333; background: #f7f2e8; }
+html[data-theme="light"] .result-table th,
+html[data-theme="light"] .result-table td { border-bottom-color: rgba(0, 0, 0, 0.08); color: #111111; }
+html[data-theme="light"] .result-table td:first-child { color: #333333; }
+html[data-theme="light"] .multi-table th {
+  background: #f2ece0;
+  color: #333333;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+html[data-theme="light"] .multi-table th:first-child,
+html[data-theme="light"] .multi-table td:first-child {
+  background: #f7f2e8;
+  color: #111111;
+}
+html[data-theme="light"] .multi-table td {
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #111111;
+}
+
+/* ---------- 弹窗 / 付费窗 ---------- */
+html[data-theme="light"] .modal-mask {
+  background: rgba(60, 50, 35, 0.55);
+}
+html[data-theme="light"] .paywall {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+}
+html[data-theme="light"] .paywall-title { color: #7a5200; }
+html[data-theme="light"] .paywall-sub { color: #444444; }
+html[data-theme="light"] .paywall-credit {
+  color: #005c9c;
+  background: rgba(0, 104, 176, 0.08);
+  border-color: rgba(0, 104, 176, 0.28);
+}
+
+/* ---------- 访问码闸门 ---------- */
+html[data-theme="light"] .access-gate {
+  background: radial-gradient(circle at 50% 18%, rgba(10, 157, 92, 0.10), transparent 34%),
+              linear-gradient(145deg, #f7f2e8, #f2ece0 56%, #efe8da);
+}
+html[data-theme="light"] .access-card {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 18px 44px rgba(90, 75, 50, 0.14);
+}
+html[data-theme="light"] .access-card > p { color: #333333; }
+html[data-theme="light"] .access-card h1,
+html[data-theme="light"] .access-card h1 span { color: #0a7a76; }
+
+/* ---------- 杂项 ---------- */
+html[data-theme="light"] .chip,
+html[data-theme="light"] .badge,
+html[data-theme="light"] .tag {
+  background: rgba(0, 104, 176, 0.08);
+  color: #005c9c;
+  border-color: rgba(0, 104, 176, 0.25);
+}
+html[data-theme="light"] code,
+html[data-theme="light"] pre {
+  background: #f2ece0;
+  color: #1f1f1f;
+  border-color: rgba(0, 0, 0, 0.1);
+}

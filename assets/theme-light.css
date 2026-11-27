@@ -336,6 +336,7 @@ html[data-theme="light"] .paid-report-upsell {
 html[data-theme="light"] .hero-brand-mark {
   background: linear-gradient(135deg, #0a7fd0, #00539e) !important;
   color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
   box-shadow: 0 8px 22px rgba(0, 104, 176, 0.22);
 }
 html[data-theme="light"] option { background: #ffffff; color: #111111; }
