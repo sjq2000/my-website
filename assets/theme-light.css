@@ -272,6 +272,49 @@ html[data-theme="light"] .sjq-analytics-settings {
   color: #333333 !important;
 }
 
+/* ---------- 内页里原本写死为浅色的文字统一压深 ---------- */
+html[data-theme="light"] .page-header h1,
+html[data-theme="light"] .page-header p,
+html[data-theme="light"] .card h3,
+html[data-theme="light"] .input-group label,
+html[data-theme="light"] .report strong,
+html[data-theme="light"] th,
+html[data-theme="light"] td,
+html[data-theme="light"] td:first-child,
+html[data-theme="light"] .pay-title,
+html[data-theme="light"] .price-tag,
+html[data-theme="light"] .stat-value,
+html[data-theme="light"] .step-num,
+html[data-theme="light"] .paid-report-title,
+html[data-theme="light"] .paid-report-subtitle,
+html[data-theme="light"] .paid-report-item,
+html[data-theme="light"] .sample-header h2,
+html[data-theme="light"] .report-section h3,
+html[data-theme="light"] .report-section p,
+html[data-theme="light"] .locked-preview,
+html[data-theme="light"] .ability-row,
+html[data-theme="light"] .body-type-cell strong,
+html[data-theme="light"] .generated-list div,
+html[data-theme="light"] .growth-chart-title,
+html[data-theme="light"] .growth-assessment h2,
+html[data-theme="light"] .growth-assessment p,
+html[data-theme="light"] .progress-title,
+html[data-theme="light"] .pay-section p,
+html[data-theme="light"] .pay-section strong,
+html[data-theme="light"] .report-text strong { color: #111111; }
+
+html[data-theme="light"] .paid-report-price { color: #06713f; }
+html[data-theme="light"] .paid-report-upsell {
+  background: linear-gradient(135deg, rgba(0, 200, 110, 0.10), rgba(0, 120, 200, 0.08));
+  border-color: rgba(0, 104, 176, 0.2);
+}
+html[data-theme="light"] .hero-brand-mark {
+  background: linear-gradient(135deg, #0a7fd0, #00539e) !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 22px rgba(0, 104, 176, 0.22);
+}
+html[data-theme="light"] option { background: #ffffff; color: #111111; }
+
 /* ---------- 页脚 ---------- */
 html[data-theme="light"] footer {
   border-top-color: rgba(0, 0, 0, 0.1);
