@@ -75,13 +75,16 @@ async function loadLibrary() {
   const data = await res.json();
   state.sources = data.sources || [];
   const flat = [];
+  const seen = new Set();
   for (const s of state.sources) {
     for (const row of s.rows) {
       const name = row[0];
       const v = row.slice(1, 26).map(Number);
-      if (v.length === 25 && v.every((x) => Number.isFinite(x))) {
-        flat.push({ name, v, src: s.id, srcLabel: s.label });
-      }
+      if (v.length !== 25 || !v.every((x) => Number.isFinite(x))) continue;
+      const key = name;   // 同名只保留第一条（跨来源也去重）
+      if (seen.has(key)) continue;
+      seen.add(key);
+      flat.push({ name, v, src: s.id, srcLabel: s.label });
     }
   }
   state.lib = flat;
