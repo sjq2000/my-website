@@ -362,14 +362,15 @@ html[data-theme="light"] .scroll-indicator span {
 
 /* 导航「项目 ▾」：去掉会变成小方块的下划线伪元素，只留一个纯文本三角 */
 .nav-dropdown > a::after {
-  content: "\25BE";
-  position: static;
-  display: inline-block;
-  width: auto;
-  height: auto;
-  bottom: auto;
-  left: auto;
-  background: none;
+  content: "\25BE" !important;
+  position: static !important;
+  display: inline-block !important;
+  width: auto !important;
+  height: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  background: transparent !important;
+  border: 0 !important;
   margin-left: 5px;
   font-size: 9px;
   line-height: 1;
