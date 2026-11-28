@@ -353,3 +353,49 @@ html[data-theme="light"] .scroll-indicator span {
   border-right-color: #0068b0;
   border-bottom-color: #0068b0;
 }
+
+/* ==========================================================================
+   以下为「不分主题」的公共修补
+   ========================================================================== */
+
+/* 付费升级块：不再通栏，和正文容器同宽居中 */
+.paid-report-upsell {
+  max-width: 880px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* 导航「项目 ▾」：去掉会变成小方块的下划线伪元素，只留一个纯文本三角 */
+.nav-dropdown > a::after {
+  content: "\25BE";
+  position: static;
+  display: inline-block;
+  width: auto;
+  height: auto;
+  bottom: auto;
+  left: auto;
+  background: none;
+  margin-left: 5px;
+  font-size: 9px;
+  line-height: 1;
+  vertical-align: 1px;
+}
+.nav-dropdown > a:hover::after { width: auto; }
+
+/* 中英文切换：日间模式用浅色药丸，和整体一致 */
+html[data-theme="light"] .sjq-language-switcher {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.14) !important;
+  box-shadow: none;
+}
+html[data-theme="light"] .sjq-language-switcher button {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  color: #333333 !important;
+}
+html[data-theme="light"] .sjq-language-switcher button.active,
+html[data-theme="light"] .sjq-language-switcher button[aria-pressed="true"] {
+  color: #0068b0 !important;
+  background: rgba(0, 104, 176, 0.08) !important;
+  border-color: rgba(0, 104, 176, 0.3) !important;
+}

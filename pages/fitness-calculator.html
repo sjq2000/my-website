@@ -495,6 +495,23 @@
       margin: 0 auto; padding: 0 30px; min-height: 40px;
       font-size: 14px; border-radius: 8px;
     }
+
+    /* ==== 一行三个项目 ==== */
+    .page-container { max-width: 1040px; }
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .calc-grid .calc-item { margin-bottom: 0; padding: 18px; }
+    .calc-grid .calc-item h3 { font-size: 15px; margin-bottom: 10px; }
+    .calc-grid .calc-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .calc-grid .calc-row input { min-width: 0; width: 100%; padding: 10px 12px; font-size: 14px; }
+    .calc-grid .calc-row button { width: 100%; padding: 10px 12px; }
+    .paid-report-upsell { max-width: 992px; }
+    @media (max-width: 900px) { .calc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 600px) { .calc-grid { grid-template-columns: 1fr; } }
 </style>
   <script>
     // Normal distribution CDF
@@ -526,8 +543,8 @@
       document.getElementById(outputId).textContent = result;
     }
   </script>
-  <link rel="stylesheet" href="../assets/theme-light.css?v=13">
-  <script src="../assets/theme.js?v=13"></script>
+  <link rel="stylesheet" href="../assets/theme-light.css?v=14">
+  <script src="../assets/theme.js?v=14"></script>
 </head>
 <body>
 
@@ -565,104 +582,107 @@
       <p class="source">*数据来源：《2019中国学生体质与健康调研报告》&nbsp;·&nbsp;具体百分位因地区不同有细微差异</p>
     </div>
     <!-- Calculator Items -->
-    <div class="calc-item">
-      <h3>📏 身高（cm）</h3>
-      <div class="calc-row">
-        <input type="number" id="height" placeholder="请输入您的身高">
-        <button onclick="calculateScore('height', 'heightResult', 173.14, 6.34)">计算</button>
+    <div class="calc-grid">
+      <div class="calc-item">
+        <h3>📏 身高（cm）</h3>
+        <div class="calc-row">
+          <input type="number" id="height" placeholder="请输入您的身高">
+          <button onclick="calculateScore('height', 'heightResult', 173.14, 6.34)">计算</button>
+        </div>
+        <div class="calc-result" id="heightResult"></div>
       </div>
-      <div class="calc-result" id="heightResult"></div>
+
+      <div class="calc-item">
+        <h3>⚖️ 体重（kg）</h3>
+        <div class="calc-row">
+          <input type="number" id="weight" placeholder="请输入您的体重">
+          <button onclick="calculateScore('weight', 'weightResult', 67.7, 10.5)">计算</button>
+        </div>
+        <div class="calc-result" id="weightResult"></div>
+      </div>
+
+      <div class="calc-item">
+        <h3>🫁 肺活量（ml）</h3>
+        <div class="calc-row">
+          <input type="number" id="lungCapacity" placeholder="请输入您的肺活量">
+          <button onclick="calculateScore('lungCapacity', 'lungCapacityResult', 4063.4, 814.7)">计算</button>
+        </div>
+        <div class="calc-result" id="lungCapacityResult"></div>
+      </div>
+
+      <div class="calc-item">
+        <h3>💪 胸围（cm）</h3>
+        <div class="calc-row">
+          <input type="number" id="chest" placeholder="请输入您的胸围">
+          <button onclick="calculateScore('chest', 'chestResult', 87.75, 7.91)">计算</button>
+        </div>
+        <div class="calc-result" id="chestResult"></div>
+      </div>
+
+      <div class="calc-item">
+        <h3>📐 腰围（cm）</h3>
+        <div class="calc-row">
+          <input type="number" id="waist" placeholder="请输入您的腰围">
+          <button onclick="calculateScore('waist', 'waistResult', 77.71, 10.04)">计算</button>
+        </div>
+        <div class="calc-result" id="waistResult"></div>
+      </div>
+
+      <div class="calc-item">
+        <h3>📐 臀围（cm）</h3>
+        <div class="calc-row">
+          <input type="number" id="hip" placeholder="请输入您的臀围">
+          <button onclick="calculateScore('hip', 'hipResult', 93.63, 7.93)">计算</button>
+        </div>
+        <div class="calc-result" id="hipResult"></div>
+      </div>
+
+      <div class="calc-item">
+        <h3>⚡ 50米跑（秒）</h3>
+        <div class="calc-row">
+          <input type="number" id="sprint50" placeholder="请输入您的50米跑成绩">
+          <button onclick="calculateScore('sprint50', 'sprint50Result', 7.52, 0.62, true)">计算</button>
+        </div>
+        <div class="calc-result" id="sprint50Result"></div>
+      </div>
+
+      <div class="calc-item">
+        <h3>🦘 立定跳远（cm）</h3>
+        <div class="calc-row">
+          <input type="number" id="score" placeholder="请输入您的立定跳远成绩">
+          <button onclick="calculateScore('score', 'result', 219.8, 23.3)">计算</button>
+        </div>
+        <div class="calc-result" id="result"></div>
+      </div>
+
+      <div class="calc-item">
+        <h3>✊ 握力（kg）</h3>
+        <div class="calc-row">
+          <input type="number" id="grip" placeholder="请输入您的握力值">
+          <button onclick="calculateScore('grip', 'gripResult', 41.83, 8.22)">计算</button>
+        </div>
+        <div class="calc-result" id="gripResult"></div>
+      </div>
+
+      <div class="calc-item">
+        <h3>🏃 1000米跑（秒）</h3>
+        <div class="calc-row">
+          <input type="number" id="runTime" placeholder="请输入您的1000米跑成绩">
+          <button onclick="calculateScore('runTime', 'runResult', 274.25, 42.94, true)">计算</button>
+        </div>
+        <div class="calc-result" id="runResult"></div>
+      </div>
+
+      <div class="calc-item">
+        <h3>🏆 体测总分</h3>
+        <div class="calc-row">
+          <input type="number" id="totalScore" placeholder="请输入您的体测总分">
+          <button onclick="calculateScore('totalScore', 'totalScoreResult', 64, 9.55)">计算</button>
+        </div>
+        <div class="calc-result" id="totalScoreResult"></div>
+      </div>
     </div>
 
-    <div class="calc-item">
-      <h3>⚖️ 体重（kg）</h3>
-      <div class="calc-row">
-        <input type="number" id="weight" placeholder="请输入您的体重">
-        <button onclick="calculateScore('weight', 'weightResult', 67.7, 10.5)">计算</button>
-      </div>
-      <div class="calc-result" id="weightResult"></div>
-    </div>
-
-    <div class="calc-item">
-      <h3>🫁 肺活量（ml）</h3>
-      <div class="calc-row">
-        <input type="number" id="lungCapacity" placeholder="请输入您的肺活量">
-        <button onclick="calculateScore('lungCapacity', 'lungCapacityResult', 4063.4, 814.7)">计算</button>
-      </div>
-      <div class="calc-result" id="lungCapacityResult"></div>
-    </div>
-
-    <div class="calc-item">
-      <h3>💪 胸围（cm）</h3>
-      <div class="calc-row">
-        <input type="number" id="chest" placeholder="请输入您的胸围">
-        <button onclick="calculateScore('chest', 'chestResult', 87.75, 7.91)">计算</button>
-      </div>
-      <div class="calc-result" id="chestResult"></div>
-    </div>
-
-    <div class="calc-item">
-      <h3>📐 腰围（cm）</h3>
-      <div class="calc-row">
-        <input type="number" id="waist" placeholder="请输入您的腰围">
-        <button onclick="calculateScore('waist', 'waistResult', 77.71, 10.04)">计算</button>
-      </div>
-      <div class="calc-result" id="waistResult"></div>
-    </div>
-
-    <div class="calc-item">
-      <h3>📐 臀围（cm）</h3>
-      <div class="calc-row">
-        <input type="number" id="hip" placeholder="请输入您的臀围">
-        <button onclick="calculateScore('hip', 'hipResult', 93.63, 7.93)">计算</button>
-      </div>
-      <div class="calc-result" id="hipResult"></div>
-    </div>
-
-    <div class="calc-item">
-      <h3>⚡ 50米跑（秒）</h3>
-      <div class="calc-row">
-        <input type="number" id="sprint50" placeholder="请输入您的50米跑成绩">
-        <button onclick="calculateScore('sprint50', 'sprint50Result', 7.52, 0.62, true)">计算</button>
-      </div>
-      <div class="calc-result" id="sprint50Result"></div>
-    </div>
-
-    <div class="calc-item">
-      <h3>🦘 立定跳远（cm）</h3>
-      <div class="calc-row">
-        <input type="number" id="score" placeholder="请输入您的立定跳远成绩">
-        <button onclick="calculateScore('score', 'result', 219.8, 23.3)">计算</button>
-      </div>
-      <div class="calc-result" id="result"></div>
-    </div>
-
-    <div class="calc-item">
-      <h3>✊ 握力（kg）</h3>
-      <div class="calc-row">
-        <input type="number" id="grip" placeholder="请输入您的握力值">
-        <button onclick="calculateScore('grip', 'gripResult', 41.83, 8.22)">计算</button>
-      </div>
-      <div class="calc-result" id="gripResult"></div>
-    </div>
-
-    <div class="calc-item">
-      <h3>🏃 1000米跑（秒）</h3>
-      <div class="calc-row">
-        <input type="number" id="runTime" placeholder="请输入您的1000米跑成绩">
-        <button onclick="calculateScore('runTime', 'runResult', 274.25, 42.94, true)">计算</button>
-      </div>
-      <div class="calc-result" id="runResult"></div>
-    </div>
-
-    <div class="calc-item">
-      <h3>🏆 体测总分</h3>
-      <div class="calc-row">
-        <input type="number" id="totalScore" placeholder="请输入您的体测总分">
-        <button onclick="calculateScore('totalScore', 'totalScoreResult', 64, 9.55)">计算</button>
-      </div>
-      <div class="calc-result" id="totalScoreResult"></div>
-    </div>
   </div>
 
 
