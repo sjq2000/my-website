@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>基因实验室 2 · DNA 分析工作台</title>
+<link rel="stylesheet" href="styles.css?v=4">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><span class="brand-mark">GL2</span><span class="brand-text">基因实验室 2</span><span class="beta">beta</span></div>
+
+  <button class="sample-chip" id="sampleChip" title="切换样本">
+    <span class="dot"></span>
+    <span class="sample-name" id="sampleName">未载入样本</span>
+    <span class="chev">▾</span>
+  </button>
+
+  <div class="spacer"></div>
+
+  <div class="plan-badge" id="planBadge">FREE</div>
+  <button class="icon-btn" id="langBtn" title="语言">EN</button>
+  <button class="icon-btn" id="themeBtn" title="主题">☀</button>
+  <button class="cta-btn" id="upgradeBtn">升级</button>
+</header>
+
+<div class="shell">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="view" id="view"></main>
+</div>
+
+<div class="modal-mask" id="modalMask" hidden>
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h3 id="modalTitle">选择样本</h3>
+      <button class="icon-btn" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="app.js?v=4"></script>
+</body>
+</html>
