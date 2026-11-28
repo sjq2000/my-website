@@ -358,12 +358,7 @@ html[data-theme="light"] .scroll-indicator span {
    以下为「不分主题」的公共修补
    ========================================================================== */
 
-/* 付费升级块：不再通栏，和正文容器同宽居中 */
-.paid-report-upsell {
-  max-width: 880px;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
+/* 付费升级块宽度：改由各页面自己声明（见页面内 style） */
 
 /* 导航「项目 ▾」：去掉会变成小方块的下划线伪元素，只留一个纯文本三角 */
 .nav-dropdown > a::after {
