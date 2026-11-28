@@ -29,6 +29,7 @@ const I18N = {
     load: "载入", clear: "清空", save: "保存", delete: "删除",
     savedEmpty: "还没有保存的样本", sampleLoaded: "已载入", notEnough: "至少要 25 个数字",
     langBtn: "EN", themeBtn: "☀", proHint: "已解锁",
+    unlock: "解锁报告",
     fit: "拟合度", residual: "残差", other: "其他",
     srcOwn: "上传自己的 G25 坐标", srcOwnHint: "已有 25 维坐标？直接粘贴或选文件",
     srcEst: "祖源估算", srcEstHint: "没有坐标？按祖先来源人群估算",
@@ -60,6 +61,7 @@ const I18N = {
     load: "Load", clear: "Clear", save: "Save", delete: "Delete",
     savedEmpty: "No saved samples yet", sampleLoaded: "Loaded", notEnough: "need at least 25 numbers",
     langBtn: "中文", themeBtn: "☾", proHint: "Unlocked",
+    unlock: "Unlock report",
     fit: "Fit", residual: "Residual", other: "Other",
     srcOwn: "Upload your own G25 coordinates", srcOwnHint: "Already have 25 values? Paste or pick a file",
     srcEst: "Ancestry estimate", srcEstHint: "No coordinates? Estimate from ancestral populations",
@@ -406,7 +408,7 @@ function heatmapCard(preview) {
     ? "补一张国家中心点表 → Canvas 画世界地图 → 按距离着色 → 图例 0–20 / 导出 PNG → 之后做 3D 球"
     : "country centroids → canvas world map → colour by distance → legend 0–20 / export PNG → 3D globe");
   card.appendChild(ph);
-  if (preview && state.plan !== "pro") card.appendChild(paywallLine(t.unlockHeatmap, t.unlockAll));
+  if (preview && state.plan !== "pro") card.appendChild(paywallLine(t.unlockHeatmap, t.unlock));
   return card;
 }
 
@@ -431,7 +433,7 @@ function viewDashboard() {
 
   // 2) 成分拆解
   wrap.appendChild(breakdownCard(true));
-  if (state.plan !== "pro") wrap.appendChild(paywallLine(t.unlockBreakdown, t.unlockAll));
+  if (state.plan !== "pro") wrap.appendChild(paywallLine(t.unlockBreakdown, t.unlock));
 
   // 3) 热力图
   wrap.appendChild(heatmapCard(true));
