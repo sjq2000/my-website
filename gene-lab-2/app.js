@@ -9,8 +9,8 @@ const LS = {
 const I18N = {
   zh: {
     dashboard: "总览", matches: "匹配", breakdown: "成分拆解", heatmap: "热力图",
-    upload: "上传 / 坐标", saved: "已保存样本",
-    sample: "样本", noSample: "未载入样本",
+    upload: "上传 / 坐标", saved: "已保存样本", demo: "示例样本",
+    sample: "样本", noSample: "未载入样本", loadDemo: "载入示例样本", demoLoaded: "已载入示例样本",
     upgrade: "升级", planFree: "FREE", planPro: "PRO",
     matchesTitle: "最接近的人群", matchesSub: "按 G25 欧氏距离排序，越小越接近",
     closest: "最接近", distance: "距离", tier: "接近度", rank: "#",
@@ -41,8 +41,8 @@ const I18N = {
   },
   en: {
     dashboard: "Dashboard", matches: "Matches", breakdown: "Breakdown", heatmap: "Heatmap",
-    upload: "Upload / Coordinates", saved: "Saved coordinates",
-    sample: "Sample", noSample: "No sample loaded",
+    upload: "Upload / Coordinates", saved: "Saved coordinates", demo: "Demo sample",
+    sample: "Sample", noSample: "No sample loaded", loadDemo: "Load demo sample", demoLoaded: "Demo sample loaded",
     upgrade: "Upgrade", planFree: "FREE", planPro: "PRO",
     matchesTitle: "Closest matches", matchesSub: "Ranked by G25 Euclidean distance",
     closest: "Closest", distance: "Distance", tier: "Proximity", rank: "#",
@@ -296,6 +296,11 @@ function renderSidebar() {
     nav.appendChild(b);
   }
   nav.appendChild(el("div", "nav-sep"));
+  const demoBtn = el("button", "nav-item");
+  demoBtn.innerHTML = '<span class="ico">✦</span><span>' + t.demo + "</span>";
+  demoBtn.onclick = loadDemo;
+  nav.appendChild(demoBtn);
+
   for (const [id, ico, label] of [["upload", "↑", t.upload], ["saved", "★", t.saved]]) {
     const b = el("button", "nav-item" + (state.view === id ? " active" : ""));
     b.innerHTML = '<span class="ico">' + ico + "</span><span>" + label + "</span>";
@@ -423,6 +428,11 @@ function viewDashboard() {
   if (!state.sample) {
     const c = el("div", "card");
     c.appendChild(el("div", "empty", t.noSample + " — " + t.upload));
+    const bDemo = el("button", "btn primary", t.loadDemo);
+    bDemo.onclick = loadDemo;
+    bDemo.style.margin = "0 auto";
+    bDemo.style.display = "block";
+    c.appendChild(bDemo);
     wrap.appendChild(c);
     return wrap;
   }
@@ -766,6 +776,16 @@ function pickForSlot(index) {
   setTimeout(() => search.focus(), 40);
 }
 
+const DEMO_PREFIX = "Han_Beijing_(Northern_China_Profile)";
+
+function loadDemo() {
+  if (!state.lib.length) return;
+  let p = state.lib.find((x) => x.name.indexOf(DEMO_PREFIX) === 0);
+  if (!p) p = state.lib.find((x) => x.src === "modern_worldgenetics") || state.lib[0];
+  loadSample({ name: p.name, v: p.v.slice(), src: p.src });
+  toast(T().demoLoaded);
+}
+
 function randomSample() {
   if (!state.lib.length) return;
   const p = state.lib[Math.floor(Math.random() * state.lib.length)];
@@ -835,6 +855,10 @@ function bind() {
     await Promise.all([loadLibrary(), loadModels()]);
     if (state.sample) { rank(); state.breakdown = breakdown(state.sample); }
     render();
+    if (!state.sample && !LS.get("gl2-seeded", false)) {
+      LS.set("gl2-seeded", true);
+      loadDemo();
+    }
   } catch (e) {
     $("#view").innerHTML = '<div class="card"><div class="empty">数据加载失败：' + e.message + "</div></div>";
   }
